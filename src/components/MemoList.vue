@@ -2287,6 +2287,25 @@ const getHistoryDotColor = (action) => {
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+  }
+  .modal-content {
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    border-radius: 0;
+  }
+  .modal-header, .modal-footer {
+    padding: 1rem;
+  }
+  .modal-body {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -2389,6 +2408,13 @@ const getHistoryDotColor = (action) => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
 }
 
 .detail-group {
