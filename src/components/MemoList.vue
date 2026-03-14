@@ -527,6 +527,7 @@ const getStatusColor = (status) => {
     case 'rejected': return 'status-rejected';
     case 'pending': return 'status-pending';
     case 'requested changes': return 'status-requested-changes';
+    case 'draft': return 'status-draft';
     default: return 'status-default';
   }
 };
@@ -594,6 +595,9 @@ const getActions = (memo) => {
   }
   if (memo.status === 'Requested Changes') {
     return ['view', 'update'];
+  }
+  if (memo.status === 'Draft') {
+    return ['view', 'edit', 'delete'];
   }
   return ['view']; // Default fallback
 };
@@ -893,10 +897,14 @@ const getHistoryDotColor = (action) => {
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-header-left">
-            <button v-if="isCreateMode" class="btn-back" @click="goBackToWizard">
+            <button v-if="isConfirming" class="btn-back" @click="cancelConfirmation">
               <ArrowLeft class="icon" />
             </button>
-            <h2 v-if="isCreateMode">New Memo Request</h2>
+            <button v-else-if="isCreateMode" class="btn-back" @click="goBackToWizard">
+              <ArrowLeft class="icon" />
+            </button>
+            <h2 v-if="isConfirming">Review Submission</h2>
+            <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
           </div>
           <button class="btn-close" @click="closeViewModal">
@@ -1483,12 +1491,13 @@ const getHistoryDotColor = (action) => {
           </div>
           
           <template v-if="isEditMode">
+            <div class="modal-actions-left">
+              <button class="btn-secondary" @click="closeViewModal">Cancel Request</button>
+            </div>
             <template v-if="isConfirming">
-              <button class="btn-secondary" @click="cancelConfirmation">Back to Edit</button>
-              <button class="btn-primary" @click="handleUpdate">Confirm & Submit</button>
+              <button class="btn-primary ml-auto" @click="handleUpdate">Confirm & Submit</button>
             </template>
             <template v-else>
-              <button class="btn-secondary" @click="closeViewModal">Cancel</button>
               <button class="btn-draft ml-auto mr-2" @click="handleSaveDraft">Save Draft</button>
               <button class="btn-primary" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo' }}</button>
             </template>
@@ -1651,6 +1660,7 @@ const getHistoryDotColor = (action) => {
 .status-rejected { background: #fee2e2; color: #b91c1c; }
 .status-pending { background: #f1f5f9; color: #64748b; } /* Switched to Gray */
 .status-requested-changes { background: #fef9c3; color: #854d0e; } /* Yellow/Amber remains correct */
+.status-draft { background: #e0f2fe; color: #0369a1; }
 .status-default { background: #f1f5f9; color: #475569; }
 
 /* Compact Approver Chain */

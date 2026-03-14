@@ -507,5 +507,39 @@ export const mockMemos = [
     history: [
       { at: "2026-03-04T16:00:00Z", action: "Created", user: "Tyrell Wellick", note: "Migration to Slate." }
     ]
+  },
+  {
+    id: 22,
+    title: "Draft: Q2 Hardware Refresh Proposal",
+    description: "Initial thoughts on the hardware upgrades needed for the dev team in Q2. Need to verify pricing with GA.",
+    category: "Operational",
+    categoryType: "Infrastructure Change",
+    department: "Engineering",
+    createdAt: "2026-03-14T10:00:00Z",
+    requester: "Tyrell Wellick",
+    status: "Draft",
+    approvalChain: [],
+    attachmentsCount: 0,
+    memoNumber: "ENG-DRAFT-001",
+    history: [
+      { at: "2026-03-14T10:00:00Z", action: "Draft Created", user: "Tyrell Wellick", note: "Working on budget details." }
+    ]
+  },
+  {
+    id: 23,
+    title: "Draft: New API Authentication Spec",
+    description: "Drafting the transition from API keys to OAuth2.1 for all internal services.",
+    category: "Technical",
+    categoryType: "Infrastructure Change",
+    department: "Engineering",
+    createdAt: "2026-03-14T15:30:00Z",
+    requester: "Tyrell Wellick",
+    status: "Draft",
+    approvalChain: [],
+    attachmentsCount: 1,
+    memoNumber: "ENG-DRAFT-002",
+    history: [
+      { at: "2026-03-14T15:30:00Z", action: "Draft Created", user: "Tyrell Wellick", note: "Need to consult with Security first." }
+    ]
   }
 ];

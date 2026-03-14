@@ -37,13 +37,23 @@ const handleFilterChange = (newFilters) => {
 const pageTitle = computed(() => {
   if (activeTab.value === 'my_memos') return 'My Memos';
   if (activeTab.value === 'pending_approval') return 'Pending Approval';
+  if (activeTab.value === 'drafts') return 'Draft Memos';
   return 'All eMemos';
 });
 
 const pageDescription = computed(() => {
   if (activeTab.value === 'my_memos') return 'Memos created by you.';
   if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
+  if (activeTab.value === 'drafts') return 'Memos you have saved but not yet submitted.';
   return 'A simple overview of all memorandums in the system.';
+});
+
+const pendingCount = computed(() => {
+  return memos.value.filter(m => {
+    return m.approvalChain.some(tier => 
+      tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
+    );
+  }).length;
 });
 
 const filteredMemos = computed(() => {
@@ -57,11 +67,13 @@ const filteredMemos = computed(() => {
         tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
       );
     });
+  } else if (activeTab.value === 'drafts') {
+    result = result.filter(m => m.requester === currentUser && m.status === 'Draft');
   } else if (activeTab.value === 'all') {
-    // Show self + subordinates
+    // Show self + subordinates (excluding drafts of subordinates usually, but here we show all non-drafts)
     const subordinateNames = subordinates.map(s => s.name);
     const hierarchy = [currentUser, ...subordinateNames];
-    result = result.filter(m => hierarchy.includes(m.requester));
+    result = result.filter(m => hierarchy.includes(m.requester) && m.status !== 'Draft');
   }
 
   return result.filter(memo => {
@@ -161,6 +173,13 @@ const toggleMenu = () => {
           @click="activeTab = 'pending_approval'"
         >
           Pending Approval
+          <span v-if="pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
+        </button>
+        <button 
+          :class="['tab-btn', { active: activeTab === 'drafts' }]"
+          @click="activeTab = 'drafts'"
+        >
+          Drafts
         </button>
       </div>
 
@@ -277,6 +296,22 @@ const toggleMenu = () => {
 .tab-btn.active {
   color: #0f172a;
   border-bottom-color: #3b82f6;
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
 }
 
 .list-wrapper {
