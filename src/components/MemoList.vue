@@ -579,13 +579,20 @@ const getStatusIcon = (status) => {
 const getApprovalProgress = (memo) => {
   if (memo.status === 'Draft') return 0;
   if (memo.status === 'Approved') return 100;
-  if (memo.status === 'Rejected') return 100;
   
-  const total = memo.approvalChain.length;
-  if (total === 0) return 100;
+  const total = memo.approvalChain?.length || 0;
+  if (total === 0) return memo.status === 'Approved' ? 100 : 0;
   
   const approved = memo.approvalChain.filter(tier => tier.status === 'Approved').length;
   return Math.round((approved / total) * 100);
+};
+
+const getProgressLabel = (memo) => {
+  if (memo.status === 'Draft') return 'Draft';
+  if (memo.status === 'Approved') return '100% Approved';
+  if (memo.status === 'Rejected') return 'Rejected';
+  if (memo.status === 'Requested Changes') return 'Changes Requested';
+  return `${getApprovalProgress(memo)}% Progress`;
 };
 
 const handleRemind = (memo) => {
@@ -732,9 +739,13 @@ const getHistoryDotColor = (action) => {
             <div class="memo-card-footer">
               <div class="progress-container" v-if="memo.status !== 'Draft'">
                 <div class="progress-bar-wrapper">
-                  <div class="progress-bar-fill" :style="{ width: getApprovalProgress(memo) + '%' }"></div>
+                  <div 
+                    class="progress-bar-fill" 
+                    :class="getStatusColor(memo.status)"
+                    :style="{ width: getApprovalProgress(memo) + '%' }"
+                  ></div>
                 </div>
-                <span class="progress-label">{{ getApprovalProgress(memo) }}% Approved</span>
+                <span class="progress-label">{{ getProgressLabel(memo) }}</span>
               </div>
               <div v-else class="draft-indicator">
                 <FileText class="icon-tiny text-slate-400" />
@@ -1486,6 +1497,9 @@ const getHistoryDotColor = (action) => {
                         <div class="tier-nodes">
                           <template v-for="(approver, approverIdx) in tier.approvers" :key="approverIdx">
                             <div class="approver-node-compact" :class="getStatusColor(approver.status)">
+                              <div class="node-icon-overlay">
+                                <component :is="getStatusIcon(approver.status)" class="node-mini-icon" />
+                              </div>
                               <span class="approver-initials">{{ approver.name.substring(0, 1) }}</span>
                               <div class="approver-tooltip">
                                 <div class="tooltip-name">{{ approver.name }}</div>
@@ -1780,10 +1794,15 @@ const getHistoryDotColor = (action) => {
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  background: #3b82f6;
   border-radius: 999px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.progress-bar-fill.status-approved { background: #10b981; }
+.progress-bar-fill.status-rejected { background: #ef4444; }
+.progress-bar-fill.status-requested-changes { background: #f59e0b; }
+.progress-bar-fill.status-pending { background: #3b82f6; }
 
 .progress-label {
   font-size: 0.7rem;
@@ -1968,28 +1987,28 @@ const getHistoryDotColor = (action) => {
   opacity: 0;
 }
 .approver-node-compact.status-approved {
-  box-shadow: 0 0 0 2px #10b981;
+  border-color: #10b981;
   background: #ecfdf5;
+  color: #059669;
 }
-.approver-node-compact.status-approved .approver-initials { color: #059669; }
 
 .approver-node-compact.status-rejected {
-  box-shadow: 0 0 0 2px #ef4444;
+  border-color: #ef4444;
   background: #fef2f2;
+  color: #dc2626;
 }
-.approver-node-compact.status-rejected .approver-initials { color: #dc2626; }
 
 .approver-node-compact.status-pending {
-  box-shadow: 0 0 0 2px #cbd5e1;
+  border-color: #cbd5e1;
   background: #f8fafc;
+  color: #64748b;
 }
-.approver-node-compact.status-pending .approver-initials { color: #64748b; }
 
 .approver-node-compact.status-requested-changes {
-  box-shadow: 0 0 0 2px #fde047;
-  background: #fef9c3;
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #d97706;
 }
-.approver-node-compact.status-requested-changes .approver-initials { color: #854d0e; }
 
 /* Tooltip */
 .approver-tooltip {
@@ -3619,6 +3638,51 @@ const getHistoryDotColor = (action) => {
   text-align: center;
   color: #94a3b8;
   font-size: 0.95rem;
+}
+
+.approver-node-compact {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  border: 2px solid #e2e8f0;
+}
+
+.approver-node-compact:hover {
+  transform: scale(1.1);
+  z-index: 20;
+}
+
+.approver-initials {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.node-icon-overlay {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  z-index: 5;
+  border: 1px solid currentColor;
+}
+
+.node-mini-icon {
+  width: 10px;
+  height: 10px;
 }
 </style>
 

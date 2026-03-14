@@ -13,6 +13,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Approved",
         requiredApprovals: 1,
         approvers: [
           { name: "Sarah Connor", role: "CMO", status: "Approved" }
@@ -21,6 +22,7 @@ export const mockMemos = [
       {
         tier: 2,
         type: "single",
+        status: "Pending",
         requiredApprovals: 1,
         approvers: [
           { name: "John Smith", role: "Finance Dir", status: "Pending" }
@@ -48,6 +50,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Approved",
         requiredApprovals: 1,
         approvers: [
           { name: "Alan Turing", role: "CTO", status: "Approved" }
@@ -75,6 +78,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "quorum",
+        status: "Pending",
         requiredApprovals: 2,
         approvers: [
           { name: "Michael Scott", role: "Regional Manager", status: "Approved" },
@@ -107,6 +111,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Rejected",
         requiredApprovals: 1,
         approvers: [
           { name: "Dwight Schrute", role: "Assistant Regional Manager", status: "Rejected" }
@@ -134,6 +139,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Approved",
         requiredApprovals: 1,
         approvers: [
           { name: "Elliot Alderson", role: "Security Engineer", status: "Approved" }
@@ -142,6 +148,7 @@ export const mockMemos = [
       {
         tier: 2,
         type: "quorum",
+        status: "Pending",
         requiredApprovals: 1,
         approvers: [
           { name: "Tyrell Wellick", role: "VP Tech", status: "Pending" },
@@ -170,6 +177,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Approved",
         requiredApprovals: 1,
         approvers: [
           { name: "Joanna Wellick", role: "Chief of Staff", status: "Approved" }
@@ -178,6 +186,7 @@ export const mockMemos = [
       {
         tier: 2,
         type: "single",
+        status: "Approved",
         requiredApprovals: 1,
         approvers: [
           { name: "Phillip Price", role: "CEO", status: "Approved" }
@@ -206,6 +215,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Pending",
         requiredApprovals: 1,
         approvers: [
           { name: "Gideon Goddard", role: "IT Manager", status: "Pending" }
@@ -232,6 +242,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "quorum",
+        status: "Approved",
         requiredApprovals: 2,
         approvers: [
           { name: "Susan Jacobs", role: "General Counsel", status: "Pending" },
@@ -263,6 +274,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Requested Changes",
         requiredApprovals: 1,
         approvers: [
           { name: "Lloyd Chung", role: "Legal Associate", status: "Requested Changes" }
@@ -291,6 +303,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Requested Changes",
         requiredApprovals: 1,
         approvers: [
           { name: "Phillip Price", role: "CEO", status: "Requested Changes" }
@@ -319,6 +332,7 @@ export const mockMemos = [
       {
         tier: 1,
         type: "single",
+        status: "Requested Changes",
         requiredApprovals: 1,
         approvers: [
           { name: "Tyrell Wellick", role: "VP Tech", status: "Requested Changes" }
@@ -342,7 +356,7 @@ export const mockMemos = [
     createdAt: "2026-03-13T12:00:00Z",
     requester: "Elliot Alderson",
     status: "Approved",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Gideon Goddard", role: "IT Manager", status: "Approved" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Approved", requiredApprovals: 1, approvers: [{ name: "Gideon Goddard", role: "IT Manager", status: "Approved" }] }],
     attachmentsCount: 1,
     memoNumber: "SEC-2026-005",
     history: [
@@ -360,7 +374,7 @@ export const mockMemos = [
     createdAt: "2026-03-12T16:30:00Z",
     requester: "Pam Beesly",
     status: "Pending",
-    approvalChain: [{ tier: 1, type: "quorum", requiredApprovals: 1, approvers: [{ name: "Michael Scott", role: "Regional Manager", status: "Pending" }] }],
+    approvalChain: [{ tier: 1, type: "quorum", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Michael Scott", role: "Regional Manager", status: "Pending" }] }],
     attachmentsCount: 4,
     memoNumber: "OPS-2026-115",
     history: [
@@ -377,7 +391,7 @@ export const mockMemos = [
     createdAt: "2026-03-11T14:00:00Z",
     requester: "John Doe",
     status: "Pending",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Sarah Connor", role: "CMO", status: "Pending" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Sarah Connor", role: "CMO", status: "Pending" }] }],
     attachmentsCount: 1,
     memoNumber: "MKT-2026-095",
     history: [
@@ -394,7 +408,7 @@ export const mockMemos = [
     createdAt: "2026-03-10T11:00:00Z",
     requester: "Tyrell Wellick",
     status: "Approved",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Phillip Price", role: "CEO", status: "Approved" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Approved", requiredApprovals: 1, approvers: [{ name: "Phillip Price", role: "CEO", status: "Approved" }] }],
     attachmentsCount: 1,
     memoNumber: "ENG-2026-058",
     history: [
@@ -413,7 +427,7 @@ export const mockMemos = [
     requester: "Tyrell Wellick",
     status: "Rejected",
     rejectionReason: "Budget already allocated for cloud migration. Defer to next quarter.",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Rejected" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Rejected", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Rejected" }] }],
     attachmentsCount: 0,
     memoNumber: "ENG-2026-060",
     history: [
@@ -431,7 +445,7 @@ export const mockMemos = [
     createdAt: "2026-03-08T15:00:00Z",
     requester: "Pam Beesly",
     status: "Pending",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Toby Flenderson", role: "HR Lead", status: "Pending" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Toby Flenderson", role: "HR Lead", status: "Pending" }] }],
     attachmentsCount: 2,
     memoNumber: "HR-2026-020",
     history: [
@@ -448,7 +462,7 @@ export const mockMemos = [
     createdAt: "2026-03-07T10:00:00Z",
     requester: "Susan Jacobs",
     status: "Approved",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Phillip Price", role: "CEO", status: "Approved" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Approved", requiredApprovals: 1, approvers: [{ name: "Phillip Price", role: "CEO", status: "Approved" }] }],
     attachmentsCount: 1,
     memoNumber: "LGL-2026-048",
     history: [
@@ -466,7 +480,7 @@ export const mockMemos = [
     createdAt: "2026-03-06T14:00:00Z",
     requester: "Angela Moss",
     status: "Pending",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "John Smith", role: "Finance Dir", status: "Pending" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "John Smith", role: "Finance Dir", status: "Pending" }] }],
     attachmentsCount: 1,
     memoNumber: "ACC-2026-012",
     history: [
@@ -483,7 +497,7 @@ export const mockMemos = [
     createdAt: "2026-03-05T09:00:00Z",
     requester: "Jim Halpert",
     status: "Approved",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Michael Scott", role: "Regional Manager", status: "Approved" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Approved", requiredApprovals: 1, approvers: [{ name: "Michael Scott", role: "Regional Manager", status: "Approved" }] }],
     attachmentsCount: 1,
     memoNumber: "SAL-2026-025",
     history: [
@@ -501,7 +515,7 @@ export const mockMemos = [
     createdAt: "2026-03-04T16:00:00Z",
     requester: "Tyrell Wellick",
     status: "Pending",
-    approvalChain: [{ tier: 1, type: "single", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Pending" }] }],
+    approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Pending" }] }],
     attachmentsCount: 0,
     memoNumber: "ENG-2026-065",
     history: [
