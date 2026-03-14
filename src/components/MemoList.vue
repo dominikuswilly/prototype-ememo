@@ -25,6 +25,7 @@ const selectedMemo = ref(null);
 const selectedRow = ref(null);
 const isHistoryCollapsed = ref(true);
 const isAttachmentsCollapsed = ref(true);
+const isConfirming = ref(false);
 
 // Pagination State
 const currentPage = ref(1);
@@ -216,6 +217,15 @@ const filteredTemplates = computed(() => {
 const templateInputRef = ref(null);
 const dropdownStyle = ref({});
 
+const HR_TEMPLATES = [
+  'Pengajuan Karyawan Kontrak Khusus Trainee',
+  'Pengajuan/Perpanjangan Karyawan Kontrak',
+  'Pengangkatan/Pengajuan Karyawan (Diatas Staff)',
+  'Pengangkatan/Pengajuan Karyawan (Staff)'
+];
+
+const isHrTemplate = (name) => HR_TEMPLATES.includes(name);
+
 const selectTemplate = (item) => {
   selectedMemo.value.categoryType = item.name;
   selectedMemo.value.category = item.division;
@@ -226,6 +236,26 @@ const selectTemplate = (item) => {
     if (selectedMemo.value.travStartDate === undefined) {
       selectedMemo.value.travStartDate = '';
       selectedMemo.value.travEndDate = '';
+    }
+  }
+
+  // Initialize HR fields if applicable
+  if (isHrTemplate(item.name)) {
+    if (selectedMemo.value.hrEmployeeType === undefined) {
+      selectedMemo.value.hrEmployeeType = 'Existing';
+      selectedMemo.value.hrName = '';
+      selectedMemo.value.hrID = '';
+      selectedMemo.value.hrDOB = '';
+      selectedMemo.value.hrStartWork = '';
+      selectedMemo.value.hrDivision = '';
+      selectedMemo.value.hrBranch = '';
+      selectedMemo.value.hrJobTitle = '';
+      selectedMemo.value.hrStatus = 'Single';
+      selectedMemo.value.hrChildren = 0;
+      selectedMemo.value.hrSalaryChange = 'no';
+      selectedMemo.value.oldSalary = { basic: 0, allowance: 0, position: 0 };
+      selectedMemo.value.newSalary = { basic: 0, allowance: 0, position: 0 };
+      selectedMemo.value.hrEffectiveDate = '';
     }
   }
   
@@ -352,7 +382,22 @@ const selectWizardTemplate = (item) => {
     entLng: null,
     entPlaceName: '',
     travStartDate: '',
-    travEndDate: ''
+    travEndDate: '',
+    // HR Fields
+    hrEmployeeType: 'Existing',
+    hrName: '',
+    hrID: '',
+    hrDOB: '',
+    hrStartWork: '',
+    hrDivision: '',
+    hrBranch: '',
+    hrJobTitle: '',
+    hrStatus: 'Single',
+    hrChildren: 0,
+    hrSalaryChange: 'no',
+    oldSalary: { basic: 0, allowance: 0, position: 0 },
+    newSalary: { basic: 0, allowance: 0, position: 0 },
+    hrEffectiveDate: ''
   };
   templateSearch.value = item.name;
   isEditMode.value = true;
@@ -388,7 +433,18 @@ const closeViewModal = () => {
   isEditMode.value = false;
   isCreateMode.value = false;
   isReviewModalOpen.value = false;
+  isConfirming.value = false;
   selectedMemo.value = null;
+  templateSearch.value = '';
+};
+
+const handleSaveDraft = () => {
+  alert('Draft saved successfully!');
+  closeViewModal();
+};
+
+const cancelConfirmation = () => {
+  isConfirming.value = false;
 };
 
 const handleApprove = () => {
@@ -438,12 +494,15 @@ const confirmReviewAction = () => {
 };
 
 const handleUpdate = () => {
+  if (isCreateMode.value && !isConfirming.value) {
+    isConfirming.value = true;
+    return;
+  }
+  
   if (isCreateMode.value) {
     alert(`Created New Memo: ${selectedMemo.value.title}`);
-    // In a real app: emit('create-memo', selectedMemo.value);
   } else {
     alert(`Updated Memo ${selectedMemo.value?.memoNumber}`);
-    // In a real app: emit('update-memo', selectedMemo.value);
   }
   closeViewModal();
 };
@@ -845,8 +904,76 @@ const getHistoryDotColor = (action) => {
           </button>
         </div>
         <div class="modal-body">
+          <div v-if="isConfirming" class="confirmation-view">
+            <div class="confirmation-header">
+              <h3 class="text-xl font-bold text-slate-800">Review Your Submission</h3>
+              <p class="text-slate-500 mt-1">Please review all data carefully before final submission.</p>
+            </div>
+            
+            <div class="confirmation-grid mt-6">
+              <div class="detail-section">
+                <h3 class="section-group-title">Summary</h3>
+                <div class="summary-item">
+                  <label>Title</label>
+                  <div class="summary-value font-semibold">{{ selectedMemo.title }}</div>
+                </div>
+                <div class="summary-item mt-3">
+                  <label>Purposing of Memo (Template)</label>
+                  <div class="summary-value">{{ selectedMemo.categoryType }}</div>
+                </div>
+                <div class="summary-item mt-3">
+                  <label>Division/Department</label>
+                  <div class="summary-value">{{ selectedMemo.department }}</div>
+                </div>
+              </div>
+
+              <div class="detail-section mt-4">
+                <h3 class="section-group-title">Content Preview</h3>
+                <div class="summary-item">
+                  <label>Description</label>
+                  <div class="summary-value leading-relaxed whitespace-pre-wrap">{{ selectedMemo.description || '-' }}</div>
+                </div>
+                <div class="summary-item mt-3">
+                  <label>Attachments</label>
+                  <div class="summary-value">{{ selectedMemo.attachmentsCount }} file(s) attached</div>
+                </div>
+              </div>
+
+              <!-- Travel summary -->
+              <div v-if="selectedMemo.categoryType === 'Pengajuan Perjalanan Dinas'" class="detail-section mt-4">
+                <h3 class="section-group-title">Travel Details</h3>
+                <div class="detail-row">
+                  <div class="summary-item">
+                    <label>Start Date</label>
+                    <div class="summary-value">{{ selectedMemo.travStartDate }}</div>
+                  </div>
+                  <div class="summary-item ml-auto">
+                    <label>End Date</label>
+                    <div class="summary-value">{{ selectedMemo.travEndDate }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HR summary -->
+              <div v-if="isHrTemplate(selectedMemo.categoryType)" class="detail-section mt-4">
+                <h3 class="section-group-title">Employee & Salary</h3>
+                <div class="summary-item">
+                  <label>Employee Name</label>
+                  <div class="summary-value font-semibold">{{ selectedMemo.hrName }} ({{ selectedMemo.hrID }})</div>
+                </div>
+                <div class="summary-item mt-2">
+                  <label>New Salary Total</label>
+                  <div class="summary-value font-bold text-blue-600">
+                    Rp {{ (Number(selectedMemo.newSalary.basic || 0) + Number(selectedMemo.newSalary.allowance || 0) + Number(selectedMemo.newSalary.position || 0)).toLocaleString('id-ID') }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Section 1: Core Information -->
-          <div class="detail-section">
+          <div v-else>
+            <div class="detail-section">
             <h3 class="section-group-title">General Information</h3>
             <div class="detail-row">
               <div v-if="!isCreateMode" class="detail-group">
@@ -1062,6 +1189,189 @@ const getHistoryDotColor = (action) => {
               </div>
             </div>
 
+            <!-- Section 3.6: HR Request Specific -->
+            <div v-if="isHrTemplate(selectedMemo.categoryType)" class="hr-details-container">
+              <!-- Employee Information -->
+              <div class="detail-section">
+                <h3 class="section-group-title">Employee Information</h3>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Types of Employees</label>
+                    <select v-if="isEditMode" v-model="selectedMemo.hrEmployeeType" class="form-select">
+                      <option value="Existing">Existing</option>
+                      <option value="New">New</option>
+                    </select>
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.hrEmployeeType }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Name</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrName" class="form-input" />
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.hrName || '-' }}</div>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Employee ID Number</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrID" class="form-input" />
+                    <div v-else class="detail-value">{{ selectedMemo.hrID || '-' }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Date of Birth</label>
+                    <div v-if="isEditMode" class="date-input-group">
+                      <input type="text" v-model="selectedMemo.hrDOB" placeholder="YYYY-MM-DD" class="form-input" />
+                      <div class="date-picker-trigger">
+                        <Calendar class="icon-small" />
+                        <input type="date" v-model="selectedMemo.hrDOB" class="hidden-date-picker" />
+                      </div>
+                    </div>
+                    <div v-else class="detail-value">{{ selectedMemo.hrDOB || '-' }}</div>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Start Work</label>
+                    <div v-if="isEditMode" class="date-input-group">
+                      <input type="text" v-model="selectedMemo.hrStartWork" placeholder="YYYY-MM-DD" class="form-input" />
+                      <div class="date-picker-trigger">
+                        <Calendar class="icon-small" />
+                        <input type="date" v-model="selectedMemo.hrStartWork" class="hidden-date-picker" />
+                      </div>
+                    </div>
+                    <div v-else class="detail-value">{{ selectedMemo.hrStartWork || '-' }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Division</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrDivision" class="form-input" />
+                    <div v-else class="detail-value">{{ selectedMemo.hrDivision || '-' }}</div>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Branch</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrBranch" class="form-input" />
+                    <div v-else class="detail-value">{{ selectedMemo.hrBranch || '-' }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Job Title</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrJobTitle" class="form-input" />
+                    <div v-else class="detail-value">{{ selectedMemo.hrJobTitle || '-' }}</div>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Status</label>
+                    <select v-if="isEditMode" v-model="selectedMemo.hrStatus" class="form-select">
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                    </select>
+                    <div v-else class="detail-value">{{ selectedMemo.hrStatus }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Number of Children</label>
+                    <input v-if="isEditMode" type="number" v-model="selectedMemo.hrChildren" class="form-input" />
+                    <div v-else class="detail-value">{{ selectedMemo.hrChildren ?? '0' }}</div>
+                  </div>
+                </div>
+                <div class="detail-group">
+                  <label>Salary Change</label>
+                  <select v-if="isEditMode" v-model="selectedMemo.hrSalaryChange" class="form-select">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <div v-else class="detail-value">{{ selectedMemo.hrSalaryChange === 'yes' ? 'Yes' : 'No' }}</div>
+                </div>
+              </div>
+
+              <!-- Old Salary Breakdown (Conditional) -->
+              <div v-if="selectedMemo.hrSalaryChange === 'yes'" class="detail-section">
+                <h3 class="section-group-title">Old Salary Breakdown</h3>
+                <div class="salary-grid">
+                  <div class="detail-group">
+                    <label>Basic Salary</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.oldSalary.basic" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary.basic || 0).toLocaleString('id-ID') }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Meal / Transport Allowance</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.oldSalary.allowance" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary.allowance || 0).toLocaleString('id-ID') }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Position Allowance</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.oldSalary.position" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary.position || 0).toLocaleString('id-ID') }}</div>
+                  </div>
+                  <div class="detail-group salary-total-group">
+                    <label>Total (Read-Only)</label>
+                    <div class="detail-value font-bold text-blue-600">
+                      Rp {{ (Number(selectedMemo.oldSalary.basic || 0) + Number(selectedMemo.oldSalary.allowance || 0) + Number(selectedMemo.oldSalary.position || 0)).toLocaleString('id-ID') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- New Salary Breakdown -->
+              <div class="detail-section">
+                <h3 class="section-group-title">New Salary Breakdown</h3>
+                <div class="salary-grid">
+                  <div class="detail-group">
+                    <label>Basic Salary</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.newSalary.basic" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary.basic || 0).toLocaleString('id-ID') }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Meal / Transport Allowance</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.newSalary.allowance" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary.allowance || 0).toLocaleString('id-ID') }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Position Allowance</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.newSalary.position" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary.position || 0).toLocaleString('id-ID') }}</div>
+                  </div>
+                  <div class="detail-group salary-total-group">
+                    <label>Total (Read-Only)</label>
+                    <div class="detail-value font-bold text-blue-600">
+                      Rp {{ (Number(selectedMemo.newSalary.basic || 0) + Number(selectedMemo.newSalary.allowance || 0) + Number(selectedMemo.newSalary.position || 0)).toLocaleString('id-ID') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Effective Date -->
+              <div class="detail-section">
+                <h3 class="section-group-title">Effective Date</h3>
+                <div class="detail-group">
+                  <label>Effective starting from</label>
+                  <div v-if="isEditMode" class="date-input-group">
+                    <input type="text" v-model="selectedMemo.hrEffectiveDate" placeholder="YYYY-MM-DD" class="form-input" />
+                    <div class="date-picker-trigger">
+                      <Calendar class="icon-small" />
+                      <input type="date" v-model="selectedMemo.hrEffectiveDate" class="hidden-date-picker" />
+                    </div>
+                  </div>
+                  <div v-else class="detail-value font-medium">{{ selectedMemo.hrEffectiveDate || '-' }}</div>
+                </div>
+              </div>
+            </div>
             <!-- Section 4: Rejection/Changes (Conditional) -->
             <div v-if="!isCreateMode && ['Rejected', 'Requested Changes'].includes(selectedMemo.status) && selectedMemo.rejectionReason" 
                  :class="['detail-section', selectedMemo.status === 'Rejected' ? 'rejection-alert-new' : 'requested-changes-alert-new']">
@@ -1160,9 +1470,10 @@ const getHistoryDotColor = (action) => {
                   </div>
                 </div>
               </div>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
         <div class="modal-footer">
           <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'" class="modal-actions-left">
@@ -1172,8 +1483,15 @@ const getHistoryDotColor = (action) => {
           </div>
           
           <template v-if="isEditMode">
-            <button class="btn-secondary" @click="closeViewModal">Cancel</button>
-            <button class="btn-primary" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo' }}</button>
+            <template v-if="isConfirming">
+              <button class="btn-secondary" @click="cancelConfirmation">Back to Edit</button>
+              <button class="btn-primary" @click="handleUpdate">Confirm & Submit</button>
+            </template>
+            <template v-else>
+              <button class="btn-secondary" @click="closeViewModal">Cancel</button>
+              <button class="btn-draft ml-auto mr-2" @click="handleSaveDraft">Save Draft</button>
+              <button class="btn-primary" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo' }}</button>
+            </template>
           </template>
           <template v-else>
             <button v-if="getActions(selectedMemo).includes('remind')" class="btn-remind" @click="handleRemind(selectedMemo)">
@@ -2069,6 +2387,79 @@ const getHistoryDotColor = (action) => {
   cursor: pointer;
   pointer-events: auto; /* Enable clicks on the hidden native picker */
   width: 100%;
+}
+
+/* HR details */
+.hr-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-group-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.salary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.salary-total-group {
+  grid-column: span 3;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #cbd5e1;
+}
+
+/* Confirmation View */
+.confirmation-view {
+  padding: 0.5rem;
+}
+
+.confirmation-header {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-item label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.btn-draft {
+  background-color: white;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-draft:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  color: #1e293b;
 }
 
 /* Attachments */
