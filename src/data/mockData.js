@@ -9,6 +9,7 @@ export const mockMemos = [
     createdAt: "2026-03-10T09:00:00Z",
     requester: "John Doe",
     status: "Pending",
+    isReminded: true,
     approvalChain: [
       {
         tier: 1,
@@ -74,6 +75,7 @@ export const mockMemos = [
     createdAt: "2026-03-11T11:15:00Z",
     requester: "Tyrell Wellick",
     status: "Pending",
+    isReminded: true,
     approvalChain: [
       {
         tier: 1,
@@ -374,6 +376,7 @@ export const mockMemos = [
     createdAt: "2026-03-12T16:30:00Z",
     requester: "Pam Beesly",
     status: "Pending",
+    isReminded: true,
     approvalChain: [{ tier: 1, type: "quorum", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Michael Scott", role: "Regional Manager", status: "Pending" }] }],
     attachmentsCount: 4,
     memoNumber: "OPS-2026-115",
@@ -391,6 +394,7 @@ export const mockMemos = [
     createdAt: "2026-03-11T14:00:00Z",
     requester: "John Doe",
     status: "Pending",
+    isReminded: true,
     approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Sarah Connor", role: "CMO", status: "Pending" }] }],
     attachmentsCount: 1,
     memoNumber: "MKT-2026-095",
@@ -515,6 +519,7 @@ export const mockMemos = [
     createdAt: "2026-03-04T16:00:00Z",
     requester: "Tyrell Wellick",
     status: "Pending",
+    isReminded: true,
     approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Pending" }] }],
     attachmentsCount: 0,
     memoNumber: "ENG-2026-065",
@@ -554,6 +559,113 @@ export const mockMemos = [
     memoNumber: "ENG-DRAFT-002",
     history: [
       { at: "2026-03-14T15:30:00Z", action: "Draft Created", user: "Tyrell Wellick", note: "Need to consult with Security first." }
+    ]
+  },
+  {
+    id: 23,
+    title: "Scenario A: 1 of 2 Approved (Tier 2)",
+    description: "This scenario shows a memo that has passed the first tier and is currently in the second tier with 1 out of 2 approvals completed.",
+    category: "Operations",
+    categoryType: "Resource Allocation",
+    department: "Engineering",
+    createdAt: "2026-03-14T09:00:00Z",
+    requester: "Tyrell Wellick",
+    status: "Pending",
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Approved",
+        requiredApprovals: 1,
+        approvers: [{ name: "Elliot Alderson", role: "Security Lead", status: "Approved" }]
+      },
+      {
+        tier: 2,
+        type: "quorum",
+        status: "Pending",
+        requiredApprovals: 2,
+        approvers: [
+          { name: "Angela Moss", role: "PR Manager", status: "Approved" },
+          { name: "Tyrell Wellick", role: "Specialist", status: "Pending" }
+        ]
+      }
+    ],
+    attachmentsCount: 2,
+    memoNumber: "OPS-2026-001",
+    history: [
+      { at: "2026-03-14T09:00:00Z", action: "Created", user: "Tyrell Wellick" },
+      { at: "2026-03-14T10:30:00Z", action: "Approved", user: "Elliot Alderson", note: "Tier 1 cleared." },
+      { at: "2026-03-14T11:45:00Z", action: "Approved", user: "Angela Moss", note: "Waiting for Darlene." }
+    ]
+  },
+  {
+    id: 24,
+    title: "Scenario B: 2 of 2 Approved (Tier 2, waiting Tier 3)",
+    description: "This scenario shows a memo that is fully approved in Tier 2 and is now waiting for the final single approval in Tier 3.",
+    category: "Finance",
+    categoryType: "Budget Adjustment",
+    department: "Engineering",
+    createdAt: "2026-03-13T08:00:00Z",
+    requester: "Tyrell Wellick",
+    status: "Pending",
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Approved",
+        requiredApprovals: 1,
+        approvers: [{ name: "Elliot Alderson", role: "Security Lead", status: "Approved" }]
+      },
+      {
+        tier: 2,
+        type: "all",
+        status: "Approved",
+        requiredApprovals: 2,
+        approvers: [
+          { name: "Angela Moss", role: "PR Manager", status: "Approved" },
+          { name: "Darlene Alderson", role: "Specialist", status: "Approved" }
+        ]
+      },
+      {
+        tier: 3,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Tyrell Wellick", role: "CEO", status: "Pending" }]
+      }
+    ],
+    attachmentsCount: 1,
+    memoNumber: "FIN-2026-002",
+    history: [
+      { at: "2026-03-13T08:00:00Z", action: "Created", user: "Tyrell Wellick" },
+      { at: "2026-03-13T09:00:00Z", action: "Approved", user: "Elliot Alderson" },
+      { at: "2026-03-13T10:00:00Z", action: "Approved", user: "Angela Moss" },
+      { at: "2026-03-13T11:00:00Z", action: "Approved", user: "Darlene Alderson" }
+    ]
+  },
+  {
+    id: 25,
+    title: "Scenario C: Single Tier Pending",
+    description: "A simple scenario where there is only one tier and one approver, and it is still pending.",
+    category: "General",
+    categoryType: "Office Supplies",
+    department: "Engineering",
+    createdAt: "2026-03-14T14:00:00Z",
+    requester: "Tyrell Wellick",
+    status: "Pending",
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Tyrell Wellick", role: "Security Lead", status: "Pending" }]
+      }
+    ],
+    attachmentsCount: 0,
+    memoNumber: "GEN-2026-003",
+    history: [
+      { at: "2026-03-14T14:00:00Z", action: "Created", user: "Tyrell Wellick" }
     ]
   }
 ];

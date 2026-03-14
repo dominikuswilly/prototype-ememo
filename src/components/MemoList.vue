@@ -615,8 +615,8 @@ const getActions = (memo) => {
   if (memo.status === 'Pending') {
     const actions = ['view'];
     
-    // Logic for Remind: if requester and pending > 3 days
-    if (isRequester) {
+    // Logic for Remind: if requester and pending > 3 days and NOT already reminded
+    if (isRequester && !memo.isReminded) {
       const created = new Date(memo.createdAt);
       const now = new Date();
       const diffTime = Math.abs(now - created);
@@ -709,9 +709,13 @@ const getHistoryDotColor = (action) => {
                 <h3 class="memo-card-title">{{ memo.title }}</h3>
                 <span class="memo-card-number">#{{ memo.memoNumber }}</span>
               </div>
-              <div :class="['status-badge-premium', getStatusColor(memo.status)]" :title="memo.status">
-                <component :is="getStatusIcon(memo.status)" class="status-icon" />
-                <span class="status-text">{{ memo.status }}</span>
+              <div class="header-right-group">
+                <div v-if="memo.isReminded" class="reminded-tag" title="Approvers have been reminded">
+                  <Bell class="icon-tiny" />
+                </div>
+                <div :class="['status-badge-premium', getStatusColor(memo.status)]" :title="memo.status">
+                  <component :is="getStatusIcon(memo.status)" class="status-icon" />
+                </div>
               </div>
             </div>
 
@@ -975,9 +979,17 @@ const getHistoryDotColor = (action) => {
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
           </div>
-          <button class="btn-close" @click="closeViewModal">
-            <X class="icon" />
-          </button>
+          <div class="modal-header-right">
+            <div v-if="selectedMemo && selectedMemo.isReminded" class="reminded-tag mr-2" title="Approvers have been reminded">
+              <Bell class="icon-tiny" />
+            </div>
+            <div v-if="!isCreateMode" :class="['status-badge-premium', getStatusColor(selectedMemo.status)]" :title="selectedMemo.status">
+              <component :is="getStatusIcon(selectedMemo.status)" class="status-icon" />
+            </div>
+            <button class="btn-close ml-3" @click="closeViewModal">
+              <X class="icon" />
+            </button>
+          </div>
         </div>
         <div class="modal-body">
           <div v-if="isConfirming" class="confirmation-view">
@@ -1066,12 +1078,6 @@ const getHistoryDotColor = (action) => {
               <div v-if="!isCreateMode" class="detail-group">
                 <label>Created At</label>
                 <div class="detail-value">{{ formatDate(selectedMemo.createdAt) }}</div>
-              </div>
-              <div v-if="!isCreateMode" class="detail-group">
-                <label>Status</label>
-                <div class="detail-value">
-                   <span class="status-badge" :class="getStatusColor(selectedMemo.status)">{{ selectedMemo.status }}</span>
-                </div>
               </div>
             </div>
             
@@ -1673,14 +1679,14 @@ const getHistoryDotColor = (action) => {
 
 /* Card Header */
 .memo-card-header {
+  position: relative;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .memo-card-title-group {
-  flex: 1;
+  padding-right: 70px; /* Special space for badges in the corner */
 }
 
 .memo-card-title {
@@ -1703,23 +1709,72 @@ const getHistoryDotColor = (action) => {
   font-family: monospace;
 }
 
+.header-right-group {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.reminded-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fdf2f8;
+  color: #db2777;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid #fbcfe8;
+  transition: all 0.2s;
+}
+
+@media (max-width: 640px) {
+  .header-right-group {
+    top: -2px;
+    right: -2px;
+  }
+  
+  .reminded-tag {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+}
+
+.responsive-tag {
+  flex-shrink: 0;
+}
+
 /* Premium Status Badge */
 .status-badge-premium {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: 999px;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.025em;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .status-badge-premium {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
 }
 
 .status-icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 .status-approved { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
@@ -2297,6 +2352,22 @@ const getHistoryDotColor = (action) => {
     max-height: 100vh !important;
     border-radius: 0;
   }
+}
+
+@media (max-width: 640px) {
+  .modal-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .modal-header-left {
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
   .modal-header, .modal-footer {
     padding: 1rem;
   }
@@ -2314,10 +2385,17 @@ const getHistoryDotColor = (action) => {
   border-bottom: 1px solid #e2e8f0;
 }
 
+.modal-header-right {
+  display: flex;
+  align-items: center;
+}
+
 .modal-header-left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .btn-back {
