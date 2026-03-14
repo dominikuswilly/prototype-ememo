@@ -1,6 +1,6 @@
 <script setup>
 import { ref, defineProps, defineExpose, computed, nextTick, onMounted, onUnmounted } from 'vue';
-import { ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search } from 'lucide-vue-next';
+import { ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search, Calendar } from 'lucide-vue-next';
 import MapPicker from './MapPicker.vue';
 
 const props = defineProps({
@@ -219,6 +219,16 @@ const dropdownStyle = ref({});
 const selectTemplate = (item) => {
   selectedMemo.value.categoryType = item.name;
   selectedMemo.value.category = item.division;
+  selectedMemo.value.department = item.division;
+  
+  // Initialize Travel fields if applicable
+  if (item.name === 'Pengajuan Perjalanan Dinas') {
+    if (selectedMemo.value.travStartDate === undefined) {
+      selectedMemo.value.travStartDate = '';
+      selectedMemo.value.travEndDate = '';
+    }
+  }
+  
   templateSearch.value = item.name;
   showSuggestions.value = false;
 };
@@ -327,7 +337,7 @@ const selectWizardTemplate = (item) => {
     description: '',
     category: item.division,
     categoryType: item.name,
-    department: 'Marketing',
+    department: item.division,
     attachmentsCount: 0,
     status: 'Pending',
     approvalChain: [],
@@ -340,7 +350,9 @@ const selectWizardTemplate = (item) => {
     entPersonRole: '',
     entLat: null,
     entLng: null,
-    entPlaceName: ''
+    entPlaceName: '',
+    travStartDate: '',
+    travEndDate: ''
   };
   templateSearch.value = item.name;
   isEditMode.value = true;
@@ -350,6 +362,11 @@ const selectWizardTemplate = (item) => {
 
 const openCreateModal = () => {
   openWizard();
+};
+
+const goBackToWizard = () => {
+  isModalOpen.value = false;
+  isWizardOpen.value = true;
 };
 
 
@@ -724,18 +741,12 @@ const getHistoryDotColor = (action) => {
     <!-- ─── New Memo Wizard ─────────────────────────────────────────────── -->
     <div v-if="isWizardOpen" class="modal-overlay" @click.self="closeWizard">
       <div class="wizard-modal">
-
-        <!-- Step 1: Division Selection -->
-        <template v-if="wizardStep === 1">
-          <div class="wizard-header">
-            <div>
-              <div class="wizard-step-label">Step 1 of 2</div>
-              <h2 class="wizard-title">Select Division</h2>
-            </div>
-            <button class="btn-close" @click="closeWizard"><X class="icon" /></button>
-          </div>
-          <div class="wizard-body">
-            <!-- Wizard Search -->
+        <!-- Unified Header with Integrated Search -->
+        <div class="wizard-header">
+          <div class="wizard-header-left">
+            <button v-if="wizardStep === 2 && !isSearchingInWizard" class="btn-back" @click="wizardStep = 1">
+              <ArrowLeft class="icon" />
+            </button>
             <div class="wizard-search-container">
               <div class="search-input-wrapper">
                 <Search class="search-icon" />
@@ -751,79 +762,69 @@ const getHistoryDotColor = (action) => {
                 </button>
               </div>
             </div>
-
-            <div v-if="!isSearchingInWizard" class="division-grid">
-              <button
-                v-for="div in divisions"
-                :key="div.name"
-                class="division-card"
-                :style="{ '--div-color': div.color, '--div-bg': div.bg, '--div-border': div.borderColor }"
-                @click="selectWizardDivision(div.name)"
-              >
-                <div class="division-icon-wrap">
-                  <component :is="div.component" class="division-icon" />
-                </div>
-                <div class="division-info">
-                  <div class="division-name">{{ div.name }}</div>
-                  <div class="division-count">{{ div.count }} template{{ div.count > 1 ? 's' : '' }}</div>
-                </div>
-                <ChevronRight class="division-arrow" />
-              </button>
-            </div>
-
-            <!-- Search Results -->
-            <div v-else class="template-list search-results">
-              <div class="search-results-meta">
-                Found {{ wizardFilteredTemplates.length }} templates matching "{{ wizardSearch }}"
-              </div>
-              <button
-                v-for="(tpl, idx) in wizardFilteredTemplates"
-                :key="idx"
-                class="template-item"
-                @click="selectWizardTemplate(tpl)"
-              >
-                <div class="template-item-content">
-                  <div class="template-item-name">{{ tpl.name }}</div>
-                  <div class="template-item-division">{{ tpl.division }}</div>
-                </div>
-                <ChevronRight class="template-item-arrow" />
-              </button>
-              <div v-if="wizardFilteredTemplates.length === 0" class="search-empty">
-                No templates found for "{{ wizardSearch }}"
-              </div>
-            </div>
           </div>
-        </template>
+          <button class="btn-close" @click="closeWizard"><X class="icon" /></button>
+        </div>
 
-        <!-- Step 2: Template Selection -->
-        <template v-else>
-          <div class="wizard-header">
-            <div class="wizard-header-left">
-              <button class="btn-back" @click="wizardStep = 1">
-                <ArrowLeft class="icon" />
-              </button>
-              <div>
-                <div class="wizard-step-label">Step 2 of 2</div>
-                <h2 class="wizard-title">{{ wizardDivision }}</h2>
-              </div>
+        <div class="wizard-body">
+          <!-- Content Switching -->
+
+          <!-- Content Switching -->
+          <!-- Global Search Results -->
+          <div v-if="isSearchingInWizard" class="template-list search-results">
+            <div class="search-results-meta">
+              Found {{ wizardFilteredTemplates.length }} templates matching "{{ wizardSearch }}"
             </div>
-            <button class="btn-close" @click="closeWizard"><X class="icon" /></button>
-          </div>
-          <div class="wizard-body">
-            <div class="template-list">
-              <button
-                v-for="(tpl, idx) in wizardDivisionTemplates"
-                :key="idx"
-                class="template-item"
-                @click="selectWizardTemplate(tpl)"
-              >
+            <button
+              v-for="(tpl, idx) in wizardFilteredTemplates"
+              :key="idx"
+              class="template-item"
+              @click="selectWizardTemplate(tpl)"
+            >
+              <div class="template-item-content">
                 <div class="template-item-name">{{ tpl.name }}</div>
-                <ChevronRight class="template-item-arrow" />
-              </button>
+                <div class="template-item-division">{{ tpl.division }}</div>
+              </div>
+              <ChevronRight class="template-item-arrow" />
+            </button>
+            <div v-if="wizardFilteredTemplates.length === 0" class="search-empty">
+              No templates found for "{{ wizardSearch }}"
             </div>
           </div>
-        </template>
 
+          <!-- Step 1: Division Grid -->
+          <div v-else-if="wizardStep === 1" class="division-grid">
+            <button
+              v-for="div in divisions"
+              :key="div.name"
+              class="division-card"
+              :style="{ '--div-color': div.color, '--div-bg': div.bg, '--div-border': div.borderColor }"
+              @click="selectWizardDivision(div.name)"
+            >
+              <div class="division-icon-wrap">
+                <component :is="div.component" class="division-icon" />
+              </div>
+              <div class="division-info">
+                <div class="division-name">{{ div.name }}</div>
+                <div class="division-count">{{ div.count }} template{{ div.count > 1 ? 's' : '' }}</div>
+              </div>
+              <ChevronRight class="division-arrow" />
+            </button>
+          </div>
+
+          <!-- Step 2: Division Templates -->
+          <div v-else class="template-list">
+            <button
+              v-for="(tpl, idx) in wizardDivisionTemplates"
+              :key="idx"
+              class="template-item"
+              @click="selectWizardTemplate(tpl)"
+            >
+              <div class="template-item-name">{{ tpl.name }}</div>
+              <ChevronRight class="template-item-arrow" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -832,8 +833,13 @@ const getHistoryDotColor = (action) => {
     <div v-if="isModalOpen && selectedMemo" class="modal-overlay" @click.self="closeViewModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 v-if="isCreateMode">New Memo Request</h2>
-          <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
+          <div class="modal-header-left">
+            <button v-if="isCreateMode" class="btn-back" @click="goBackToWizard">
+              <ArrowLeft class="icon" />
+            </button>
+            <h2 v-if="isCreateMode">New Memo Request</h2>
+            <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
+          </div>
           <button class="btn-close" @click="closeViewModal">
             <X class="icon" />
           </button>
@@ -867,7 +873,7 @@ const getHistoryDotColor = (action) => {
             </div>
             
             <div class="detail-group">
-              <label>Template</label>
+              <label>Purposing of Memo</label>
               <div v-if="isEditMode" class="autocomplete-wrapper">
                 <input
                   ref="templateInputRef"
@@ -1027,6 +1033,35 @@ const getHistoryDotColor = (action) => {
               </div>
             </div>
 
+            <!-- Section 3.5: Travel Request Specific -->
+            <div v-if="selectedMemo.categoryType === 'Pengajuan Perjalanan Dinas'" class="detail-section">
+              <h3 class="section-group-title">Travel Period</h3>
+              <div class="detail-row">
+                <div class="detail-group">
+                  <label>Start Date</label>
+                  <div v-if="isEditMode" class="date-input-group">
+                    <input type="text" v-model="selectedMemo.travStartDate" placeholder="YYYY-MM-DD" class="form-input" />
+                    <div class="date-picker-trigger">
+                      <Calendar class="icon-small" />
+                      <input type="date" v-model="selectedMemo.travStartDate" class="hidden-date-picker" />
+                    </div>
+                  </div>
+                  <div v-else class="detail-value font-medium">{{ selectedMemo.travStartDate || '-' }}</div>
+                </div>
+                <div class="detail-group">
+                  <label>End Date</label>
+                  <div v-if="isEditMode" class="date-input-group">
+                    <input type="text" v-model="selectedMemo.travEndDate" placeholder="YYYY-MM-DD" class="form-input" />
+                    <div class="date-picker-trigger">
+                      <Calendar class="icon-small" />
+                      <input type="date" v-model="selectedMemo.travEndDate" class="hidden-date-picker" />
+                    </div>
+                  </div>
+                  <div v-else class="detail-value font-medium">{{ selectedMemo.travEndDate || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
             <!-- Section 4: Rejection/Changes (Conditional) -->
             <div v-if="!isCreateMode && ['Rejected', 'Requested Changes'].includes(selectedMemo.status) && selectedMemo.rejectionReason" 
                  :class="['detail-section', selectedMemo.status === 'Rejected' ? 'rejection-alert-new' : 'requested-changes-alert-new']">
@@ -1060,10 +1095,10 @@ const getHistoryDotColor = (action) => {
             </div>
 
             <!-- Section 5: Workflow & Files -->
-            <div class="detail-section">
+            <div v-if="!isCreateMode" class="detail-section">
               <h3 class="section-group-title">Workflow & History</h3>
               
-              <div v-if="!isCreateMode" class="detail-group" style="position: relative; z-index: 10;">
+              <div class="detail-group" style="position: relative; z-index: 10;">
                 <label>Approval Chain</label>
                 <div class="modal-approval-chain-container">
                   <div class="modal-approval-chain">
@@ -1684,6 +1719,32 @@ const getHistoryDotColor = (action) => {
   border-bottom: 1px solid #e2e8f0;
 }
 
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
 .modal-header h2 {
   font-size: 1.25rem;
   font-weight: 600;
@@ -1977,6 +2038,37 @@ const getHistoryDotColor = (action) => {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* Date Input Group (Custom Component) */
+.date-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-picker-trigger {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  pointer-events: none; /* Let clicks pass through to the hidden input */
+}
+
+.date-picker-trigger:hover {
+  color: #3b82f6;
+}
+
+.hidden-date-picker {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  pointer-events: auto; /* Enable clicks on the hidden native picker */
+  width: 100%;
 }
 
 /* Attachments */
@@ -2668,31 +2760,18 @@ const getHistoryDotColor = (action) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
+  min-height: 72px;
 }
 
 .wizard-header-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.wizard-step-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.25rem;
-}
-
-.wizard-title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0;
+  gap: 1rem;
+  flex: 1;
+  max-width: 440px;
 }
 
 .btn-back {
@@ -2827,8 +2906,7 @@ const getHistoryDotColor = (action) => {
 }
 
 .wizard-search-container {
-  padding: 1rem 1.5rem 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  flex: 1;
 }
 
 .search-input-wrapper {
