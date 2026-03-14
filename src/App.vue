@@ -356,6 +356,15 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     margin-left: 0 !important;
     padding-top: 5rem;
   }
+  .content-header {
+    margin-bottom: 1.5rem;
+  }
+  .header-titles h1 {
+    font-size: 1.5rem;
+  }
+  .header-titles p {
+    font-size: 0.875rem;
+  }
   .mobile-header {
     position: fixed;
     top: 0;

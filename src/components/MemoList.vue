@@ -643,9 +643,8 @@ const getActions = (memo) => {
           }
         }
         
-        // Otherwise, it's fully pending at Tier 1 -> View, Edit, Delete
-        // Only requester can delete/edit usually, but we check involvement above
-        actions.push('delete');
+        // Otherwise, it's fully pending at Tier 1 -> View only for now
+        // (Previously allowed delete/edit here)
         return actions;
       }
     }
