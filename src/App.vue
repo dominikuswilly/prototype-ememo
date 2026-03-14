@@ -167,34 +167,38 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     >
       <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
 
-      <header class="content-header">
-        <div class="header-titles">
-          <h1>{{ pageTitle }}</h1>
-          <p>{{ pageDescription }}</p>
+      <header class="sticky-page-header">
+        <div class="tabs-nav">
+          <button 
+            v-for="tab in ['all', 'my_memos', 'pending_approval', 'drafts']" 
+            :key="tab"
+            :class="['tab-btn', { active: activeTab === tab }]"
+            @click="activeTab = tab"
+          >
+            {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : (tab === 'all' ? 'All Memos' : 'Drafts')) }}
+            <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
+          </button>
         </div>
-        <button class="create-btn" @click="triggerCreateModal">
-          <Plus class="icon-small" />
-          <span>New Request</span>
-        </button>
-      </header>
-      
-      <div class="tabs-container">
-        <button 
-          v-for="tab in ['all', 'my_memos', 'pending_approval', 'drafts']" 
-          :key="tab"
-          :class="['tab-btn', { active: activeTab === tab }]"
-          @click="activeTab = tab"
-        >
-          {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : (tab === 'all' ? 'All Memos' : 'Drafts')) }}
-          <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
-        </button>
-      </div>
 
-      <MemoFilter 
-        :members="[{ name: currentUser, role: 'you' }, ...subordinates]" 
-        :activeTab="activeTab"
-        @filter-change="handleFilterChange" 
-      />
+        <div class="header-main-row">
+          <div class="header-titles">
+            <h1>{{ pageTitle }}</h1>
+            <p>{{ pageDescription }}</p>
+          </div>
+          <button class="create-btn" @click="triggerCreateModal">
+            <Plus class="icon-small" />
+            <span>New Request</span>
+          </button>
+        </div>
+
+        <div class="header-filter-wrapper">
+          <MemoFilter 
+            :members="[{ name: currentUser, role: 'you' }, ...subordinates]" 
+            :activeTab="activeTab"
+            @filter-change="handleFilterChange" 
+          />
+        </div>
+      </header>
 
       <div class="list-wrapper">
         <MemoList 
@@ -287,24 +291,57 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   height: 16px;
 }
 
-.tabs-container {
+.sticky-page-header {
+  background-color: var(--bg-app);
+  z-index: 10;
+  padding-bottom: 0px;
+  margin-bottom: 2rem;
+}
+
+.header-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem var(--gutter) 0.5rem;
+}
+
+.tabs-nav {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
   overflow-x: auto;
-  padding-bottom: 1px;
+  padding: 0.75rem var(--gutter) 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.header-filter-wrapper {
+  padding: 1rem var(--gutter);
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-app);
+  z-index: 80;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Deep override for MemoFilter when inside sticky header */
+.header-filter-wrapper .filter-wrapper {
+  margin-bottom: 0;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Hide scrollbar for tabs container Chrome/Safari */
-.tabs-container::-webkit-scrollbar {
+.tabs-nav::-webkit-scrollbar {
   display: none;
 }
 
 .tab-btn {
   background: none;
   border: none;
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -408,6 +445,49 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     right: 2rem;
     z-index: 80;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  }
+  .sticky-page-header {
+    margin-bottom: 1.5rem;
+    background-color: white;
+    padding: 0.5rem 1rem 0;
+    margin-left: -1.5rem; /* Compensate for main-content padding */
+    margin-right: -1.5rem;
+  }
+  .header-filter-wrapper {
+    position: sticky;
+    top: 115px; /* Offset for Mobile Header (64px) + Tabs Nav (approx 51px) */
+    background-color: white;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding: 0.75rem 1.5rem;
+    z-index: 70;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .header-main-row {
+    position: static; /* Revert stickiness */
+    background-color: white;
+    padding: 1rem 1.5rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+  .tabs-nav {
+    position: sticky;
+    top: 64px;
+    background-color: white;
+    z-index: 75;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding: 0.5rem 1.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .header-titles h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+  }
+  .header-titles p {
+    display: none; /* Hide description on mobile when sticky to save space */
   }
 }
 
