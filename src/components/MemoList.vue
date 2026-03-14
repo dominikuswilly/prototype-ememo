@@ -1,6 +1,9 @@
 <script setup>
-import { ref, defineProps, defineExpose, computed, nextTick, onMounted, onUnmounted } from 'vue';
-import { ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search, Calendar } from 'lucide-vue-next';
+import { ref, defineProps, defineExpose, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
+import { 
+  ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search, Calendar,
+  CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check
+} from 'lucide-vue-next';
 import MapPicker from './MapPicker.vue';
 
 const props = defineProps({
@@ -93,15 +96,45 @@ const handleRowClick = (memo) => {
   selectedRow.value = (selectedRow.value && selectedRow.value.id === memo.id) ? null : memo;
 };
 
+const dragSourceId = ref(null);
+
+const onDragStart = (id) => {
+  dragSourceId.value = id;
+};
+
+const onDragOver = (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+};
+
+const onDrop = (targetId) => {
+  if (dragSourceId.value === targetId) return;
+  
+  const sourceIdx = memosCopy.value.findIndex(m => m.id === dragSourceId.value);
+  const targetIdx = memosCopy.value.findIndex(m => m.id === targetId);
+  
+  if (sourceIdx !== -1 && targetIdx !== -1) {
+    const [movedItem] = memosCopy.value.splice(sourceIdx, 1);
+    memosCopy.value.splice(targetIdx, 0, movedItem);
+    // In a real app, we would emit('reorder', memosCopy.value) or sync with backend
+  }
+  dragSourceId.value = null;
+};
+
+const memosCopy = ref([]);
+watch(() => props.memos, (newMemos) => {
+  memosCopy.value = [...newMemos];
+}, { immediate: true });
+
 const processedMemos = computed(() => {
   if (isMobile.value) {
     // Lazy load: Show everything from page 1 up to current page
-    return props.memos.slice(0, currentPage.value * itemsPerPage.value);
+    return memosCopy.value.slice(0, currentPage.value * itemsPerPage.value);
   }
   // Standard pagination: Show only the current page
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return props.memos.slice(start, end);
+  return memosCopy.value.slice(start, end);
 });
 
 const isReviewModalOpen = ref(false);
@@ -532,6 +565,29 @@ const getStatusColor = (status) => {
   }
 };
 
+const getStatusIcon = (status) => {
+  switch (status.toLowerCase()) {
+    case 'approved': return CheckCircle;
+    case 'rejected': return AlertCircle;
+    case 'pending': return Clock;
+    case 'requested changes': return FileEdit;
+    case 'draft': return FileText;
+    default: return FileText;
+  }
+};
+
+const getApprovalProgress = (memo) => {
+  if (memo.status === 'Draft') return 0;
+  if (memo.status === 'Approved') return 100;
+  if (memo.status === 'Rejected') return 100;
+  
+  const total = memo.approvalChain.length;
+  if (total === 0) return 100;
+  
+  const approved = memo.approvalChain.filter(tier => tier.status === 'Approved').length;
+  return Math.round((approved / total) * 100);
+};
+
 const handleRemind = (memo) => {
   alert(`Reminder sent to approvers for Memo ${memo.memoNumber}`);
 };
@@ -625,115 +681,117 @@ const getHistoryDotColor = (action) => {
 
 <template>
   <div class="memo-list-container">
-    <div class="table-responsive">
-      <table class="simple-table">
-        <thead>
-          <tr>
-            <th>Memo#</th>
-            <th>Title</th>
-            <th>Requester</th>
-            <th>Created At</th>
-            <th>Status</th>
-            <th>Approval Chain</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="memo in processedMemos"
-            :key="memo.id"
-            class="memo-row"
-            :class="{ 'row-selected': selectedRow && selectedRow.id === memo.id }"
-            @mousedown="handlePressStart(memo)"
-            @mouseup="handlePressEnd"
-            @mouseleave="handlePressEnd"
-            @touchstart="handlePressStart(memo)"
-            @touchend="handlePressEnd"
-            @touchcancel="handlePressEnd"
-            @contextmenu="isMobile ? $event.preventDefault() : null"
-            @click="handleRowClick(memo)"
+    <div class="memo-container">
+      <div v-if="processedMemos.length > 0" class="memo-grid">
+        <div 
+          v-for="memo in processedMemos" 
+          :key="memo.id"
+          class="memo-card-wrapper"
+          draggable="true"
+          @dragstart="onDragStart(memo.id)"
+          @dragover="onDragOver"
+          @drop="onDrop(memo.id)"
+        >
+          <div 
+            class="memo-card" 
+            :class="{ active: selectedRow && selectedRow.id === memo.id }"
+            @click="selectedRow = selectedRow?.id === memo.id ? null : memo"
           >
-            <td class="num-col" data-label="Memo#">{{ memo.memoNumber }}</td>
-            <td class="title-col" data-label="Title">
-              <div class="memo-title">{{ memo.title }}</div>
-            </td>
-            <td data-label="Requester">
-              <div class="font-medium text-gray-900">
-                {{ memo.requester }}
-                <span v-if="memo.requester === currentUser" class="text-muted italic text-xs ml-1">(you)</span>
+            <!-- Card Header: Title and Status -->
+            <div class="memo-card-header">
+              <div class="memo-card-title-group">
+                <h3 class="memo-card-title">{{ memo.title }}</h3>
+                <span class="memo-card-number">#{{ memo.memoNumber }}</span>
               </div>
-              <div class="text-xs text-muted mt-0.5">{{ memo.department }}</div>
-            </td>
-            <td class="date-col" data-label="Created">{{ formatDate(memo.createdAt) }}</td>
-            <td data-label="Status">
-              <span class="status-badge" :class="getStatusColor(memo.status)">{{ memo.status }}</span>
-            </td>
-            <td class="approvers-col" data-label="Chain">
-              <div class="approval-chain">
-                <template v-for="(tier, tierIdx) in memo.approvalChain" :key="tierIdx">
-                  <!-- Tier Container -->
-                  <div class="tier-group" :class="{'is-quorum': tier.approvers.length > 1}">
-                    <!-- Quorum Label (if applicable) -->
-                    <div v-if="tier.approvers.length > 1" class="tier-label">
-                      {{ tier.type === 'quorum' ? `Any ${tier.requiredApprovals} of ${tier.approvers.length}` : 'All Required' }}
-                    </div>
-                    <div class="tier-nodes">
-                      <template v-for="(approver, approverIdx) in tier.approvers" :key="approverIdx">
-                        <div class="approver-node-compact" :class="getStatusColor(approver.status)">
-                          <span class="approver-initials">{{ approver.name.substring(0, 1) }}</span>
-                          <div class="approver-tooltip">
-                            <div class="tooltip-name">{{ approver.name }}</div>
-                            <div class="tooltip-role">{{ approver.role }}</div>
-                            <div class="tooltip-status" :class="getStatusColor(approver.status)">{{ approver.status }}</div>
-                          </div>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                  <div v-if="tierIdx < memo.approvalChain.length - 1" class="chain-connector-compact">
-                    <ChevronRight class="chain-arrow-compact" />
-                  </div>
-                </template>
+              <div :class="['status-badge-premium', getStatusColor(memo.status)]" :title="memo.status">
+                <component :is="getStatusIcon(memo.status)" class="status-icon" />
+                <span class="status-text">{{ memo.status }}</span>
               </div>
-            </td>
-            
-            <!-- Row Action Overlay (Moved to tr level for structural stability) -->
-            <Transition name="fade">
-              <div 
-                v-if="selectedRow && selectedRow.id === memo.id" 
-                class="row-action-overlay" 
-                @click.stop 
-                @touchstart.stop 
-                @mousedown.stop
-                draggable="false"
-              >
-                <div class="overlay-buttons" draggable="false">
-                  <button class="overlay-btn view" @click="openViewModal(memo, false)" draggable="false">
-                    <Eye class="icon-small" /> View
-                  </button>
-                  <button v-if="getActions(memo).includes('update')" class="overlay-btn edit" @click="openViewModal(memo, true)" draggable="false">
-                    <Edit class="icon-small" /> Update
-                  </button>
-                  <button v-if="getActions(memo).includes('edit')" class="overlay-btn edit" @click="openViewModal(memo, true)" draggable="false">
-                    <Edit class="icon-small" /> Edit
-                  </button>
-                  <button v-if="getActions(memo).includes('delete')" class="overlay-btn delete" @click="handleDelete(memo)" draggable="false">
-                    <Trash2 class="icon-small" /> Delete
-                  </button>
-                  <button v-if="getActions(memo).includes('remind')" class="overlay-btn remind" @click.stop="handleRemind(memo)" draggable="false">
-                    <Bell class="icon-small" /> Remind
-                  </button>
-                  <button class="overlay-btn-close" @click="selectedRow = null" draggable="false">
-                    <X class="icon-small" />
-                  </button>
+            </div>
+
+            <!-- Card Body: Metadata -->
+            <div class="memo-card-body">
+              <p class="memo-card-desc">{{ memo.description }}</p>
+              <div class="memo-details-row">
+                <div class="detail-item" title="Requester">
+                  <User class="detail-icon" />
+                  <span>{{ memo.requester }}</span>
+                </div>
+                <div class="detail-item" title="Created Date">
+                  <Calendar class="detail-icon" />
+                  <span>{{ formatDate(memo.createdAt) }}</span>
+                </div>
+                <div class="detail-item" title="Department">
+                  <Layers class="detail-icon" />
+                  <span>{{ memo.department }}</span>
                 </div>
               </div>
+            </div>
+
+            <!-- Card Footer: Progress & Actions -->
+            <div class="memo-card-footer">
+              <div class="progress-container" v-if="memo.status !== 'Draft'">
+                <div class="progress-bar-wrapper">
+                  <div class="progress-bar-fill" :style="{ width: getApprovalProgress(memo) + '%' }"></div>
+                </div>
+                <span class="progress-label">{{ getApprovalProgress(memo) }}% Approved</span>
+              </div>
+              <div v-else class="draft-indicator">
+                <FileText class="icon-tiny text-slate-400" />
+                <span>Not Submitted</span>
+              </div>
+              
+              <div class="card-actions-mini">
+                <button class="mini-action-btn view" @click.stop="openViewModal(memo, false)" title="View Details">
+                  <Eye class="icon-tiny" />
+                </button>
+                <button v-if="getActions(memo).includes('edit')" class="mini-action-btn edit" @click.stop="openViewModal(memo, true)" title="Edit Draft">
+                  <Edit class="icon-tiny" />
+                </button>
+                <button v-if="getActions(memo).includes('update')" class="mini-action-btn update" @click.stop="openViewModal(memo, true)" title="Update/Review">
+                  <Edit class="icon-tiny" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Selection Overlay (Quick Actions on Click) -->
+            <Transition name="fade">
+              <div v-if="selectedRow && selectedRow.id === memo.id" class="card-overlay" @click.stop>
+                <div class="overlay-btns">
+                  <button class="overlay-main-btn view" @click="openViewModal(memo, false)">
+                    <Eye class="icon-small" /> Open Memo
+                  </button>
+                  <button v-if="getActions(memo).includes('update') || getActions(memo).includes('edit')" 
+                    class="overlay-main-btn edit" @click="openViewModal(memo, true)">
+                    <Edit class="icon-small" /> {{ getActions(memo).includes('edit') ? 'Edit Draft' : 'Update Content' }}
+                  </button>
+                  <button v-if="getActions(memo).includes('delete')" class="overlay-main-btn delete" @click="handleDelete(memo)">
+                    <Trash2 class="icon-small" /> Delete
+                  </button>
+                  <button v-if="getActions(memo).includes('remind')" class="overlay-main-btn remind" @click="handleRemind(memo)">
+                    <Bell class="icon-small" /> Remind Approvers
+                  </button>
+                </div>
+                <button class="overlay-close" @click="selectedRow = null">
+                  <X class="icon-small" />
+                </button>
+              </div>
             </Transition>
-          </tr>
-          <tr v-if="processedMemos.length === 0">
-            <td colspan="6" class="empty-state">No memos found.</td>
-          </tr>
-        </tbody>
-      </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="empty-state-premium">
+        <div class="empty-icon-circle">
+          <Check class="empty-icon" />
+        </div>
+        <h2>{{ activeTab === 'pending_approval' ? 'No pending items — great job!' : 'All clear!' }}</h2>
+        <p>There are no memos available in this section currently.</p>
+        <button v-if="activeTab === 'my_memos' || activeTab === 'all'" class="btn-create-empty" @click="openCreateModal">
+          <Plus class="icon-small mr-2" /> Create Your First Memo
+        </button>
+      </div>
     </div>
 
     <!-- Pagination Controls (Desktop) -->
@@ -1560,77 +1618,64 @@ const getHistoryDotColor = (action) => {
 
 <style scoped>
 .memo-list-container {
+  width: 100%;
+}
+
+.memo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.memo-card-wrapper {
+  perspective: 1000px;
+}
+
+.memo-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-}
-
-.simple-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.simple-table th {
-  background-color: #f8fafc;
-  padding: 1rem;
-  font-weight: 600;
-  color: #475569;
-  border-bottom: 2px solid #e2e8f0;
-  white-space: nowrap;
-}
-
-.simple-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  vertical-align: top;
-}
-
-.simple-table tr:hover td {
-  background-color: #f1f5f9;
-}
-
-.memo-row {
-  cursor: pointer;
-  transition: all 0.2s;
+  border-radius: var(--radius-lg);
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
   position: relative;
-  user-select: none;
-  -webkit-touch-callout: none; /* Disable native context menu on iOS */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  height: 100%;
 }
 
-.memo-row.row-selected td {
-  background-color: #eff6ff !important;
-  border-bottom-color: #3b82f6;
+.memo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #3b82f6;
 }
 
-.num-col {
-  font-family: monospace;
-  color: #64748b;
-  font-weight: 600;
+.memo-card.active {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1), var(--shadow-md);
 }
 
-.title-col {
-  max-width: 300px;
+/* Card Header */
+.memo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-.memo-title {
-  font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 0.25rem;
+.memo-card-title-group {
+  flex: 1;
 }
 
-.memo-desc {
-  color: #64748b;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  /* Truncate desc if too long */
+.memo-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+  margin-bottom: 0.35rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -1638,105 +1683,290 @@ const getHistoryDotColor = (action) => {
   overflow: hidden;
 }
 
-.date-col {
-  color: #475569;
-  font-size: 0.85rem;
-  white-space: nowrap;
+.memo-card-number {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: monospace;
 }
 
-.center-col {
-  text-align: center;
-}
-
-/* Status Badges */
-.status-badge {
-  padding: 0.25rem 0.5rem;
+/* Premium Status Badge */
+.status-badge-premium {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
   border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: bold;
-}
-
-.status-approved { background: #dcfce7; color: #15803d; }
-.status-rejected { background: #fee2e2; color: #b91c1c; }
-.status-pending { background: #f1f5f9; color: #64748b; } /* Switched to Gray */
-.status-requested-changes { background: #fef9c3; color: #854d0e; } /* Yellow/Amber remains correct */
-.status-draft { background: #e0f2fe; color: #0369a1; }
-.status-default { background: #f1f5f9; color: #475569; }
-
-/* Compact Approver Chain */
-.approvers-col {
-  min-width: 150px;
-}
-
-.approval-chain {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tier-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-.tier-group.is-quorum {
-  padding: 0.35rem 0.5rem 0.25rem 0.75rem;
-  background: #f8fafc;
-  border-radius: 20px;
-  border: 1px dashed #cbd5e1;
-}
-
-.tier-label {
-  font-size: 0.6rem;
   font-weight: 700;
-  color: #64748b;
   text-transform: uppercase;
-  margin-bottom: 0.2rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.025em;
   white-space: nowrap;
 }
 
-.tier-nodes {
-  display: flex;
-  align-items: center;
+.status-icon {
+  width: 14px;
+  height: 14px;
 }
 
-.approver-node-compact {
-  position: relative;
+.status-approved { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
+.status-pending { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
+.status-rejected { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+.status-requested-changes { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; } /* Red for issues */
+.status-draft { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+/* Card Body */
+.memo-card-body {
+  flex: 1;
+}
+
+.memo-card-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.memo-details-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.detail-icon {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+}
+
+/* Card Footer & Progress */
+.memo-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.progress-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.progress-bar-wrapper {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.draft-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.card-actions-mini {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mini-action-btn {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  border: 2px solid white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 1px #cbd5e1;
-  background: white;
   cursor: pointer;
-  transition: transform 0.2s, z-index 0.2s;
-  z-index: 1;
+  transition: all 0.2s;
 }
 
-/* Overlap effect */
-.approver-node-compact:not(:first-child) {
-  margin-left: -8px;
+.mini-action-btn:hover {
+  background: #f8fafc;
+  color: #3b82f6;
+  border-color: #3b82f6;
 }
 
-.approver-node-compact:hover {
+.mini-action-btn.update:hover { color: #f59e0b; border-color: #f59e0b; }
+
+/* Card Overlay (Quick Actions) */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.overlay-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.overlay-main-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.overlay-main-btn.view { background: #3b82f6; color: white; }
+.overlay-main-btn.edit { background: #f59e0b; color: white; }
+.overlay-main-btn.delete { background: #ef4444; color: white; }
+.overlay-main-btn.remind { background: #6366f1; color: white; }
+
+.overlay-main-btn:hover {
+  filter: brightness(1.1);
   transform: translateY(-2px);
-  z-index: 10;
 }
 
-.approver-initials {
-  font-size: 0.75rem;
+.overlay-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+}
+
+/* Empty State Premium */
+.empty-state-premium {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 2px dashed #e2e8f0;
+}
+
+.empty-icon-circle {
+  width: 64px;
+  height: 64px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.empty-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.empty-state-premium h2 {
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
 }
 
-/* Colored Rings based on status */
+.empty-state-premium p {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  max-width: 320px;
+}
+
+.btn-create-empty {
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 640px) {
+  .memo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 .approver-node-compact.status-approved {
   box-shadow: 0 0 0 2px #10b981;
   background: #ecfdf5;

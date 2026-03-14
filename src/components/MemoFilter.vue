@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { Search, CalendarDays } from 'lucide-vue-next';
+import { Search, CalendarDays, ChevronDown, ChevronUp, Filter } from 'lucide-vue-next';
 
 const props = defineProps({
   members: {
@@ -14,6 +14,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['filter-change']);
+
+const isCollapsed = ref(false);
 
 const filters = ref({
   keyword: '',
@@ -34,6 +36,10 @@ const toggleStatus = (status) => {
   }
 };
 
+const toggleCollapse = () => {
+  isCollapsed.value = !isCollapsed.value;
+};
+
 watch(filters, (newFilters) => {
   emit('filter-change', { ...newFilters });
 }, { deep: true });
@@ -50,87 +56,165 @@ const openDatePicker = (event) => {
 </script>
 
 <template>
-  <div class="filter-container">
-    
-    <!-- Member Filter (Only for "All Memos") -->
-    <div v-if="activeTab === 'all'" class="filter-group member-group">
-      <select v-model="filters.member" class="filter-input select-input">
-        <option value="">All Members</option>
-        <option v-for="member in members" :key="member.name" :value="member.name">
-          {{ member.name }} ({{ member.role }})
-        </option>
-      </select>
-    </div>
-
-    <!-- Keyword Search -->
-    <div class="filter-group keyword-group">
-      <div class="input-icon-wrapper">
-        <Search class="input-icon" />
-        <input 
-          type="text" 
-          v-model="filters.keyword" 
-          placeholder="Search by Title, Desc, or Memo#" 
-          class="filter-input"
-        />
+  <div class="filter-wrapper">
+    <div class="filter-header" @click="toggleCollapse">
+      <div class="header-left">
+        <Filter class="header-icon" />
+        <span class="header-title">Filter & Search</span>
       </div>
-    </div>
-
-    <!-- Date Range -->
-    <div class="filter-group date-group">
-      <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
-        <CalendarDays class="input-icon" />
-        <div class="date-display-field">
-          {{ filters.startDate || 'YYYY-MM-DD' }}
-        </div>
-        <input 
-          type="date" 
-          v-model="filters.startDate" 
-          class="hidden-date-input"
-          aria-label="Start Date"
-        />
-      </div>
-      <span class="date-separator">to</span>
-      <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
-        <CalendarDays class="input-icon" />
-        <div class="date-display-field">
-          {{ filters.endDate || 'YYYY-MM-DD' }}
-        </div>
-        <input 
-          type="date" 
-          v-model="filters.endDate" 
-          class="hidden-date-input"
-          aria-label="End Date"
-        />
-      </div>
-    </div>
-
-    <!-- Status Toggles -->
-    <div class="filter-group status-group">
-      <button 
-        v-for="status in availableStatuses" 
-        :key="status"
-        @click="toggleStatus(status)"
-        class="status-toggle-btn"
-        :class="['toggle-' + status.toLowerCase().replace(/\s+/g, '-'), { active: filters.statuses.includes(status) }]"
-      >
-        {{ status }}
+      <button class="toggle-btn">
+        <ChevronUp v-if="!isCollapsed" class="toggle-icon" />
+        <ChevronDown v-else class="toggle-icon" />
       </button>
     </div>
 
+    <div :class="['filter-content', { 'is-collapsed': isCollapsed }]">
+      <div class="filter-container">
+        <!-- Member Filter (Only for "All Memos") -->
+        <div v-if="activeTab === 'all'" class="filter-group member-group">
+          <select v-model="filters.member" class="filter-input select-input">
+            <option value="">All Members</option>
+            <option v-for="member in members" :key="member.name" :value="member.name">
+              {{ member.name }} ({{ member.role }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Keyword Search -->
+        <div class="filter-group keyword-group">
+          <div class="input-icon-wrapper">
+            <Search class="input-icon" />
+            <input 
+              type="text" 
+              v-model="filters.keyword" 
+              placeholder="Search by Title, Desc, or Memo#" 
+              class="filter-input"
+            />
+          </div>
+        </div>
+
+        <!-- Date Range -->
+        <div class="filter-group date-group">
+          <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
+            <CalendarDays class="input-icon" />
+            <div class="date-display-field">
+              {{ filters.startDate || 'YYYY-MM-DD' }}
+            </div>
+            <input 
+              type="date" 
+              v-model="filters.startDate" 
+              class="hidden-date-input"
+              aria-label="Start Date"
+            />
+          </div>
+          <span class="date-separator">to</span>
+          <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
+            <CalendarDays class="input-icon" />
+            <div class="date-display-field">
+              {{ filters.endDate || 'YYYY-MM-DD' }}
+            </div>
+            <input 
+              type="date" 
+              v-model="filters.endDate" 
+              class="hidden-date-input"
+              aria-label="End Date"
+            />
+          </div>
+        </div>
+
+        <!-- Status Toggles -->
+        <div class="filter-group status-group">
+          <button 
+            v-for="status in availableStatuses" 
+            :key="status"
+            @click="toggleStatus(status)"
+            class="status-toggle-btn"
+            :class="['toggle-' + status.toLowerCase().replace(/\s+/g, '-'), { active: filters.statuses.includes(status) }]"
+          >
+            {{ status }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.filter-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: background 0.2s;
+}
+
+.filter-header:hover {
+  background: #f1f5f9;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  width: 18px;
+  height: 18px;
+  color: #64748b;
+}
+
+.header-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.filter-content {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out, padding 0.3s ease-out;
+  max-height: 500px;
+  opacity: 1;
+}
+
+.filter-content.is-collapsed {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
 .filter-container {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
-  background: white;
   padding: 1rem 1.25rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 1.5rem;
 }
 
 .filter-group {
@@ -178,7 +262,6 @@ const openDatePicker = (event) => {
   font-size: 0.85rem;
 }
 
-/* Base input icons inside wrappers */
 .input-icon {
   position: absolute;
   left: 0.75rem;
@@ -223,17 +306,6 @@ const openDatePicker = (event) => {
   flex: 0 0 auto;
 }
 
-.date-input {
-  width: auto;
-  min-width: 130px;
-}
-
-.date-separator {
-  font-size: 0.85rem;
-  color: #64748b;
-  font-weight: 500;
-}
-
 .status-group {
   display: flex;
   gap: 0.5rem;
@@ -255,7 +327,6 @@ const openDatePicker = (event) => {
   background: #f8fafc;
 }
 
-/* Active Status Styles */
 .status-toggle-btn.active.toggle-pending {
   background: #e0e7ff;
   border-color: #818cf8;
@@ -280,42 +351,21 @@ const openDatePicker = (event) => {
   color: #854d0e;
 }
 
-@media (max-width: 1024px) {
-  .date-group {
-    flex: 1;
-  }
-}
-
 @media (max-width: 768px) {
   .filter-container {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
   
   .filter-group {
     width: 100%;
-  }
-  
-  .date-group {
-    flex-wrap: wrap;       /* Allow dates to stack if needed */
-    justify-content: center; /* Center them when wrapped */
-  }
-  
-  .date-input {
-    flex: 1;              /* Allow inputs to stretch to full available width on mobile */
-    min-width: 120px;
   }
 
   .status-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
-  }
-
-  .status-toggle-btn {
-    width: 100%;
-    padding: 0.6rem 0.5rem;
-    text-align: center;
   }
 }
 </style>

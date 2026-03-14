@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import Sidebar from './components/Sidebar.vue';
 import MemoFilter from './components/MemoFilter.vue';
 import MemoList from './components/MemoList.vue';
@@ -123,6 +123,21 @@ const toggleMenu = () => {
 
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
 };
+
+const isSidebarCollapsed = ref(false);
+
+const isMobile = ref(window.innerWidth <= 768);
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+const handleSidebarCollapse = (collapsed) => {
+  isSidebarCollapsed.value = collapsed;
+};
+
+onMounted(() => window.addEventListener('resize', handleResize));
+onUnmounted(() => window.removeEventListener('resize', handleResize));
 </script>
 
 <template>
@@ -131,55 +146,47 @@ const toggleMenu = () => {
     <header class="mobile-header">
       <div class="mobile-logo">eMemo</div>
       <button @click="toggleMenu" class="menu-btn">
-        <Menu v-if="!isMobileMenuOpen" class="w-6 h-6" />
-        <X v-else class="w-6 h-6" />
+        <Menu v-if="!isMobileMenuOpen" class="icon-small" />
+        <X v-else class="icon-small" />
       </button>
     </header>
 
-    <!-- Mobile Overlay -->
-    <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
-
-    <!-- Sidebar Wrapper -->
-    <div :class="['sidebar-wrapper', isMobileMenuOpen ? 'open' : '']">
-      <Sidebar />
+    <!-- Sidebar -->
+    <div :class="['sidebar-wrapper', { 'mobile-open': isMobileMenuOpen }]">
+      <Sidebar 
+        :is-mobile="isMobile"
+        @collapse="handleSidebarCollapse" 
+        @close="isMobileMenuOpen = false"
+      />
     </div>
-    
-    <main class="main-content">
-      <div class="header">
+
+    <!-- Main Content -->
+    <main 
+      class="main-content" 
+      :style="{ marginLeft: isMobile ? '0' : (isSidebarCollapsed ? '80px' : '260px') }"
+    >
+      <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
+
+      <header class="content-header">
         <div class="header-titles">
           <h1>{{ pageTitle }}</h1>
           <p>{{ pageDescription }}</p>
         </div>
-        <button class="btn-primary create-btn" @click="triggerCreateModal">
-          <Plus class="icon-small" /> New Request
+        <button class="create-btn" @click="triggerCreateModal">
+          <Plus class="icon-small" />
+          <span>New Request</span>
         </button>
-      </div>
+      </header>
       
       <div class="tabs-container">
         <button 
-          :class="['tab-btn', { active: activeTab === 'all' }]"
-          @click="activeTab = 'all'"
+          v-for="tab in ['all', 'my_memos', 'pending_approval', 'drafts']" 
+          :key="tab"
+          :class="['tab-btn', { active: activeTab === tab }]"
+          @click="activeTab = tab"
         >
-          All Memos
-        </button>
-        <button 
-          :class="['tab-btn', { active: activeTab === 'my_memos' }]"
-          @click="activeTab = 'my_memos'"
-        >
-          My Memos
-        </button>
-        <button 
-          :class="['tab-btn', { active: activeTab === 'pending_approval' }]"
-          @click="activeTab = 'pending_approval'"
-        >
-          Pending Approval
-          <span v-if="pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
-        </button>
-        <button 
-          :class="['tab-btn', { active: activeTab === 'drafts' }]"
-          @click="activeTab = 'drafts'"
-        >
-          Drafts
+          {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : (tab === 'all' ? 'All Memos' : 'Drafts')) }}
+          <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
         </button>
       </div>
 
@@ -190,7 +197,12 @@ const toggleMenu = () => {
       />
 
       <div class="list-wrapper">
-        <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
+        <MemoList 
+          ref="memoListRef" 
+          :memos="filteredMemos" 
+          :activeTab="activeTab" 
+          :currentUser="currentUser" 
+        />
       </div>
     </main>
   </div>
@@ -201,59 +213,73 @@ const toggleMenu = () => {
   display: flex;
   min-height: 100vh;
   position: relative;
+  background-color: var(--bg-app);
 }
 
-/* Sidebar styling controlled by App layout now */
 .sidebar-wrapper {
   position: fixed;
   left: 0;
   top: 0;
   height: 100vh;
   z-index: 100;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-content {
   flex: 1;
-  margin-left: 250px;
-  padding: 2rem;
-  max-width: 100%;
+  padding: var(--gutter);
+  min-width: 0;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.header {
-  margin-bottom: 2rem;
+.content-header {
+  margin-bottom: 2.5rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .header-titles h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.025em;
   margin-bottom: 0.25rem;
 }
 
 .header-titles p {
-  color: #64748b;
+  color: var(--text-muted);
+  font-size: 1rem;
 }
 
 .create-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  gap: 0.75rem;
+  padding: 0.8rem 1.5rem;
   background-color: #3b82f6;
   border: none;
   color: white;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: var(--radius-md);
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
 }
 
 .create-btn:hover {
   background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+}
+
+.create-btn:active {
+  transform: translateY(0);
+}
+
+.create-btn span {
+  display: inline-block;
 }
 
 .icon-small {
@@ -263,12 +289,11 @@ const toggleMenu = () => {
 
 .tabs-container {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
   border-bottom: 1px solid #e2e8f0;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+  padding-bottom: 1px;
 }
 
 /* Hide scrollbar for tabs container Chrome/Safari */
@@ -279,22 +304,23 @@ const toggleMenu = () => {
 .tab-btn {
   background: none;
   border: none;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #64748b;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
   white-space: nowrap;
+  letter-spacing: -0.01em;
 }
 
 .tab-btn:hover {
-  color: #0f172a;
+  color: var(--text-main);
 }
 
 .tab-btn.active {
-  color: #0f172a;
+  color: #3b82f6;
   border-bottom-color: #3b82f6;
 }
 
@@ -315,83 +341,70 @@ const toggleMenu = () => {
 }
 
 .list-wrapper {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow: hidden;
+  margin-top: 0.5rem;
 }
 
-/* Mobile Header (Hidden on Desktop) */
-.mobile-header {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background-color: white;
-  border-bottom: 1px solid #e2e8f0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 50;
-}
-
-.mobile-logo {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.menu-btn {
-  background: none;
-  border: none;
-  color: #475569;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.mobile-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.4);
-  z-index: 90;
-}
-
+/* Mobile styles */
 @media (max-width: 768px) {
-  .mobile-header {
-    display: flex;
-  }
-  
   .sidebar-wrapper {
     transform: translateX(-100%);
   }
-  
-  .sidebar-wrapper.open {
+  .sidebar-wrapper.mobile-open {
     transform: translateX(0);
   }
-
   .main-content {
-    margin-left: 0;
-    padding: 1rem;
-    padding-top: 5rem; /* Space for fixed mobile header */
+    margin-left: 0 !important;
+    padding-top: 5rem;
   }
+  .mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    z-index: 90;
+  }
+  .mobile-logo {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: #3b82f6;
+  }
+  .menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+  }
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 95;
+  }
+  .create-btn span {
+    display: none;
+  }
+  .create-btn {
+    padding: 0.75rem;
+    border-radius: 50%;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 80;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  }
+}
 
-  .header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .header-titles h1 {
-    font-size: 1.5rem;
-  }
-  
-  .tabs-container {
-    gap: 0.5rem;
-  }
-
-  .tab-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.95rem;
+@media (min-width: 769px) {
+  .mobile-header {
+    display: none;
   }
 }
 </style>
