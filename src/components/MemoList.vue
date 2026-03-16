@@ -32,8 +32,8 @@ const isConfirming = ref(false);
 
 // Pagination State
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
-const pageSizeOptions = [5, 10, 20, 50];
+const itemsPerPage = ref(12);
+const pageSizeOptions = [4, 8, 12, 16, 20, 24, 48];
 
 const totalPages = computed(() => Math.ceil(props.memos.length / itemsPerPage.value));
 
@@ -1638,9 +1638,27 @@ const getHistoryDotColor = (action) => {
 
 .memo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   padding: 0.5rem 0;
+}
+
+@media (max-width: 1280px) {
+  .memo-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .memo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .memo-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .memo-card-wrapper {
