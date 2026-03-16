@@ -1535,9 +1535,10 @@ const getHistoryDotColor = (action) => {
           </div>
 
           <!-- Action Area (Moved from footer) -->
-          <div class="modal-section-actions mt-6 pt-6 border-t border-slate-200">
+          <div class="modal-section-actions mt-6 pt-6 border-t border-slate-200" 
+               :style="{ textAlign: (!isEditMode && activeTab === 'pending_approval') || getActions(selectedMemo).includes('remind') ? 'center' : 'left' }">
             <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
-              class="modal-actions-group">
+              class="modal-actions-group is-centered">
               <button class="btn-success" @click="handleApprove">Approve</button>
               <button class="btn-warning" @click="handleRequestChanges">Request Changes</button>
               <button class="btn-danger" @click="handleReject">Reject</button>
@@ -1556,10 +1557,11 @@ const getHistoryDotColor = (action) => {
               </div>
             </template>
             <template v-else>
-              <button v-if="getActions(selectedMemo).includes('remind')" class="btn-remind w-full"
-                @click="handleRemind(selectedMemo)">
-                <Bell class="icon-small mr-1" /> Remind Approvers
-              </button>
+              <div v-if="getActions(selectedMemo).includes('remind')" class="modal-actions-group is-centered">
+                <button class="btn-remind" @click="handleRemind(selectedMemo)">
+                  <Bell class="icon-small mr-1" /> Remind Approvers
+                </button>
+              </div>
             </template>
           </div>
         </div>
@@ -2806,11 +2808,16 @@ const getHistoryDotColor = (action) => {
   gap: 0.75rem;
   flex-wrap: wrap;
   align-items: center;
+  width: 100%;
 }
+
 
 /* Button size consistency */
 .modal-actions-group button,
 .modal-footer button {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
   height: 2.5rem;
   padding: 0 1.25rem;
   font-weight: 600;
@@ -2819,6 +2826,23 @@ const getHistoryDotColor = (action) => {
   justify-content: center;
   border-radius: 8px;
   font-size: 0.95rem;
+}
+
+.modal-actions-group.is-centered {
+  justify-content: center !important;
+  width: fit-content !important;
+  margin: 0 auto !important;
+}
+
+.modal-actions-group.is-centered button {
+  margin: 0 !important;
+}
+
+@media (min-width: 641px) {
+  .modal-actions-group.is-centered button {
+    flex: none !important;
+    width: 180px !important;
+  }
 }
 
 @media (max-width: 640px) {
