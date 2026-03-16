@@ -2,7 +2,7 @@
 import { ref, defineProps, defineExpose, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import {
   ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search, Calendar,
-  CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check
+  CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check, XCircle
 } from 'lucide-vue-next';
 import MapPicker from './MapPicker.vue';
 
@@ -1548,23 +1548,28 @@ const getHistoryDotColor = (action) => {
           </div>
 
           <!-- Action Area (Moved from footer) -->
-          <div class="modal-section-actions mt-6 pt-6 border-t border-slate-200"
-            :style="{ textAlign: (!isEditMode && activeTab === 'pending_approval') || getActions(selectedMemo).includes('remind') ? 'center' : 'left' }">
+          <div>
             <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
               class="modal-actions-group is-centered">
-              <button class="btn-success" @click="handleApprove">Approve</button>
-              <button class="btn-warning" @click="handleRequestChanges">Request Changes</button>
-              <button class="btn-danger" @click="handleReject">Reject</button>
+              <button class="btn-success" @click="handleApprove">
+                <CheckCircle class="icon-small mr-2" /> Approve
+              </button>
+              <button class="btn-warning" @click="handleRequestChanges">
+                <FileEdit class="icon-small mr-2" /> Request Changes
+              </button>
+              <button class="btn-danger" @click="handleReject">
+                <XCircle class="icon-small mr-2" /> Reject
+              </button>
             </div>
 
             <template v-if="isEditMode">
-              <div class="modal-actions-group">
+              <div class="modal-actions-group is-centered">
                 <template v-if="isConfirming">
-                  <button class="btn-primary w-full" @click="handleUpdate">Confirm & Submit Submission</button>
+                  <button class="btn-primary" @click="handleUpdate">Confirm & Submit Submission</button>
                 </template>
                 <template v-else>
                   <button class="btn-draft" @click="handleSaveDraft">Save Draft</button>
-                  <button class="btn-primary flex-1" @click="handleUpdate">
+                  <button class="btn-primary" @click="handleUpdate">
                     {{ isCreateMode ? 'Submit Request' : 'Update Memo' }}
                   </button>
                 </template>
@@ -2754,6 +2759,11 @@ const getHistoryDotColor = (action) => {
   height: 12px;
 }
 
+.icon-small {
+  width: 16px;
+  height: 16px;
+}
+
 .mt-4 {
   margin-top: 1rem;
 }
@@ -2895,8 +2905,8 @@ const getHistoryDotColor = (action) => {
 
 .modal-actions-group.is-centered {
   justify-content: center !important;
-  width: fit-content !important;
-  margin: 0 auto !important;
+  width: 100% !important;
+  margin: 2rem auto !important;
 }
 
 .modal-actions-group.is-centered button {
@@ -2906,7 +2916,7 @@ const getHistoryDotColor = (action) => {
 @media (min-width: 641px) {
   .modal-actions-group.is-centered button {
     flex: none !important;
-    width: 180px !important;
+    width: 260px !important;
   }
 }
 
