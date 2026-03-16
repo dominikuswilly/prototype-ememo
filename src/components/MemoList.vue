@@ -1370,7 +1370,7 @@ const getHistoryDotColor = (action) => {
                       <span class="prefix">Rp</span>
                       <input type="number" v-model="selectedMemo.oldSalary.basic" class="form-input" />
                     </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary.basic || 0).toLocaleString('id-ID') }}</div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.basic || 0).toLocaleString('id-ID') }}</div>
                   </div>
                   <div class="detail-group">
                     <label>Meal / Transport Allowance</label>
@@ -1378,7 +1378,7 @@ const getHistoryDotColor = (action) => {
                       <span class="prefix">Rp</span>
                       <input type="number" v-model="selectedMemo.oldSalary.allowance" class="form-input" />
                     </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary.allowance || 0).toLocaleString('id-ID') }}</div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.allowance || 0).toLocaleString('id-ID') }}</div>
                   </div>
                   <div class="detail-group">
                     <label>Position Allowance</label>
@@ -1386,12 +1386,12 @@ const getHistoryDotColor = (action) => {
                       <span class="prefix">Rp</span>
                       <input type="number" v-model="selectedMemo.oldSalary.position" class="form-input" />
                     </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary.position || 0).toLocaleString('id-ID') }}</div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.position || 0).toLocaleString('id-ID') }}</div>
                   </div>
                   <div class="detail-group salary-total-group">
                     <label>Total (Read-Only)</label>
                     <div class="detail-value font-bold text-blue-600">
-                      Rp {{ (Number(selectedMemo.oldSalary.basic || 0) + Number(selectedMemo.oldSalary.allowance || 0) + Number(selectedMemo.oldSalary.position || 0)).toLocaleString('id-ID') }}
+                      Rp {{ (Number(selectedMemo.oldSalary?.basic || 0) + Number(selectedMemo.oldSalary?.allowance || 0) + Number(selectedMemo.oldSalary?.position || 0)).toLocaleString('id-ID') }}
                     </div>
                   </div>
                 </div>
@@ -1407,7 +1407,7 @@ const getHistoryDotColor = (action) => {
                       <span class="prefix">Rp</span>
                       <input type="number" v-model="selectedMemo.newSalary.basic" class="form-input" />
                     </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary.basic || 0).toLocaleString('id-ID') }}</div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.basic || 0).toLocaleString('id-ID') }}</div>
                   </div>
                   <div class="detail-group">
                     <label>Meal / Transport Allowance</label>
@@ -1415,7 +1415,7 @@ const getHistoryDotColor = (action) => {
                       <span class="prefix">Rp</span>
                       <input type="number" v-model="selectedMemo.newSalary.allowance" class="form-input" />
                     </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary.allowance || 0).toLocaleString('id-ID') }}</div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.allowance || 0).toLocaleString('id-ID') }}</div>
                   </div>
                   <div class="detail-group">
                     <label>Position Allowance</label>
@@ -1423,12 +1423,12 @@ const getHistoryDotColor = (action) => {
                       <span class="prefix">Rp</span>
                       <input type="number" v-model="selectedMemo.newSalary.position" class="form-input" />
                     </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary.position || 0).toLocaleString('id-ID') }}</div>
+                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.position || 0).toLocaleString('id-ID') }}</div>
                   </div>
                   <div class="detail-group salary-total-group">
                     <label>Total (Read-Only)</label>
                     <div class="detail-value font-bold text-blue-600">
-                      Rp {{ (Number(selectedMemo.newSalary.basic || 0) + Number(selectedMemo.newSalary.allowance || 0) + Number(selectedMemo.newSalary.position || 0)).toLocaleString('id-ID') }}
+                      Rp {{ (Number(selectedMemo.newSalary?.basic || 0) + Number(selectedMemo.newSalary?.allowance || 0) + Number(selectedMemo.newSalary?.position || 0)).toLocaleString('id-ID') }}
                     </div>
                   </div>
                 </div>
