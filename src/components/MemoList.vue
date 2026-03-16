@@ -1765,8 +1765,9 @@ const getHistoryDotColor = (action) => {
   }
   
   .reminded-tag {
-    width: 24px;
-    height: 24px;
+    width: auto;
+    padding: 0 0.5rem;
+    height: 28px;
     border-radius: 6px;
   }
 }
@@ -1799,8 +1800,9 @@ const getHistoryDotColor = (action) => {
 
 @media (max-width: 640px) {
   .status-badge-premium {
-    width: 24px;
-    height: 24px;
+    width: auto;
+    padding: 0 0.6rem;
+    height: 28px;
     border-radius: 6px;
   }
 }
@@ -2391,15 +2393,23 @@ const getHistoryDotColor = (action) => {
   .modal-header {
     flex-wrap: wrap;
     gap: 0.75rem;
+    position: relative; /* Added to anchor absolute close button */
+    padding-right: 3.5rem !important; /* Ensure room for close button */
   }
   .modal-header-left {
     width: 100%;
     gap: 0.5rem;
   }
+  .modal-header-right {
+    width: 100%;
+    justify-content: flex-start;
+    padding-right: 0; /* Header-right already has room due to header padding */
+  }
   .btn-close {
     position: absolute;
     top: 1rem;
     right: 1rem;
+    margin: 0 !important; /* Clear ml-3 or other margins */
   }
   .modal-header, .modal-footer {
     padding: 1rem;
