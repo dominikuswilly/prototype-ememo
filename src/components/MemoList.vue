@@ -168,23 +168,15 @@ const templateList = [
   { name: 'LPJ Cash Advance dibawah Rp. 2.500.000,-', division: 'Accounting & Finance' },
   { name: 'LPJ Cash Advance Rp. 2.500.000,- s/d Rp. 10.000.000,-', division: 'Accounting & Finance' },
   { name: 'Pembelian Karangan Bunga', division: 'Accounting & Finance' },
-  { name: 'Pembelian Kue / Parsel', division: 'Accounting & Finance' },
   { name: 'Pengajuan Fee Agent', division: 'Accounting & Finance' },
   { name: 'Pengajuan Kartu Kredit Corporate', division: 'Accounting & Finance' },
   { name: 'Pengajuan Pembukaan Rekening Perusahaan', division: 'Accounting & Finance' },
-  { name: 'Pengajuan Perjalanan Dinas', division: 'Accounting & Finance' },
   { name: 'Pengajuan Sewa Kantor', division: 'Accounting & Finance' },
   { name: 'Pertanggung Jawaban Perjalanan Dinas', division: 'Accounting & Finance' },
-  { name: 'Reimburse diatas Rp. 10.000.000,-', division: 'Accounting & Finance' },
-  { name: 'Reimburse diatas Rp. 500.000,-', division: 'Accounting & Finance' },
-  { name: 'Reimburse dibawah Rp. 500.000,-', division: 'Accounting & Finance' },
   { name: 'Reimburse Entertain diatas Rp. 10.000.000,-', division: 'Accounting & Finance' },
-  { name: 'Reimburse Entertain diatas Rp. 500.000,-', division: 'Accounting & Finance' },
   { name: 'Reimburse Entertain dibawah Rp. 500.000,-', division: 'Accounting & Finance' },
   { name: 'Reimburse Entertain Rp. 2.500.000,- s/d Rp. 10.000.000,-', division: 'Accounting & Finance' },
   { name: 'Reimburse Entertain Rp. 500.000,- s/d Rp. 2.500.000,-', division: 'Accounting & Finance' },
-  { name: 'Reimburse Rp. 2.500.000,- s/d Rp. 10.000.000,-', division: 'Accounting & Finance' },
-  { name: 'Reimburse Rp. 500.000,- s/d Rp. 2.500.000,-', division: 'Accounting & Finance' },
   { name: 'Sponsorship', division: 'Accounting & Finance' },
   // Claim
   { name: 'Internal Memo', division: 'Claim' },
@@ -215,12 +207,13 @@ const templateList = [
   { name: 'Perjalanan Dinas', division: 'HRD' },
   { name: 'Perpanjangan Masa Jabatan', division: 'HRD' },
   // IT
-  { name: 'IT Testing', division: 'IT' },
   { name: 'Pembelian Hardware/Software', division: 'IT' },
   { name: 'Pembelian Hardware/Software Diatas 4 Juta', division: 'IT' },
   { name: 'Pengajuan/Perpanjangan Lisensi', division: 'IT' },
   { name: 'Pengajuan/Perpanjangan Maintenance', division: 'IT' },
   { name: 'Service Hardware/Software', division: 'IT' },
+  { name: 'Template Test PJDNS 1.76.7', division: 'IT' },
+  { name: 'Template Test STD 1.76.8', division: 'IT' },
   // Legal
   { name: 'Internal Memo Legal', division: 'Legal' },
   { name: 'Pengisian Dokumen Non PKS', division: 'Legal' },
@@ -230,7 +223,6 @@ const templateList = [
   { name: 'Permintaan PKS (Persetujuan Khusus)', division: 'Legal' },
   { name: 'Review / Drafting PKS', division: 'Legal' },
   // Technical
-  { name: 'Lain-Lain', division: 'Technical' },
   { name: 'Penggunaan Asuransi', division: 'Technical' },
   { name: 'Self Insurance', division: 'Technical' },
   { name: 'Sponsorship', division: 'Technical' },
@@ -705,16 +697,18 @@ const getHistoryDotColor = (action) => {
           >
             <!-- Card Header: Title and Status -->
             <div class="memo-card-header">
-              <div class="memo-card-title-group">
-                <h3 class="memo-card-title">{{ memo.title }}</h3>
-                <span class="memo-card-number">#{{ memo.memoNumber }}</span>
-              </div>
-              <div class="header-right-group">
-                <div v-if="memo.isReminded" class="reminded-tag" title="Approvers have been reminded">
-                  <Bell class="icon-tiny" />
+              <div class="memo-card-header-top">
+                <div class="memo-card-title-group">
+                  <h3 class="memo-card-title">{{ memo.title }}</h3>
+                  <span class="memo-card-number">#{{ memo.memoNumber }}</span>
                 </div>
-                <div :class="['status-badge-premium', getStatusColor(memo.status)]" :title="memo.status">
-                  <component :is="getStatusIcon(memo.status)" class="status-icon" />
+                <div class="header-right-group">
+                  <div v-if="memo.isReminded" class="reminded-tag" title="Approvers have been reminded">
+                    <Bell class="icon-tiny" />
+                  </div>
+                  <div :class="['status-badge-premium', getStatusColor(memo.status)]" :title="memo.status">
+                    <component :is="getStatusIcon(memo.status)" class="status-icon" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -982,9 +976,11 @@ const getHistoryDotColor = (action) => {
           <div class="modal-header-right">
             <div v-if="selectedMemo && selectedMemo.isReminded" class="reminded-tag mr-2" title="Approvers have been reminded">
               <Bell class="icon-tiny" />
+              <span v-if="!isEditMode" class="tag-text">REMINDED</span>
             </div>
             <div v-if="!isCreateMode" :class="['status-badge-premium', getStatusColor(selectedMemo.status)]" :title="selectedMemo.status">
               <component :is="getStatusIcon(selectedMemo.status)" class="status-icon" />
+              <span v-if="!isEditMode" class="badge-text">{{ selectedMemo.status }}</span>
             </div>
             <button class="btn-close ml-3" @click="closeViewModal">
               <X class="icon" />
@@ -1682,11 +1678,19 @@ const getHistoryDotColor = (action) => {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+}
+
+.memo-card-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .memo-card-title-group {
-  padding-right: 70px; /* Special space for badges in the corner */
+  flex: 1;
+  min-width: 0; /* Important for text truncation inside flexbox */
 }
 
 .memo-card-title {
@@ -1710,12 +1714,10 @@ const getHistoryDotColor = (action) => {
 }
 
 .header-right-group {
-  position: absolute;
-  top: 0;
-  right: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .reminded-tag {
@@ -1724,11 +1726,18 @@ const getHistoryDotColor = (action) => {
   justify-content: center;
   background: #fdf2f8;
   color: #db2777;
-  width: 28px;
+  padding: 0 0.5rem;
   height: 28px;
   border-radius: 8px;
   border: 1px solid #fbcfe8;
   transition: all 0.2s;
+  gap: 0.35rem;
+}
+
+.tag-text {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
 }
 
 @media (max-width: 640px) {
@@ -1753,7 +1762,8 @@ const getHistoryDotColor = (action) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
+  padding: 0 0.6rem;
+  min-width: 28px;
   height: 28px;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -1762,6 +1772,11 @@ const getHistoryDotColor = (action) => {
   letter-spacing: 0.025em;
   white-space: nowrap;
   flex-shrink: 0;
+  gap: 0.35rem;
+}
+
+.badge-text {
+  font-size: 0.7rem;
 }
 
 @media (max-width: 640px) {

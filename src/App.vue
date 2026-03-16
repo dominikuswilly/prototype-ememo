@@ -208,6 +208,10 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
           :currentUser="currentUser" 
         />
       </div>
+
+      <footer class="app-footer">
+        <p>Designed by Willy</p>
+      </footer>
     </main>
   </div>
 </template>
@@ -491,9 +495,27 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   }
 }
 
-@media (min-width: 769px) {
-  .mobile-header {
-    display: none;
+.app-footer {
+  margin-top: 3rem;
+  padding: 2rem var(--gutter);
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.app-footer p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .app-footer {
+    padding-bottom: 6rem; /* Space for fab button */
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
   }
 }
 </style>
