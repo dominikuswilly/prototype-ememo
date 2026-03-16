@@ -938,6 +938,7 @@ const getHistoryDotColor = (action) => {
             <h2 v-if="isConfirming">Review Submission</h2>
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
+            <span v-if="!isCreateMode && selectedMemo" class="header-memo-number">{{ selectedMemo.memoNumber }}</span>
           </div>
           <div class="modal-header-right">
             <div v-if="selectedMemo && selectedMemo.isReminded" class="reminded-tag mr-2"
@@ -987,8 +988,16 @@ const getHistoryDotColor = (action) => {
                   </div>
                 </div>
                 <div class="summary-item mt-3">
-                  <label>Attachments</label>
-                  <div class="summary-value">{{ selectedMemo.attachmentsCount }} file(s) attached</div>
+                  <label>Attachment ({{ selectedMemo.attachmentsCount }})</label>
+                  <div v-if="selectedMemo.attachmentsCount > 0" class="attachments-grid mt-2">
+                    <div v-for="n in selectedMemo.attachmentsCount" :key="n" class="attachment-card">
+                      <div class="attachment-icon-box">
+                        <FileText class="attachment-icon-large" />
+                      </div>
+                      <span class="attachment-name">Doc {{ n }}</span>
+                    </div>
+                  </div>
+                  <div v-else class="summary-value mt-1 text-slate-400 italic">No files attached</div>
                 </div>
               </div>
 
@@ -1023,7 +1032,8 @@ const getHistoryDotColor = (action) => {
                 </div>
               </div>
             </div>
-          </div><div v-else class="modal-sections-column">
+          </div>
+          <div v-else class="modal-sections-column">
             <!-- Section 1: Core Information -->
             <!-- Rejection/Changes (Conditional) - Moved to top -->
             <div
@@ -1064,13 +1074,16 @@ const getHistoryDotColor = (action) => {
             <div class="detail-section">
               <h3 class="section-group-title">General Information</h3>
               <div class="detail-row">
-                <div v-if="!isCreateMode" class="detail-group">
-                  <label>Memo Number</label>
-                  <div class="detail-value font-mono">{{ selectedMemo.memoNumber }}</div>
-                </div>
                 <div class="detail-group">
-                  <label>Department</label>
-                  <div class="detail-value">{{ selectedMemo.department }}</div>
+                  <label>{{ isCreateMode ? 'Department' : 'Requester' }}</label>
+                  <div v-if="isCreateMode" class="detail-value">{{ selectedMemo.department }}</div>
+                  <div v-else class="detail-value requester-info-row">
+                    <span class="requester-name">{{ selectedMemo.requester }}</span>
+                    <span class="department-marker">
+                      <Building2 class="icon-tiny" style="margin: 0 0.25rem;" />
+                      {{ selectedMemo.department }}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1108,7 +1121,7 @@ const getHistoryDotColor = (action) => {
               </div>
             </div>
 
-              <!-- Section 2: Content -->
+            <!-- Section 2: Content -->
             <template v-if="!isCreateMode || (selectedMemo.category && selectedMemo.categoryType)">
               <div class="detail-section">
                 <h3 class="section-group-title">Memo Content</h3>
@@ -1126,7 +1139,7 @@ const getHistoryDotColor = (action) => {
                 <!-- Attachments Section -->
                 <div class="detail-group mt-4 attachments-collapsible">
                   <button class="section-toggle-header" @click="isAttachmentsCollapsed = !isAttachmentsCollapsed">
-                    <label class="m-0 cursor-pointer">Attachments ({{ selectedMemo.attachmentsCount }})</label>
+                    <label class="m-0 cursor-pointer">Attachment ({{ selectedMemo.attachmentsCount }})</label>
                     <div class="history-toggle-icon" :class="{ 'is-open': !isAttachmentsCollapsed }">
                       <ChevronRight class="icon-small" />
                     </div>
@@ -1139,7 +1152,7 @@ const getHistoryDotColor = (action) => {
                         <div class="attachment-icon-box">
                           <FileText class="attachment-icon-large" />
                         </div>
-                        <span class="attachment-name">Doc #{{ n }}</span>
+                        <span class="attachment-name">Doc {{ n }}</span>
                         <button v-if="isEditMode" class="btn-remove-attachment-abs" title="Remove"
                           @click.prevent="selectedMemo.attachmentsCount--">
                           <X class="icon-tiny" />
@@ -1535,8 +1548,8 @@ const getHistoryDotColor = (action) => {
           </div>
 
           <!-- Action Area (Moved from footer) -->
-          <div class="modal-section-actions mt-6 pt-6 border-t border-slate-200" 
-               :style="{ textAlign: (!isEditMode && activeTab === 'pending_approval') || getActions(selectedMemo).includes('remind') ? 'center' : 'left' }">
+          <div class="modal-section-actions mt-6 pt-6 border-t border-slate-200"
+            :style="{ textAlign: (!isEditMode && activeTab === 'pending_approval') || getActions(selectedMemo).includes('remind') ? 'center' : 'left' }">
             <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
               class="modal-actions-group is-centered">
               <button class="btn-success" @click="handleApprove">Approve</button>
@@ -1551,8 +1564,9 @@ const getHistoryDotColor = (action) => {
                 </template>
                 <template v-else>
                   <button class="btn-draft" @click="handleSaveDraft">Save Draft</button>
-                  <button class="btn-primary flex-1" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo'
-                  }}</button>
+                  <button class="btn-primary flex-1" @click="handleUpdate">
+                    {{ isCreateMode ? 'Submit Request' : 'Update Memo' }}
+                  </button>
                 </template>
               </div>
             </template>
@@ -1724,9 +1738,10 @@ const getHistoryDotColor = (action) => {
 
 .header-right-group {
   display: flex;
-  align-items: flex-start;
-  gap: 0.4rem;
+  align-items: center;
   flex-shrink: 0;
+  margin-left: 0.75rem;
+  margin-right: 0.25rem;
 }
 
 .reminded-tag {
@@ -1741,6 +1756,7 @@ const getHistoryDotColor = (action) => {
   border: 1px solid #fbcfe8;
   transition: all 0.2s;
   gap: 0.35rem;
+  margin-right: 0.25rem;
 }
 
 .tag-text {
@@ -1751,8 +1767,8 @@ const getHistoryDotColor = (action) => {
 
 @media (max-width: 640px) {
   .header-right-group {
-    top: -2px;
-    right: -2px;
+    margin-left: 0.5rem;
+    margin-right: 0;
   }
 
   .reminded-tag {
@@ -1783,6 +1799,7 @@ const getHistoryDotColor = (action) => {
   white-space: nowrap;
   flex-shrink: 0;
   gap: 0.35rem;
+  margin-left: 0.25rem;
 }
 
 .badge-text {
@@ -2665,9 +2682,17 @@ const getHistoryDotColor = (action) => {
 }
 
 .detail-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+  .detail-group {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
 }
 
 .detail-group label {
@@ -2687,6 +2712,46 @@ const getHistoryDotColor = (action) => {
 .font-semibold {
   font-weight: 600;
   font-size: 1.1rem;
+}
+
+.requester-info-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.requester-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.department-marker {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #4338ca;
+  background: #e0e7ff;
+  padding: 2px 8px;
+  border-radius: 99px;
+  margin-left: 0.6rem;
+  font-weight: 600;
+}
+
+.header-memo-number {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  margin-left: 0.75rem;
+  font-weight: 600;
+}
+
+.icon-tiny {
+  width: 12px;
+  height: 12px;
 }
 
 .mt-4 {
@@ -2850,7 +2915,7 @@ const getHistoryDotColor = (action) => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .modal-actions-group button,
   .modal-footer button {
     width: 100%;
