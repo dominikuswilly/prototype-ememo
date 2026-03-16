@@ -1548,7 +1548,7 @@ const getHistoryDotColor = (action) => {
           </div>
 
           <!-- Action Area (Moved from footer) -->
-          <div>
+          <div class="modal-section-actions">
             <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
               class="modal-actions-group is-centered">
               <button class="btn-success" @click="handleApprove">
@@ -2873,9 +2873,10 @@ const getHistoryDotColor = (action) => {
 
 /* Action Area (Moved from footer) */
 .modal-section-actions {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px dashed #e2e8f0;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f1f5f9;
+  width: 100%;
 }
 
 .modal-actions-group {
@@ -2904,19 +2905,22 @@ const getHistoryDotColor = (action) => {
 }
 
 .modal-actions-group.is-centered {
+  display: flex !important;
   justify-content: center !important;
   width: 100% !important;
-  margin: 2rem auto !important;
+  margin: 0 auto !important;
+  gap: 1.25rem !important;
 }
 
 .modal-actions-group.is-centered button {
+  flex: 0 0 auto !important;
+  max-width: none !important;
   margin: 0 !important;
 }
 
 @media (min-width: 641px) {
   .modal-actions-group.is-centered button {
-    flex: none !important;
-    width: 260px !important;
+    width: 240px !important;
   }
 }
 
