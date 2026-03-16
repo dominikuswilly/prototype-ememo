@@ -13,7 +13,7 @@ const activeTab = ref('all');
 
 // Mock user for "Pending Approval" logic
 // Mock user for hierarchy
-const currentUser = 'Tyrell Wellick';
+const currentUser = 'Willy';
 const subordinates = [
   { name: 'Elliot Alderson', role: 'Cybersecurity Engineer' },
   { name: 'Angela Moss', role: 'Risk Management PR' },

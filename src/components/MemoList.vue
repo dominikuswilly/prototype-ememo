@@ -17,7 +17,7 @@ const props = defineProps({
   },
   currentUser: {
     type: String,
-    default: 'Tyrell Wellick'
+    default: 'Willy'
   }
 });
 

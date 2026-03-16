@@ -69,7 +69,7 @@ const handleNavClick = () => {
         <User class="avatar-icon" />
       </div>
       <div class="user-info">
-        <div class="user-name">Tyrell Wellick</div>
+        <div class="user-name">Willy</div>
         <div class="user-role">CTO</div>
       </div>
     </div>

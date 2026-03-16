@@ -45,7 +45,7 @@ export const mockMemos = [
     categoryType: "Infrastructure Change",
     department: "Engineering",
     createdAt: "2026-03-08T14:30:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Approved",
     approvalChain: [
       {
@@ -61,7 +61,7 @@ export const mockMemos = [
     attachmentsCount: 1,
     memoNumber: "ENG-2026-042",
     history: [
-      { at: "2026-03-08T14:30:00Z", action: "Created", user: "Tyrell Wellick", note: "Urgent migration plan." },
+      { at: "2026-03-08T14:30:00Z", action: "Created", user: "Willy", note: "Urgent migration plan." },
       { at: "2026-03-09T09:00:00Z", action: "Approved", user: "Alan Turing", note: "Migration windows confirmed with Ops." }
     ]
   },
@@ -73,7 +73,7 @@ export const mockMemos = [
     categoryType: "Appointment as Permanent Employee",
     department: "Engineering",
     createdAt: "2026-03-11T11:15:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Pending",
     isReminded: true,
     approvalChain: [
@@ -92,7 +92,7 @@ export const mockMemos = [
     attachmentsCount: 2,
     memoNumber: "HR-2026-015",
     history: [
-      { at: "2026-03-11T11:15:00Z", action: "Created", user: "Tyrell Wellick", note: "Drafting new policy for Engineering." },
+      { at: "2026-03-11T11:15:00Z", action: "Created", user: "Willy", note: "Drafting new policy for Engineering." },
       { at: "2026-03-12T08:30:00Z", action: "Approved (Quorum)", user: "Michael Scott", note: "Looks good to me. Toby, please review." }
     ]
   },
@@ -153,7 +153,7 @@ export const mockMemos = [
         status: "Pending",
         requiredApprovals: 1,
         approvers: [
-          { name: "Tyrell Wellick", role: "VP Tech", status: "Pending" },
+          { name: "Willy", role: "VP Tech", status: "Pending" },
           { name: "Angela Moss", role: "SecOps", status: "Pending" }
         ]
       }
@@ -173,7 +173,7 @@ export const mockMemos = [
     categoryType: "Reimburse Entertain Rp. 500.000,- s/d Rp. 2.500.000,-",
     department: "Engineering",
     createdAt: "2026-03-09T20:15:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Approved",
     approvalChain: [
       {
@@ -198,7 +198,7 @@ export const mockMemos = [
     attachmentsCount: 1,
     memoNumber: "FIN-2026-018",
     history: [
-      { at: "2026-03-09T20:15:00Z", action: "Created", user: "Tyrell Wellick", note: "Client dinner." },
+      { at: "2026-03-09T20:15:00Z", action: "Created", user: "Willy", note: "Client dinner." },
       { at: "2026-03-10T10:00:00Z", action: "Approved Tier 1", user: "Joanna Wellick", note: "Verified." },
       { at: "2026-03-11T14:30:00Z", action: "Approved", user: "Phillip Price", note: "Important client relationship." }
     ]
@@ -238,7 +238,7 @@ export const mockMemos = [
     categoryType: "Permintaan NDA",
     department: "Engineering",
     createdAt: "2026-03-08T11:20:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Approved",
     approvalChain: [
       {
@@ -249,16 +249,16 @@ export const mockMemos = [
         approvers: [
           { name: "Susan Jacobs", role: "General Counsel", status: "Pending" },
           { name: "Lloyd Chung", role: "Legal Associate", status: "Approved" },
-          { name: "Tyrell Wellick", role: "VP Tech", status: "Approved" }
+          { name: "Willy", role: "VP Tech", status: "Approved" }
         ]
       }
     ],
     attachmentsCount: 2,
     memoNumber: "LGL-2026-031",
     history: [
-      { at: "2026-03-08T11:20:00Z", action: "Created", user: "Tyrell Wellick", note: "Standard NDA draft." },
+      { at: "2026-03-08T11:20:00Z", action: "Created", user: "Willy", note: "Standard NDA draft." },
       { at: "2026-03-09T14:00:00Z", action: "Approved (Quorum)", user: "Lloyd Chung", note: "Terms look standard." },
-      { at: "2026-03-10T09:15:00Z", action: "Approved (Quorum)", user: "Tyrell Wellick", note: "Ready for General Counsel." }
+      { at: "2026-03-10T09:15:00Z", action: "Approved (Quorum)", user: "Willy", note: "Ready for General Counsel." }
     ]
   },
   {
@@ -298,7 +298,7 @@ export const mockMemos = [
     categoryType: "Budget Request",
     department: "Engineering",
     createdAt: "2026-03-13T08:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Requested Changes",
     rejectionReason: "Travel expenses are over the limit. Please reduce by 20%.",
     approvalChain: [
@@ -315,7 +315,7 @@ export const mockMemos = [
     attachmentsCount: 2,
     memoNumber: "FIN-2026-055",
     history: [
-      { at: "2026-03-13T08:00:00Z", action: "Created", user: "Tyrell Wellick", note: "New budget for Project Phoenix." },
+      { at: "2026-03-13T08:00:00Z", action: "Created", user: "Willy", note: "New budget for Project Phoenix." },
       { at: "2026-03-13T09:15:00Z", action: "Requested Changes", user: "Phillip Price", note: "Travel expenses are over the limit. Please reduce by 20%." }
     ]
   },
@@ -337,7 +337,7 @@ export const mockMemos = [
         status: "Requested Changes",
         requiredApprovals: 1,
         approvers: [
-          { name: "Tyrell Wellick", role: "VP Tech", status: "Requested Changes" }
+          { name: "Willy", role: "VP Tech", status: "Requested Changes" }
         ]
       }
     ],
@@ -345,7 +345,7 @@ export const mockMemos = [
     memoNumber: "IT-2026-103",
     history: [
       { at: "2026-03-13T10:00:00Z", action: "Created", user: "Elliot Alderson", note: "Renewal request." },
-      { at: "2026-03-13T11:45:00Z", action: "Requested Changes", user: "Tyrell Wellick", note: "Missing user list." }
+      { at: "2026-03-13T11:45:00Z", action: "Requested Changes", user: "Willy", note: "Missing user list." }
     ]
   },
   {
@@ -410,13 +410,13 @@ export const mockMemos = [
     categoryType: "Pengajuan Perjalanan Dinas",
     department: "Engineering",
     createdAt: "2026-03-10T11:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Approved",
     approvalChain: [{ tier: 1, type: "single", status: "Approved", requiredApprovals: 1, approvers: [{ name: "Phillip Price", role: "CEO", status: "Approved" }] }],
     attachmentsCount: 1,
     memoNumber: "ENG-2026-058",
     history: [
-      { at: "2026-03-10T11:00:00Z", action: "Created", user: "Tyrell Wellick", note: "Conference attendance." },
+      { at: "2026-03-10T11:00:00Z", action: "Created", user: "Willy", note: "Conference attendance." },
       { at: "2026-03-10T12:00:00Z", action: "Approved", user: "Phillip Price", note: "Company representation." }
     ]
   },
@@ -428,14 +428,14 @@ export const mockMemos = [
     categoryType: "Infrastructure Change",
     department: "Engineering",
     createdAt: "2026-03-09T09:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Rejected",
     rejectionReason: "Budget already allocated for cloud migration. Defer to next quarter.",
     approvalChain: [{ tier: 1, type: "single", status: "Rejected", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Rejected" }] }],
     attachmentsCount: 0,
     memoNumber: "ENG-2026-060",
     history: [
-      { at: "2026-03-09T09:00:00Z", action: "Created", user: "Tyrell Wellick", note: "Required for performance." },
+      { at: "2026-03-09T09:00:00Z", action: "Created", user: "Willy", note: "Required for performance." },
       { at: "2026-03-09T11:00:00Z", action: "Rejected", user: "Alan Turing", note: "Budget locked for cloud migration." }
     ]
   },
@@ -517,14 +517,14 @@ export const mockMemos = [
     categoryType: "Infrastructure Change",
     department: "Engineering",
     createdAt: "2026-03-04T16:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Pending",
     isReminded: true,
     approvalChain: [{ tier: 1, type: "single", status: "Pending", requiredApprovals: 1, approvers: [{ name: "Alan Turing", role: "CTO", status: "Pending" }] }],
     attachmentsCount: 0,
     memoNumber: "ENG-2026-065",
     history: [
-      { at: "2026-03-04T16:00:00Z", action: "Created", user: "Tyrell Wellick", note: "Migration to Slate." }
+      { at: "2026-03-04T16:00:00Z", action: "Created", user: "Willy", note: "Migration to Slate." }
     ]
   },
   {
@@ -535,13 +535,13 @@ export const mockMemos = [
     categoryType: "Infrastructure Change",
     department: "Engineering",
     createdAt: "2026-03-14T10:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Draft",
     approvalChain: [],
     attachmentsCount: 0,
     memoNumber: "ENG-DRAFT-001",
     history: [
-      { at: "2026-03-14T10:00:00Z", action: "Draft Created", user: "Tyrell Wellick", note: "Working on budget details." }
+      { at: "2026-03-14T10:00:00Z", action: "Draft Created", user: "Willy", note: "Working on budget details." }
     ]
   },
   {
@@ -552,13 +552,13 @@ export const mockMemos = [
     categoryType: "Infrastructure Change",
     department: "Engineering",
     createdAt: "2026-03-14T15:30:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Draft",
     approvalChain: [],
     attachmentsCount: 1,
     memoNumber: "ENG-DRAFT-002",
     history: [
-      { at: "2026-03-14T15:30:00Z", action: "Draft Created", user: "Tyrell Wellick", note: "Need to consult with Security first." }
+      { at: "2026-03-14T15:30:00Z", action: "Draft Created", user: "Willy", note: "Need to consult with Security first." }
     ]
   },
   {
@@ -569,7 +569,7 @@ export const mockMemos = [
     categoryType: "Resource Allocation",
     department: "Engineering",
     createdAt: "2026-03-14T09:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Pending",
     approvalChain: [
       {
@@ -586,14 +586,14 @@ export const mockMemos = [
         requiredApprovals: 2,
         approvers: [
           { name: "Angela Moss", role: "PR Manager", status: "Approved" },
-          { name: "Tyrell Wellick", role: "Specialist", status: "Pending" }
+          { name: "Willy", role: "Specialist", status: "Pending" }
         ]
       }
     ],
     attachmentsCount: 2,
     memoNumber: "OPS-2026-001",
     history: [
-      { at: "2026-03-14T09:00:00Z", action: "Created", user: "Tyrell Wellick" },
+      { at: "2026-03-14T09:00:00Z", action: "Created", user: "Willy" },
       { at: "2026-03-14T10:30:00Z", action: "Approved", user: "Elliot Alderson", note: "Tier 1 cleared." },
       { at: "2026-03-14T11:45:00Z", action: "Approved", user: "Angela Moss", note: "Waiting for Darlene." }
     ]
@@ -606,7 +606,7 @@ export const mockMemos = [
     categoryType: "Budget Adjustment",
     department: "Engineering",
     createdAt: "2026-03-13T08:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Pending",
     approvalChain: [
       {
@@ -631,13 +631,13 @@ export const mockMemos = [
         type: "single",
         status: "Pending",
         requiredApprovals: 1,
-        approvers: [{ name: "Tyrell Wellick", role: "CEO", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CEO", status: "Pending" }]
       }
     ],
     attachmentsCount: 1,
     memoNumber: "FIN-2026-002",
     history: [
-      { at: "2026-03-13T08:00:00Z", action: "Created", user: "Tyrell Wellick" },
+      { at: "2026-03-13T08:00:00Z", action: "Created", user: "Willy" },
       { at: "2026-03-13T09:00:00Z", action: "Approved", user: "Elliot Alderson" },
       { at: "2026-03-13T10:00:00Z", action: "Approved", user: "Angela Moss" },
       { at: "2026-03-13T11:00:00Z", action: "Approved", user: "Darlene Alderson" }
@@ -651,7 +651,7 @@ export const mockMemos = [
     categoryType: "Office Supplies",
     department: "Engineering",
     createdAt: "2026-03-14T14:00:00Z",
-    requester: "Tyrell Wellick",
+    requester: "Willy",
     status: "Pending",
     approvalChain: [
       {
@@ -659,13 +659,13 @@ export const mockMemos = [
         type: "single",
         status: "Pending",
         requiredApprovals: 1,
-        approvers: [{ name: "Tyrell Wellick", role: "Security Lead", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "Security Lead", status: "Pending" }]
       }
     ],
     attachmentsCount: 0,
     memoNumber: "GEN-2026-003",
     history: [
-      { at: "2026-03-14T14:00:00Z", action: "Created", user: "Tyrell Wellick" }
+      { at: "2026-03-14T14:00:00Z", action: "Created", user: "Willy" }
     ]
   }
 ];
