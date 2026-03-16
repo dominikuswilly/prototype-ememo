@@ -1833,12 +1833,13 @@ const getHistoryDotColor = (action) => {
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  height: 4.05rem; /* Rigid height for 3 lines (3 * 1.5 * 0.9rem) */
 }
 
 .memo-details-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
   border-top: 1px solid #f1f5f9;
   padding-top: 1rem;
 }
@@ -1850,6 +1851,13 @@ const getHistoryDotColor = (action) => {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 500;
+  min-width: 0; /* Allow grid item to shrink below content size */
+}
+
+.detail-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detail-icon {
