@@ -1,6 +1,6 @@
 <script setup>
 import { ref, defineProps, defineExpose, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
-import { 
+import {
   ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search, Calendar,
   CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check
 } from 'lucide-vue-next';
@@ -69,10 +69,10 @@ const loadMore = () => {
 let holdTimer = null;
 const handlePressStart = (memo) => {
   if (!isMobile.value) return;
-  
+
   // Clear any existing timer
   if (holdTimer) clearTimeout(holdTimer);
-  
+
   holdTimer = setTimeout(() => {
     selectedRow.value = memo;
     // Vibrations can enhance mobile feel if supported
@@ -109,10 +109,10 @@ const onDragOver = (e) => {
 
 const onDrop = (targetId) => {
   if (dragSourceId.value === targetId) return;
-  
+
   const sourceIdx = memosCopy.value.findIndex(m => m.id === dragSourceId.value);
   const targetIdx = memosCopy.value.findIndex(m => m.id === targetId);
-  
+
   if (sourceIdx !== -1 && targetIdx !== -1) {
     const [movedItem] = memosCopy.value.splice(sourceIdx, 1);
     memosCopy.value.splice(targetIdx, 0, movedItem);
@@ -255,7 +255,7 @@ const selectTemplate = (item) => {
   selectedMemo.value.categoryType = item.name;
   selectedMemo.value.category = item.division;
   selectedMemo.value.department = item.division;
-  
+
   // Initialize Travel fields if applicable
   if (item.name === 'Pengajuan Perjalanan Dinas') {
     if (selectedMemo.value.travStartDate === undefined) {
@@ -283,7 +283,7 @@ const selectTemplate = (item) => {
       selectedMemo.value.hrEffectiveDate = '';
     }
   }
-  
+
   templateSearch.value = item.name;
   showSuggestions.value = false;
 };
@@ -339,21 +339,21 @@ const isSearchingInWizard = computed(() => wizardSearch.value.trim().length > 0)
 const wizardFilteredTemplates = computed(() => {
   const q = wizardSearch.value.trim().toLowerCase();
   if (!q) return [];
-  return templateList.filter(t => 
-    t.name.toLowerCase().includes(q) || 
+  return templateList.filter(t =>
+    t.name.toLowerCase().includes(q) ||
     t.division.toLowerCase().includes(q)
   );
 });
 
 const divisionMeta = {
   'Accounting & Finance': { color: '#2563eb', bg: '#eff6ff', borderColor: '#bfdbfe', component: DollarSign },
-  'Claim':                { color: '#7c3aed', bg: '#f5f3ff', borderColor: '#ddd6fe', component: FileText },
-  'Employee Benefit':     { color: '#059669', bg: '#ecfdf5', borderColor: '#a7f3d0', component: Shield },
-  'General Affair':       { color: '#d97706', bg: '#fffbeb', borderColor: '#fde68a', component: Building2 },
-  'HRD':                  { color: '#db2777', bg: '#fdf2f8', borderColor: '#fbcfe8', component: Users },
-  'IT':                   { color: '#0891b2', bg: '#ecfeff', borderColor: '#a5f3fc', component: Monitor },
-  'Legal':                { color: '#475569', bg: '#f8fafc', borderColor: '#cbd5e1', component: Briefcase },
-  'Technical':            { color: '#dc2626', bg: '#fef2f2', borderColor: '#fecaca', component: Wrench },
+  'Claim': { color: '#7c3aed', bg: '#f5f3ff', borderColor: '#ddd6fe', component: FileText },
+  'Employee Benefit': { color: '#059669', bg: '#ecfdf5', borderColor: '#a7f3d0', component: Shield },
+  'General Affair': { color: '#d97706', bg: '#fffbeb', borderColor: '#fde68a', component: Building2 },
+  'HRD': { color: '#db2777', bg: '#fdf2f8', borderColor: '#fbcfe8', component: Users },
+  'IT': { color: '#0891b2', bg: '#ecfeff', borderColor: '#a5f3fc', component: Monitor },
+  'Legal': { color: '#475569', bg: '#f8fafc', borderColor: '#cbd5e1', component: Briefcase },
+  'Technical': { color: '#dc2626', bg: '#fef2f2', borderColor: '#fecaca', component: Wrench },
 };
 
 const divisions = computed(() => {
@@ -511,7 +511,7 @@ const confirmReviewAction = () => {
   }
   selectedMemo.value.status = reviewModalType.value;
   selectedMemo.value.rejectionReason = rejectionReason.value;
-  
+
   const actionText = reviewModalType.value === 'Reject' ? 'Rejected' : 'Requested Changes for';
   alert(`${actionText} Memo ${selectedMemo.value?.memoNumber}`);
   isReviewModalOpen.value = false;
@@ -523,7 +523,7 @@ const handleUpdate = () => {
     isConfirming.value = true;
     return;
   }
-  
+
   if (isCreateMode.value) {
     alert(`Created New Memo: ${selectedMemo.value.title}`);
   } else {
@@ -571,10 +571,10 @@ const getStatusIcon = (status) => {
 const getApprovalProgress = (memo) => {
   if (memo.status === 'Draft') return 0;
   if (memo.status === 'Approved') return 100;
-  
+
   const total = memo.approvalChain?.length || 0;
   if (total === 0) return memo.status === 'Approved' ? 100 : 0;
-  
+
   const approved = memo.approvalChain.filter(tier => tier.status === 'Approved').length;
   return Math.round((approved / total) * 100);
 };
@@ -594,7 +594,7 @@ const handleRemind = (memo) => {
 const getActions = (memo) => {
   // Check if current user is involved (Requester or Approver)
   const isRequester = memo.requester === props.currentUser;
-  const isApprover = memo.approvalChain?.some(tier => 
+  const isApprover = memo.approvalChain?.some(tier =>
     tier.approvers?.some(a => a.name === props.currentUser)
   );
 
@@ -606,14 +606,14 @@ const getActions = (memo) => {
   if (memo.status === 'Approved') return ['view'];
   if (memo.status === 'Pending') {
     const actions = ['view'];
-    
+
     // Logic for Remind: if requester and pending > 3 days and NOT already reminded
     if (isRequester && !memo.isReminded) {
       const created = new Date(memo.createdAt);
       const now = new Date();
       const diffTime = Math.abs(now - created);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       if (diffDays >= 3) {
         actions.push('remind');
       }
@@ -621,11 +621,11 @@ const getActions = (memo) => {
 
     // Check if the first tier is still pending
     const tier1 = memo.approvalChain && memo.approvalChain[0];
-    
+
     if (tier1) {
       // If the first tier has any pending approvers, it's generally still in tier 1
       const isTier1Pending = tier1.approvers?.some(a => a.status === 'Pending');
-      
+
       if (isTier1Pending) {
         // New Rule: If Tier 1 is quorum, and at least 1 person HAS approved, show VIEW ONLY
         if (tier1.type === 'quorum') {
@@ -634,13 +634,13 @@ const getActions = (memo) => {
             return actions;
           }
         }
-        
+
         // Otherwise, it's fully pending at Tier 1 -> View only for now
         // (Previously allowed delete/edit here)
         return actions;
       }
     }
-    
+
     // Pending on second tier or later
     return actions;
   }
@@ -681,20 +681,10 @@ const getHistoryDotColor = (action) => {
   <div class="memo-list-container">
     <div class="memo-container">
       <div v-if="processedMemos.length > 0" class="memo-grid">
-        <div 
-          v-for="memo in processedMemos" 
-          :key="memo.id"
-          class="memo-card-wrapper"
-          draggable="true"
-          @dragstart="onDragStart(memo.id)"
-          @dragover="onDragOver"
-          @drop="onDrop(memo.id)"
-        >
-          <div 
-            class="memo-card" 
-            :class="{ active: selectedRow && selectedRow.id === memo.id }"
-            @click="selectedRow = selectedRow?.id === memo.id ? null : memo"
-          >
+        <div v-for="memo in processedMemos" :key="memo.id" class="memo-card-wrapper" draggable="true"
+          @dragstart="onDragStart(memo.id)" @dragover="onDragOver" @drop="onDrop(memo.id)">
+          <div class="memo-card" :class="{ active: selectedRow && selectedRow.id === memo.id }"
+            @click="selectedRow = selectedRow?.id === memo.id ? null : memo">
             <!-- Card Header: Title and Status -->
             <div class="memo-card-header">
               <div class="memo-card-header-top">
@@ -736,11 +726,8 @@ const getHistoryDotColor = (action) => {
             <div class="memo-card-footer">
               <div class="progress-container" v-if="memo.status !== 'Draft'">
                 <div class="progress-bar-wrapper">
-                  <div 
-                    class="progress-bar-fill" 
-                    :class="getStatusColor(memo.status)"
-                    :style="{ width: getApprovalProgress(memo) + '%' }"
-                  ></div>
+                  <div class="progress-bar-fill" :class="getStatusColor(memo.status)"
+                    :style="{ width: getApprovalProgress(memo) + '%' }"></div>
                 </div>
                 <span class="progress-label">{{ getProgressLabel(memo) }}</span>
               </div>
@@ -748,15 +735,17 @@ const getHistoryDotColor = (action) => {
                 <FileText class="icon-tiny text-slate-400" />
                 <span>Not Submitted</span>
               </div>
-              
+
               <div class="card-actions-mini">
                 <button class="mini-action-btn view" @click.stop="openViewModal(memo, false)" title="View Details">
                   <Eye class="icon-tiny" />
                 </button>
-                <button v-if="getActions(memo).includes('edit')" class="mini-action-btn edit" @click.stop="openViewModal(memo, true)" title="Edit Draft">
+                <button v-if="getActions(memo).includes('edit')" class="mini-action-btn edit"
+                  @click.stop="openViewModal(memo, true)" title="Edit Draft">
                   <Edit class="icon-tiny" />
                 </button>
-                <button v-if="getActions(memo).includes('update')" class="mini-action-btn update" @click.stop="openViewModal(memo, true)" title="Update/Review">
+                <button v-if="getActions(memo).includes('update')" class="mini-action-btn update"
+                  @click.stop="openViewModal(memo, true)" title="Update/Review">
                   <Edit class="icon-tiny" />
                 </button>
               </div>
@@ -769,14 +758,17 @@ const getHistoryDotColor = (action) => {
                   <button class="overlay-main-btn view" @click="openViewModal(memo, false)">
                     <Eye class="icon-small" /> Open Memo
                   </button>
-                  <button v-if="getActions(memo).includes('update') || getActions(memo).includes('edit')" 
+                  <button v-if="getActions(memo).includes('update') || getActions(memo).includes('edit')"
                     class="overlay-main-btn edit" @click="openViewModal(memo, true)">
-                    <Edit class="icon-small" /> {{ getActions(memo).includes('edit') ? 'Edit Draft' : 'Update Content' }}
+                    <Edit class="icon-small" /> {{ getActions(memo).includes('edit') ? 'Edit Draft' : 'Update Content'
+                    }}
                   </button>
-                  <button v-if="getActions(memo).includes('delete')" class="overlay-main-btn delete" @click="handleDelete(memo)">
+                  <button v-if="getActions(memo).includes('delete')" class="overlay-main-btn delete"
+                    @click="handleDelete(memo)">
                     <Trash2 class="icon-small" /> Delete
                   </button>
-                  <button v-if="getActions(memo).includes('remind')" class="overlay-main-btn remind" @click="handleRemind(memo)">
+                  <button v-if="getActions(memo).includes('remind')" class="overlay-main-btn remind"
+                    @click="handleRemind(memo)">
                     <Bell class="icon-small" /> Remind Approvers
                   </button>
                 </div>
@@ -796,7 +788,8 @@ const getHistoryDotColor = (action) => {
         </div>
         <h2>{{ activeTab === 'pending_approval' ? 'No pending items — great job!' : 'All clear!' }}</h2>
         <p>There are no memos available in this section currently.</p>
-        <button v-if="activeTab === 'my_memos' || activeTab === 'all'" class="btn-create-empty" @click="openCreateModal">
+        <button v-if="activeTab === 'my_memos' || activeTab === 'all'" class="btn-create-empty"
+          @click="openCreateModal">
           <Plus class="icon-small mr-2" /> Create Your First Memo
         </button>
       </div>
@@ -805,15 +798,15 @@ const getHistoryDotColor = (action) => {
     <!-- Pagination Controls (Desktop) -->
     <div v-if="memos.length > 0 && !isMobile" class="pagination-bar">
       <div class="pagination-info">
-        Showing 
-        <span class="font-bold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> 
-        to 
-        <span class="font-bold">{{ Math.min(currentPage * itemsPerPage, memos.length) }}</span> 
-        of 
-        <span class="font-bold">{{ memos.length }}</span> 
+        Showing
+        <span class="font-bold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
+        to
+        <span class="font-bold">{{ Math.min(currentPage * itemsPerPage, memos.length) }}</span>
+        of
+        <span class="font-bold">{{ memos.length }}</span>
         entries
       </div>
-      
+
       <div class="pagination-controls">
         <div class="page-size-selector">
           <label>Show</label>
@@ -823,31 +816,19 @@ const getHistoryDotColor = (action) => {
         </div>
 
         <div class="page-buttons">
-          <button 
-            class="page-btn" 
-            :disabled="currentPage === 1" 
-            @click="goToPage(currentPage - 1)"
-          >
+          <button class="page-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
             Previous
           </button>
-          
+
           <template v-for="page in totalPages" :key="page">
-            <button 
-              v-if="Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages"
-              class="page-btn"
-              :class="{ 'active': page === currentPage }"
-              @click="goToPage(page)"
-            >
+            <button v-if="Math.abs(page - currentPage) <= 1 || page === 1 || page === totalPages" class="page-btn"
+              :class="{ 'active': page === currentPage }" @click="goToPage(page)">
               {{ page }}
             </button>
             <span v-else-if="page === 2 || page === totalPages - 1" class="page-dots">...</span>
           </template>
 
-          <button 
-            class="page-btn" 
-            :disabled="currentPage === totalPages" 
-            @click="goToPage(currentPage + 1)"
-          >
+          <button class="page-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
             Next
           </button>
         </div>
@@ -879,20 +860,17 @@ const getHistoryDotColor = (action) => {
             <div class="wizard-search-container">
               <div class="search-input-wrapper">
                 <Search class="search-icon" />
-                <input 
-                  v-model="wizardSearch" 
-                  type="text" 
-                  placeholder="Search templates (e.g. 'Cash', 'Reimburse')..." 
-                  class="wizard-search-input"
-                  autofocus
-                />
+                <input v-model="wizardSearch" type="text" placeholder="Search templates (e.g. 'Cash', 'Reimburse')..."
+                  class="wizard-search-input" autofocus />
                 <button v-if="isSearchingInWizard" class="btn-clear-search" @click="wizardSearch = ''">
                   <X class="icon-tiny" />
                 </button>
               </div>
             </div>
           </div>
-          <button class="btn-close" @click="closeWizard"><X class="icon" /></button>
+          <button class="btn-close" @click="closeWizard">
+            <X class="icon" />
+          </button>
         </div>
 
         <div class="wizard-body">
@@ -904,12 +882,8 @@ const getHistoryDotColor = (action) => {
             <div class="search-results-meta">
               Found {{ wizardFilteredTemplates.length }} templates matching "{{ wizardSearch }}"
             </div>
-            <button
-              v-for="(tpl, idx) in wizardFilteredTemplates"
-              :key="idx"
-              class="template-item"
-              @click="selectWizardTemplate(tpl)"
-            >
+            <button v-for="(tpl, idx) in wizardFilteredTemplates" :key="idx" class="template-item"
+              @click="selectWizardTemplate(tpl)">
               <div class="template-item-content">
                 <div class="template-item-name">{{ tpl.name }}</div>
                 <div class="template-item-division">{{ tpl.division }}</div>
@@ -923,13 +897,9 @@ const getHistoryDotColor = (action) => {
 
           <!-- Step 1: Division Grid -->
           <div v-else-if="wizardStep === 1" class="division-grid">
-            <button
-              v-for="div in divisions"
-              :key="div.name"
-              class="division-card"
+            <button v-for="div in divisions" :key="div.name" class="division-card"
               :style="{ '--div-color': div.color, '--div-bg': div.bg, '--div-border': div.borderColor }"
-              @click="selectWizardDivision(div.name)"
-            >
+              @click="selectWizardDivision(div.name)">
               <div class="division-icon-wrap">
                 <component :is="div.component" class="division-icon" />
               </div>
@@ -943,12 +913,8 @@ const getHistoryDotColor = (action) => {
 
           <!-- Step 2: Division Templates -->
           <div v-else class="template-list">
-            <button
-              v-for="(tpl, idx) in wizardDivisionTemplates"
-              :key="idx"
-              class="template-item"
-              @click="selectWizardTemplate(tpl)"
-            >
+            <button v-for="(tpl, idx) in wizardDivisionTemplates" :key="idx" class="template-item"
+              @click="selectWizardTemplate(tpl)">
               <div class="template-item-name">{{ tpl.name }}</div>
               <ChevronRight class="template-item-arrow" />
             </button>
@@ -974,11 +940,13 @@ const getHistoryDotColor = (action) => {
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
           </div>
           <div class="modal-header-right">
-            <div v-if="selectedMemo && selectedMemo.isReminded" class="reminded-tag mr-2" title="Approvers have been reminded">
+            <div v-if="selectedMemo && selectedMemo.isReminded" class="reminded-tag mr-2"
+              title="Approvers have been reminded">
               <Bell class="icon-tiny" />
               <span v-if="!isEditMode" class="tag-text">REMINDED</span>
             </div>
-            <div v-if="!isCreateMode" :class="['status-badge-premium', getStatusColor(selectedMemo.status)]" :title="selectedMemo.status">
+            <div v-if="!isCreateMode" :class="['status-badge-premium', getStatusColor(selectedMemo.status)]"
+              :title="selectedMemo.status">
               <component :is="getStatusIcon(selectedMemo.status)" class="status-icon" />
               <span v-if="!isEditMode" class="badge-text">{{ selectedMemo.status }}</span>
             </div>
@@ -993,7 +961,7 @@ const getHistoryDotColor = (action) => {
               <h3 class="text-xl font-bold text-slate-800">Review Your Submission</h3>
               <p class="text-slate-500 mt-1">Please review all data carefully before final submission.</p>
             </div>
-            
+
             <div class="confirmation-grid mt-6">
               <div class="detail-section">
                 <h3 class="section-group-title">Summary</h3>
@@ -1015,7 +983,8 @@ const getHistoryDotColor = (action) => {
                 <h3 class="section-group-title">Content Preview</h3>
                 <div class="summary-item">
                   <label>Description</label>
-                  <div class="summary-value leading-relaxed whitespace-pre-wrap">{{ selectedMemo.description || '-' }}</div>
+                  <div class="summary-value leading-relaxed whitespace-pre-wrap">{{ selectedMemo.description || '-' }}
+                  </div>
                 </div>
                 <div class="summary-item mt-3">
                   <label>Attachments</label>
@@ -1048,7 +1017,8 @@ const getHistoryDotColor = (action) => {
                 <div class="summary-item mt-2">
                   <label>New Salary Total</label>
                   <div class="summary-value font-bold text-blue-600">
-                    Rp {{ (Number(selectedMemo.newSalary.basic || 0) + Number(selectedMemo.newSalary.allowance || 0) + Number(selectedMemo.newSalary.position || 0)).toLocaleString('id-ID') }}
+                    Rp {{ (Number(selectedMemo.newSalary.basic || 0) + Number(selectedMemo.newSalary.allowance || 0) +
+                      Number(selectedMemo.newSalary.position || 0)).toLocaleString('id-ID') }}
                   </div>
                 </div>
               </div>
@@ -1057,418 +1027,29 @@ const getHistoryDotColor = (action) => {
 
           <!-- Section 1: Core Information -->
           <div v-else>
-            <div class="detail-section">
-            <h3 class="section-group-title">General Information</h3>
-            <div class="detail-row">
-              <div v-if="!isCreateMode" class="detail-group">
-                <label>Memo Number</label>
-                <div class="detail-value font-mono">{{ selectedMemo.memoNumber }}</div>
-              </div>
-              <div class="detail-group">
-                <label>Department</label>
-                <div class="detail-value">{{ selectedMemo.department }}</div>
-              </div>
-            </div>
-
-            <div class="detail-row">
-              <div v-if="!isCreateMode" class="detail-group">
-                <label>Created At</label>
-                <div class="detail-value">{{ formatDate(selectedMemo.createdAt) }}</div>
-              </div>
-            </div>
-            
-            <div class="detail-group">
-              <label>Purposing of Memo</label>
-              <div v-if="isEditMode" class="autocomplete-wrapper">
-                <input
-                  ref="templateInputRef"
-                  type="text"
-                  class="form-input"
-                  placeholder="Search template by name or division..."
-                  v-model="templateSearch"
-                  @focus="handleTemplateFocus"
-                  @blur="handleTemplateBlur"
-                  @input="handleTemplateInput"
-                  autocomplete="off"
-                />
-                <Teleport to="body">
-                  <div
-                    v-if="showSuggestions"
-                    class="suggestions-dropdown-teleport"
-                    :style="dropdownStyle"
-                  >
-                    <template v-if="filteredTemplates.length > 0">
-                      <div
-                        v-for="(item, idx) in filteredTemplates"
-                        :key="idx"
-                        class="suggestion-item"
-                        @mousedown.prevent="selectTemplate(item)"
-                      >
-                        <span class="suggestion-name">{{ item.name }}</span>
-                        <span class="suggestion-division">{{ item.division }}</span>
-                      </div>
-                    </template>
-                    <div v-else class="suggestion-empty">No templates found</div>
-                  </div>
-                </Teleport>
-              </div>
-              <div v-else class="detail-value">
-                <div class="font-semibold">{{ selectedMemo.categoryType || '-' }}</div>
-                <div v-if="selectedMemo.category" class="template-division-badge">{{ selectedMemo.category }}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 2: Content -->
-          <template v-if="!isCreateMode || (selectedMemo.category && selectedMemo.categoryType)">
-            <div class="detail-section">
-              <h3 class="section-group-title">Memo Content</h3>
-              <div class="detail-group">
-                <label>Title</label>
-                <input v-if="isEditMode" type="text" v-model="selectedMemo.title" class="form-input" />
-                <div v-else class="detail-value font-semibold text-lg">{{ selectedMemo.title }}</div>
-              </div>
-              <div class="detail-group">
-                <label>Description</label>
-                <textarea v-if="isEditMode" v-model="selectedMemo.description" class="form-textarea" rows="4"></textarea>
-                <div v-else class="detail-value leading-relaxed">{{ selectedMemo.description }}</div>
-              </div>
-              <!-- Attachments Section -->
-              <div class="detail-group mt-4 attachments-collapsible">
-                <button class="section-toggle-header" @click="isAttachmentsCollapsed = !isAttachmentsCollapsed">
-                  <label class="m-0 cursor-pointer">Attachments ({{ selectedMemo.attachmentsCount }})</label>
-                  <div class="history-toggle-icon" :class="{ 'is-open': !isAttachmentsCollapsed }">
-                    <ChevronRight class="icon-small" />
-                  </div>
-                </button>
-
-                <div v-if="!isAttachmentsCollapsed" class="history-content-wrap mt-3">
-                  <div v-if="selectedMemo.attachmentsCount > 0" class="attachments-grid">
-                    <div v-for="n in selectedMemo.attachmentsCount" :key="n" class="attachment-card" :class="{'is-edit': isEditMode}">
-                      <div class="attachment-icon-box">
-                        <FileText class="attachment-icon-large" />
-                      </div>
-                      <span class="attachment-name">Doc #{{ n }}</span>
-                      <button v-if="isEditMode" class="btn-remove-attachment-abs" title="Remove" @click.prevent="selectedMemo.attachmentsCount--">
-                        <X class="icon-tiny" />
-                      </button>
-                    </div>
-                  </div>
-                  <div v-else class="detail-value text-muted italic">No attachments included.</div>
-                  
-                  <div v-if="isEditMode" class="mt-3">
-                     <button class="btn-upload" @click.prevent="selectedMemo.attachmentsCount++">
-                       <Plus class="icon-small" /> Add Document
-                     </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            <!-- Section 3: Category Specific (if Entertainment) -->
-            <div v-if="selectedMemo.categoryType === 'Entertainment Fund'" class="detail-section">
-              <h3 class="section-group-title">Entertainment Details</h3>
-              
-              <div class="detail-group">
-                <label>Location</label>
-                <input v-if="isEditMode" type="text" v-model="selectedMemo.entLocation" class="form-input" placeholder="Type a place or click the map to pin a location..." />
-
-                <div class="map-container mt-2">
-                  <MapPicker
-                    :locationQuery="isEditMode ? selectedMemo.entLocation : ''"
-                    :lat="selectedMemo.entLat"
-                    :lng="selectedMemo.entLng"
-                    :editable="isEditMode"
-                    @place-selected="handlePlaceSelected"
-                  />
-                </div>
-                <div v-if="!isEditMode && !selectedMemo.entLat" class="detail-value text-muted italic">No location provided</div>
-              </div>
-
-              <div class="detail-row">
-                <div class="detail-group">
-                  <label>Payment Method</label>
-                  <select v-if="isEditMode" v-model="selectedMemo.entPaymentMethod" class="form-select">
-                    <option value="Debit/Cash">Debit/Cash</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit/Cash and Credit">Debit/Cash and Credit</option>
-                  </select>
-                  <div v-else class="detail-value font-medium">{{ selectedMemo.entPaymentMethod || '-' }}</div>
-                </div>
-              </div>
-
-              <div class="detail-row">
-                <div class="detail-group" v-if="['Debit/Cash', 'Debit/Cash and Credit'].includes(selectedMemo.entPaymentMethod)">
-                  <label>Debit/Cash Amount</label>
-                   <div class="input-with-prefix" v-if="isEditMode">
-                     <span class="prefix">Rp</span>
-                     <input type="number" v-model="selectedMemo.entDebitAmount" class="form-input" />
-                   </div>
-                   <div v-else class="detail-value font-bold text-blue-600">Rp {{ selectedMemo.entDebitAmount ? Number(selectedMemo.entDebitAmount).toLocaleString('id-ID') : '0' }}</div>
-                </div>
-                
-                <div class="detail-group" v-if="['Credit', 'Debit/Cash and Credit'].includes(selectedMemo.entPaymentMethod)">
-                  <label>Credit Amount</label>
-                   <div class="input-with-prefix" v-if="isEditMode">
-                     <span class="prefix">Rp</span>
-                     <input type="number" v-model="selectedMemo.entCreditAmount" class="form-input" />
-                   </div>
-                   <div v-else class="detail-value font-bold text-blue-600">Rp {{ selectedMemo.entCreditAmount ? Number(selectedMemo.entCreditAmount).toLocaleString('id-ID') : '0' }}</div>
-                </div>
-              </div>
-
-              <h4 class="subsection-title mt-4">Person to be Entertained</h4>
-              <div class="detail-row">
-                <div class="detail-group">
-                  <label>Name</label>
-                  <input v-if="isEditMode" type="text" v-model="selectedMemo.entPersonName" class="form-input" />
-                  <div v-else class="detail-value font-medium">{{ selectedMemo.entPersonName || '-' }}</div>
-                </div>
-                <div class="detail-group">
-                  <label>Company</label>
-                  <input v-if="isEditMode" type="text" v-model="selectedMemo.entPersonCompany" class="form-input" />
-                  <div v-else class="detail-value">{{ selectedMemo.entPersonCompany || '-' }}</div>
-                </div>
-              </div>
-              <div class="detail-group">
-                <label>Role</label>
-                <input v-if="isEditMode" type="text" v-model="selectedMemo.entPersonRole" class="form-input" />
-                <div v-else class="detail-value text-slate-600">{{ selectedMemo.entPersonRole || '-' }}</div>
-              </div>
-            </div>
-
-            <!-- Section 3.5: Travel Request Specific -->
-            <div v-if="selectedMemo.categoryType === 'Pengajuan Perjalanan Dinas'" class="detail-section">
-              <h3 class="section-group-title">Travel Period</h3>
-              <div class="detail-row">
-                <div class="detail-group">
-                  <label>Start Date</label>
-                  <div v-if="isEditMode" class="date-input-group">
-                    <input type="text" v-model="selectedMemo.travStartDate" placeholder="YYYY-MM-DD" class="form-input" />
-                    <div class="date-picker-trigger">
-                      <Calendar class="icon-small" />
-                      <input type="date" v-model="selectedMemo.travStartDate" class="hidden-date-picker" />
-                    </div>
-                  </div>
-                  <div v-else class="detail-value font-medium">{{ selectedMemo.travStartDate || '-' }}</div>
-                </div>
-                <div class="detail-group">
-                  <label>End Date</label>
-                  <div v-if="isEditMode" class="date-input-group">
-                    <input type="text" v-model="selectedMemo.travEndDate" placeholder="YYYY-MM-DD" class="form-input" />
-                    <div class="date-picker-trigger">
-                      <Calendar class="icon-small" />
-                      <input type="date" v-model="selectedMemo.travEndDate" class="hidden-date-picker" />
-                    </div>
-                  </div>
-                  <div v-else class="detail-value font-medium">{{ selectedMemo.travEndDate || '-' }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Section 3.6: HR Request Specific -->
-            <div v-if="isHrTemplate(selectedMemo.categoryType)" class="hr-details-container">
-              <!-- Employee Information -->
-              <div class="detail-section">
-                <h3 class="section-group-title">Employee Information</h3>
-                <div class="detail-row">
-                  <div class="detail-group">
-                    <label>Types of Employees</label>
-                    <select v-if="isEditMode" v-model="selectedMemo.hrEmployeeType" class="form-select">
-                      <option value="Existing">Existing</option>
-                      <option value="New">New</option>
-                    </select>
-                    <div v-else class="detail-value font-medium">{{ selectedMemo.hrEmployeeType }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Name</label>
-                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrName" class="form-input" />
-                    <div v-else class="detail-value font-medium">{{ selectedMemo.hrName || '-' }}</div>
-                  </div>
-                </div>
-                <div class="detail-row">
-                  <div class="detail-group">
-                    <label>Employee ID Number</label>
-                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrID" class="form-input" />
-                    <div v-else class="detail-value">{{ selectedMemo.hrID || '-' }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Date of Birth</label>
-                    <div v-if="isEditMode" class="date-input-group">
-                      <input type="text" v-model="selectedMemo.hrDOB" placeholder="YYYY-MM-DD" class="form-input" />
-                      <div class="date-picker-trigger">
-                        <Calendar class="icon-small" />
-                        <input type="date" v-model="selectedMemo.hrDOB" class="hidden-date-picker" />
-                      </div>
-                    </div>
-                    <div v-else class="detail-value">{{ selectedMemo.hrDOB || '-' }}</div>
-                  </div>
-                </div>
-                <div class="detail-row">
-                  <div class="detail-group">
-                    <label>Start Work</label>
-                    <div v-if="isEditMode" class="date-input-group">
-                      <input type="text" v-model="selectedMemo.hrStartWork" placeholder="YYYY-MM-DD" class="form-input" />
-                      <div class="date-picker-trigger">
-                        <Calendar class="icon-small" />
-                        <input type="date" v-model="selectedMemo.hrStartWork" class="hidden-date-picker" />
-                      </div>
-                    </div>
-                    <div v-else class="detail-value">{{ selectedMemo.hrStartWork || '-' }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Division</label>
-                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrDivision" class="form-input" />
-                    <div v-else class="detail-value">{{ selectedMemo.hrDivision || '-' }}</div>
-                  </div>
-                </div>
-                <div class="detail-row">
-                  <div class="detail-group">
-                    <label>Branch</label>
-                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrBranch" class="form-input" />
-                    <div v-else class="detail-value">{{ selectedMemo.hrBranch || '-' }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Job Title</label>
-                    <input v-if="isEditMode" type="text" v-model="selectedMemo.hrJobTitle" class="form-input" />
-                    <div v-else class="detail-value">{{ selectedMemo.hrJobTitle || '-' }}</div>
-                  </div>
-                </div>
-                <div class="detail-row">
-                  <div class="detail-group">
-                    <label>Status</label>
-                    <select v-if="isEditMode" v-model="selectedMemo.hrStatus" class="form-select">
-                      <option value="Single">Single</option>
-                      <option value="Married">Married</option>
-                    </select>
-                    <div v-else class="detail-value">{{ selectedMemo.hrStatus }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Number of Children</label>
-                    <input v-if="isEditMode" type="number" v-model="selectedMemo.hrChildren" class="form-input" />
-                    <div v-else class="detail-value">{{ selectedMemo.hrChildren ?? '0' }}</div>
-                  </div>
-                </div>
-                <div class="detail-group">
-                  <label>Salary Change</label>
-                  <select v-if="isEditMode" v-model="selectedMemo.hrSalaryChange" class="form-select">
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                  <div v-else class="detail-value">{{ selectedMemo.hrSalaryChange === 'yes' ? 'Yes' : 'No' }}</div>
-                </div>
-              </div>
-
-              <!-- Old Salary Breakdown (Conditional) -->
-              <div v-if="selectedMemo.hrSalaryChange === 'yes'" class="detail-section">
-                <h3 class="section-group-title">Old Salary Breakdown</h3>
-                <div class="salary-grid">
-                  <div class="detail-group">
-                    <label>Basic Salary</label>
-                    <div class="input-with-prefix" v-if="isEditMode">
-                      <span class="prefix">Rp</span>
-                      <input type="number" v-model="selectedMemo.oldSalary.basic" class="form-input" />
-                    </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.basic || 0).toLocaleString('id-ID') }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Meal / Transport Allowance</label>
-                    <div class="input-with-prefix" v-if="isEditMode">
-                      <span class="prefix">Rp</span>
-                      <input type="number" v-model="selectedMemo.oldSalary.allowance" class="form-input" />
-                    </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.allowance || 0).toLocaleString('id-ID') }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Position Allowance</label>
-                    <div class="input-with-prefix" v-if="isEditMode">
-                      <span class="prefix">Rp</span>
-                      <input type="number" v-model="selectedMemo.oldSalary.position" class="form-input" />
-                    </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.position || 0).toLocaleString('id-ID') }}</div>
-                  </div>
-                  <div class="detail-group salary-total-group">
-                    <label>Total (Read-Only)</label>
-                    <div class="detail-value font-bold text-blue-600">
-                      Rp {{ (Number(selectedMemo.oldSalary?.basic || 0) + Number(selectedMemo.oldSalary?.allowance || 0) + Number(selectedMemo.oldSalary?.position || 0)).toLocaleString('id-ID') }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- New Salary Breakdown -->
-              <div class="detail-section">
-                <h3 class="section-group-title">New Salary Breakdown</h3>
-                <div class="salary-grid">
-                  <div class="detail-group">
-                    <label>Basic Salary</label>
-                    <div class="input-with-prefix" v-if="isEditMode">
-                      <span class="prefix">Rp</span>
-                      <input type="number" v-model="selectedMemo.newSalary.basic" class="form-input" />
-                    </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.basic || 0).toLocaleString('id-ID') }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Meal / Transport Allowance</label>
-                    <div class="input-with-prefix" v-if="isEditMode">
-                      <span class="prefix">Rp</span>
-                      <input type="number" v-model="selectedMemo.newSalary.allowance" class="form-input" />
-                    </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.allowance || 0).toLocaleString('id-ID') }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>Position Allowance</label>
-                    <div class="input-with-prefix" v-if="isEditMode">
-                      <span class="prefix">Rp</span>
-                      <input type="number" v-model="selectedMemo.newSalary.position" class="form-input" />
-                    </div>
-                    <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.position || 0).toLocaleString('id-ID') }}</div>
-                  </div>
-                  <div class="detail-group salary-total-group">
-                    <label>Total (Read-Only)</label>
-                    <div class="detail-value font-bold text-blue-600">
-                      Rp {{ (Number(selectedMemo.newSalary?.basic || 0) + Number(selectedMemo.newSalary?.allowance || 0) + Number(selectedMemo.newSalary?.position || 0)).toLocaleString('id-ID') }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Effective Date -->
-              <div class="detail-section">
-                <h3 class="section-group-title">Effective Date</h3>
-                <div class="detail-group">
-                  <label>Effective starting from</label>
-                  <div v-if="isEditMode" class="date-input-group">
-                    <input type="text" v-model="selectedMemo.hrEffectiveDate" placeholder="YYYY-MM-DD" class="form-input" />
-                    <div class="date-picker-trigger">
-                      <Calendar class="icon-small" />
-                      <input type="date" v-model="selectedMemo.hrEffectiveDate" class="hidden-date-picker" />
-                    </div>
-                  </div>
-                  <div v-else class="detail-value font-medium">{{ selectedMemo.hrEffectiveDate || '-' }}</div>
-                </div>
-              </div>
-            </div>
-            <!-- Section 4: Rejection/Changes (Conditional) -->
-            <div v-if="!isCreateMode && ['Rejected', 'Requested Changes'].includes(selectedMemo.status) && selectedMemo.rejectionReason" 
-                 :class="['detail-section', selectedMemo.status === 'Rejected' ? 'rejection-alert-new' : 'requested-changes-alert-new']">
-              <h3 class="section-group-title" :class="selectedMemo.status === 'Rejected' ? 'text-red-700' : 'text-amber-700'">
-                <component :is="selectedMemo.status === 'Rejected' ? X : Loader2" class="icon-small mr-1" /> 
+            <!-- Rejection/Changes (Conditional) - Moved to top -->
+            <div
+              v-if="!isCreateMode && ['Rejected', 'Requested Changes'].includes(selectedMemo.status) && selectedMemo.rejectionReason"
+              :class="['detail-section', selectedMemo.status === 'Rejected' ? 'rejection-alert-new' : 'requested-changes-alert-new']"
+              style="margin-bottom: 1.5rem;">
+              <h3 class="section-group-title"
+                :class="selectedMemo.status === 'Rejected' ? 'text-red-700' : 'text-amber-700'">
+                <component :is="selectedMemo.status === 'Rejected' ? X : Loader2" class="icon-small mr-1" />
                 {{ selectedMemo.status === 'Rejected' ? 'Rejection Details' : 'Requested Changes' }}
               </h3>
               <div class="detail-row">
                 <div class="detail-group">
                   <label>Concerning</label>
-                  <div class="detail-value font-semibold" :class="selectedMemo.status === 'Rejected' ? 'text-red-700' : 'text-amber-700'">
+                  <div class="detail-value font-semibold"
+                    :class="selectedMemo.status === 'Rejected' ? 'text-red-700' : 'text-amber-700'">
                     {{ selectedMemo.rejectionConcern || 'Not specified' }}
                   </div>
                 </div>
                 <div class="detail-group" v-if="selectedMemo.rejectedFields && selectedMemo.rejectedFields.length > 0">
                   <label>Flagged Fields</label>
                   <div class="flagged-fields-list mt-1">
-                    <span v-for="field in selectedMemo.rejectedFields" :key="field" 
-                          :class="['flagged-field-badge', selectedMemo.status === 'Rejected' ? 'badge-red' : 'badge-amber']">
+                    <span v-for="field in selectedMemo.rejectedFields" :key="field"
+                      :class="['flagged-field-badge', selectedMemo.status === 'Rejected' ? 'badge-red' : 'badge-amber']">
                       {{ field }}
                     </span>
                   </div>
@@ -1476,93 +1057,493 @@ const getHistoryDotColor = (action) => {
               </div>
               <div class="detail-group mt-3">
                 <label>{{ selectedMemo.status === 'Rejected' ? 'Reason for Rejection' : 'Request Details' }}</label>
-                <div class="detail-value" :class="selectedMemo.status === 'Rejected' ? 'text-red-900' : 'text-amber-900'">
+                <div class="detail-value"
+                  :class="selectedMemo.status === 'Rejected' ? 'text-red-900' : 'text-amber-900'">
                   {{ selectedMemo.rejectionReason }}
                 </div>
               </div>
             </div>
-
-            <!-- Section 5: Workflow & Files -->
-            <div v-if="!isCreateMode" class="detail-section">
-              <h3 class="section-group-title">Workflow & History</h3>
-              
-              <div class="detail-group" style="position: relative; z-index: 10;">
-                <label>Approval Chain</label>
-                <div class="modal-approval-chain-container">
-                  <div class="modal-approval-chain">
-                    <template v-for="(tier, tierIdx) in selectedMemo.approvalChain" :key="tierIdx">
-                      <div class="tier-group" :class="{'is-quorum': tier.approvers.length > 1}">
-                        <div v-if="tier.approvers.length > 1" class="tier-label">
-                          {{ tier.type === 'quorum' ? `Any ${tier.requiredApprovals} of ${tier.approvers.length}` : 'All Required' }}
-                        </div>
-                        <div class="tier-nodes">
-                          <template v-for="(approver, approverIdx) in tier.approvers" :key="approverIdx">
-                            <div class="approver-node-compact" :class="getStatusColor(approver.status)">
-                              <div class="node-icon-overlay">
-                                <component :is="getStatusIcon(approver.status)" class="node-mini-icon" />
-                              </div>
-                              <span class="approver-initials">{{ approver.name.substring(0, 1) }}</span>
-                              <div class="approver-tooltip">
-                                <div class="tooltip-name">{{ approver.name }}</div>
-                                <div class="tooltip-role">{{ approver.role }}</div>
-                                <div class="tooltip-status" :class="getStatusColor(approver.status)">{{ approver.status }}</div>
-                              </div>
-                            </div>
-                          </template>
-                        </div>
-                      </div>
-                      <div v-if="tierIdx < selectedMemo.approvalChain.length - 1" class="chain-connector-compact">
-                        <ChevronRight class="chain-arrow-compact" />
-                      </div>
-                    </template>
-                  </div>
+            <div class="detail-section">
+              <h3 class="section-group-title">General Information</h3>
+              <div class="detail-row">
+                <div v-if="!isCreateMode" class="detail-group">
+                  <label>Memo Number</label>
+                  <div class="detail-value font-mono">{{ selectedMemo.memoNumber }}</div>
+                </div>
+                <div class="detail-group">
+                  <label>Department</label>
+                  <div class="detail-value">{{ selectedMemo.department }}</div>
                 </div>
               </div>
 
-              <!-- History Section -->
-              <div v-if="!isCreateMode && selectedMemo.history && selectedMemo.history.length > 0" class="mt-4 history-collapsible border-t pt-4 border-dashed border-slate-200">
-                <button class="section-toggle-header" @click="isHistoryCollapsed = !isHistoryCollapsed">
-                  <h3 class="section-group-title m-0">Memo History</h3>
-                <div class="history-toggle-icon" :class="{ 'is-open': !isHistoryCollapsed }">
-                  <ChevronRight class="icon-small" />
-                </div>
-              </button>
-              
-              <div v-if="!isHistoryCollapsed" class="history-content-wrap mt-4">
-                <div class="history-timeline">
-                  <div v-for="(item, idx) in selectedMemo.history" :key="idx" class="timeline-item">
-                    <div class="timeline-visual">
-                      <div class="timeline-dot" :class="getHistoryDotColor(item.action)"></div>
-                      <div v-if="idx < selectedMemo.history.length - 1" class="timeline-connector"></div>
-                    </div>
-                    <div class="timeline-content">
-                      <div class="timeline-header">
-                        <span class="timeline-action" :class="getHistoryColor(item.action)">{{ item.action }}</span>
-                        <span class="timeline-date">{{ formatDate(item.at) }}</span>
-                      </div>
-                      <div class="timeline-user">
-                        <span class="font-semibold text-slate-800">{{ item.user }}</span>
-                        <span v-if="item.user === currentUser" class="text-xs italic text-slate-400 ml-1">(you)</span>
-                      </div>
-                      <div v-if="item.note" class="timeline-note mt-1">
-                        {{ item.note }}
-                      </div>
-                    </div>
-                  </div>
+              <div class="detail-row">
+                <div v-if="!isCreateMode" class="detail-group">
+                  <label>Created At</label>
+                  <div class="detail-value">{{ formatDate(selectedMemo.createdAt) }}</div>
                 </div>
               </div>
+
+              <div class="detail-group">
+                <label>Purposing of Memo</label>
+                <div v-if="isEditMode" class="autocomplete-wrapper">
+                  <input ref="templateInputRef" type="text" class="form-input"
+                    placeholder="Search template by name or division..." v-model="templateSearch"
+                    @focus="handleTemplateFocus" @blur="handleTemplateBlur" @input="handleTemplateInput"
+                    autocomplete="off" />
+                  <Teleport to="body">
+                    <div v-if="showSuggestions" class="suggestions-dropdown-teleport" :style="dropdownStyle">
+                      <template v-if="filteredTemplates.length > 0">
+                        <div v-for="(item, idx) in filteredTemplates" :key="idx" class="suggestion-item"
+                          @mousedown.prevent="selectTemplate(item)">
+                          <span class="suggestion-name">{{ item.name }}</span>
+                          <span class="suggestion-division">{{ item.division }}</span>
+                        </div>
+                      </template>
+                      <div v-else class="suggestion-empty">No templates found</div>
+                    </div>
+                  </Teleport>
+                </div>
+                <div v-else class="detail-value">
+                  <div class="font-semibold">{{ selectedMemo.categoryType || '-' }}</div>
+                  <div v-if="selectedMemo.category" class="template-division-badge">{{ selectedMemo.category }}</div>
+                </div>
               </div>
             </div>
-          </template>
+
+            <!-- Section 2: Content -->
+            <template v-if="!isCreateMode || (selectedMemo.category && selectedMemo.categoryType)">
+              <div class="detail-section">
+                <h3 class="section-group-title">Memo Content</h3>
+                <div class="detail-group">
+                  <label>Title</label>
+                  <input v-if="isEditMode" type="text" v-model="selectedMemo.title" class="form-input" />
+                  <div v-else class="detail-value font-semibold text-lg">{{ selectedMemo.title }}</div>
+                </div>
+                <div class="detail-group">
+                  <label>Description</label>
+                  <textarea v-if="isEditMode" v-model="selectedMemo.description" class="form-textarea"
+                    rows="4"></textarea>
+                  <div v-else class="detail-value leading-relaxed">{{ selectedMemo.description }}</div>
+                </div>
+                <!-- Attachments Section -->
+                <div class="detail-group mt-4 attachments-collapsible">
+                  <button class="section-toggle-header" @click="isAttachmentsCollapsed = !isAttachmentsCollapsed">
+                    <label class="m-0 cursor-pointer">Attachments ({{ selectedMemo.attachmentsCount }})</label>
+                    <div class="history-toggle-icon" :class="{ 'is-open': !isAttachmentsCollapsed }">
+                      <ChevronRight class="icon-small" />
+                    </div>
+                  </button>
+
+                  <div v-if="!isAttachmentsCollapsed" class="history-content-wrap mt-3">
+                    <div v-if="selectedMemo.attachmentsCount > 0" class="attachments-grid">
+                      <div v-for="n in selectedMemo.attachmentsCount" :key="n" class="attachment-card"
+                        :class="{ 'is-edit': isEditMode }">
+                        <div class="attachment-icon-box">
+                          <FileText class="attachment-icon-large" />
+                        </div>
+                        <span class="attachment-name">Doc #{{ n }}</span>
+                        <button v-if="isEditMode" class="btn-remove-attachment-abs" title="Remove"
+                          @click.prevent="selectedMemo.attachmentsCount--">
+                          <X class="icon-tiny" />
+                        </button>
+                      </div>
+                    </div>
+                    <div v-else class="detail-value text-muted italic">No attachments included.</div>
+
+                    <div v-if="isEditMode" class="mt-3">
+                      <button class="btn-upload" @click.prevent="selectedMemo.attachmentsCount++">
+                        <Plus class="icon-small" /> Add Document
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Section 3: Category Specific (if Entertainment) -->
+              <div v-if="selectedMemo.categoryType === 'Entertainment Fund'" class="detail-section">
+                <h3 class="section-group-title">Entertainment Details</h3>
+
+                <div class="detail-group">
+                  <label>Location</label>
+                  <input v-if="isEditMode" type="text" v-model="selectedMemo.entLocation" class="form-input"
+                    placeholder="Type a place or click the map to pin a location..." />
+
+                  <div class="map-container mt-2">
+                    <MapPicker :locationQuery="isEditMode ? selectedMemo.entLocation : ''" :lat="selectedMemo.entLat"
+                      :lng="selectedMemo.entLng" :editable="isEditMode" @place-selected="handlePlaceSelected" />
+                  </div>
+                  <div v-if="!isEditMode && !selectedMemo.entLat" class="detail-value text-muted italic">No location
+                    provided</div>
+                </div>
+
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Payment Method</label>
+                    <select v-if="isEditMode" v-model="selectedMemo.entPaymentMethod" class="form-select">
+                      <option value="Debit/Cash">Debit/Cash</option>
+                      <option value="Credit">Credit</option>
+                      <option value="Debit/Cash and Credit">Debit/Cash and Credit</option>
+                    </select>
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.entPaymentMethod || '-' }}</div>
+                  </div>
+                </div>
+
+                <div class="detail-row">
+                  <div class="detail-group"
+                    v-if="['Debit/Cash', 'Debit/Cash and Credit'].includes(selectedMemo.entPaymentMethod)">
+                    <label>Debit/Cash Amount</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.entDebitAmount" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value font-bold text-blue-600">Rp {{ selectedMemo.entDebitAmount ?
+                      Number(selectedMemo.entDebitAmount).toLocaleString('id-ID') : '0' }}</div>
+                  </div>
+
+                  <div class="detail-group"
+                    v-if="['Credit', 'Debit/Cash and Credit'].includes(selectedMemo.entPaymentMethod)">
+                    <label>Credit Amount</label>
+                    <div class="input-with-prefix" v-if="isEditMode">
+                      <span class="prefix">Rp</span>
+                      <input type="number" v-model="selectedMemo.entCreditAmount" class="form-input" />
+                    </div>
+                    <div v-else class="detail-value font-bold text-blue-600">Rp {{ selectedMemo.entCreditAmount ?
+                      Number(selectedMemo.entCreditAmount).toLocaleString('id-ID') : '0' }}</div>
+                  </div>
+                </div>
+
+                <h4 class="subsection-title mt-4">Person to be Entertained</h4>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Name</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.entPersonName" class="form-input" />
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.entPersonName || '-' }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Company</label>
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.entPersonCompany" class="form-input" />
+                    <div v-else class="detail-value">{{ selectedMemo.entPersonCompany || '-' }}</div>
+                  </div>
+                </div>
+                <div class="detail-group">
+                  <label>Role</label>
+                  <input v-if="isEditMode" type="text" v-model="selectedMemo.entPersonRole" class="form-input" />
+                  <div v-else class="detail-value text-slate-600">{{ selectedMemo.entPersonRole || '-' }}</div>
+                </div>
+              </div>
+
+              <!-- Section 3.5: Travel Request Specific -->
+              <div v-if="selectedMemo.categoryType === 'Pengajuan Perjalanan Dinas'" class="detail-section">
+                <h3 class="section-group-title">Travel Period</h3>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>Start Date</label>
+                    <div v-if="isEditMode" class="date-input-group">
+                      <input type="text" v-model="selectedMemo.travStartDate" placeholder="YYYY-MM-DD"
+                        class="form-input" />
+                      <div class="date-picker-trigger">
+                        <Calendar class="icon-small" />
+                        <input type="date" v-model="selectedMemo.travStartDate" class="hidden-date-picker" />
+                      </div>
+                    </div>
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.travStartDate || '-' }}</div>
+                  </div>
+                  <div class="detail-group">
+                    <label>End Date</label>
+                    <div v-if="isEditMode" class="date-input-group">
+                      <input type="text" v-model="selectedMemo.travEndDate" placeholder="YYYY-MM-DD"
+                        class="form-input" />
+                      <div class="date-picker-trigger">
+                        <Calendar class="icon-small" />
+                        <input type="date" v-model="selectedMemo.travEndDate" class="hidden-date-picker" />
+                      </div>
+                    </div>
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.travEndDate || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3.6: HR Request Specific -->
+              <div v-if="isHrTemplate(selectedMemo.categoryType)" class="hr-details-container">
+                <!-- Employee Information -->
+                <div class="detail-section">
+                  <h3 class="section-group-title">Employee Information</h3>
+                  <div class="detail-row">
+                    <div class="detail-group">
+                      <label>Types of Employees</label>
+                      <select v-if="isEditMode" v-model="selectedMemo.hrEmployeeType" class="form-select">
+                        <option value="Existing">Existing</option>
+                        <option value="New">New</option>
+                      </select>
+                      <div v-else class="detail-value font-medium">{{ selectedMemo.hrEmployeeType }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Name</label>
+                      <input v-if="isEditMode" type="text" v-model="selectedMemo.hrName" class="form-input" />
+                      <div v-else class="detail-value font-medium">{{ selectedMemo.hrName || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-group">
+                      <label>Employee ID Number</label>
+                      <input v-if="isEditMode" type="text" v-model="selectedMemo.hrID" class="form-input" />
+                      <div v-else class="detail-value">{{ selectedMemo.hrID || '-' }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Date of Birth</label>
+                      <div v-if="isEditMode" class="date-input-group">
+                        <input type="text" v-model="selectedMemo.hrDOB" placeholder="YYYY-MM-DD" class="form-input" />
+                        <div class="date-picker-trigger">
+                          <Calendar class="icon-small" />
+                          <input type="date" v-model="selectedMemo.hrDOB" class="hidden-date-picker" />
+                        </div>
+                      </div>
+                      <div v-else class="detail-value">{{ selectedMemo.hrDOB || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-group">
+                      <label>Start Work</label>
+                      <div v-if="isEditMode" class="date-input-group">
+                        <input type="text" v-model="selectedMemo.hrStartWork" placeholder="YYYY-MM-DD"
+                          class="form-input" />
+                        <div class="date-picker-trigger">
+                          <Calendar class="icon-small" />
+                          <input type="date" v-model="selectedMemo.hrStartWork" class="hidden-date-picker" />
+                        </div>
+                      </div>
+                      <div v-else class="detail-value">{{ selectedMemo.hrStartWork || '-' }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Division</label>
+                      <input v-if="isEditMode" type="text" v-model="selectedMemo.hrDivision" class="form-input" />
+                      <div v-else class="detail-value">{{ selectedMemo.hrDivision || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-group">
+                      <label>Branch</label>
+                      <input v-if="isEditMode" type="text" v-model="selectedMemo.hrBranch" class="form-input" />
+                      <div v-else class="detail-value">{{ selectedMemo.hrBranch || '-' }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Job Title</label>
+                      <input v-if="isEditMode" type="text" v-model="selectedMemo.hrJobTitle" class="form-input" />
+                      <div v-else class="detail-value">{{ selectedMemo.hrJobTitle || '-' }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-group">
+                      <label>Status</label>
+                      <select v-if="isEditMode" v-model="selectedMemo.hrStatus" class="form-select">
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                      </select>
+                      <div v-else class="detail-value">{{ selectedMemo.hrStatus }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Number of Children</label>
+                      <input v-if="isEditMode" type="number" v-model="selectedMemo.hrChildren" class="form-input" />
+                      <div v-else class="detail-value">{{ selectedMemo.hrChildren ?? '0' }}</div>
+                    </div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Salary Change</label>
+                    <select v-if="isEditMode" v-model="selectedMemo.hrSalaryChange" class="form-select">
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                    <div v-else class="detail-value">{{ selectedMemo.hrSalaryChange === 'yes' ? 'Yes' : 'No' }}</div>
+                  </div>
+                </div>
+
+                <!-- Old Salary Breakdown (Conditional) -->
+                <div v-if="selectedMemo.hrSalaryChange === 'yes'" class="detail-section">
+                  <h3 class="section-group-title">Old Salary Breakdown</h3>
+                  <div class="salary-grid">
+                    <div class="detail-group">
+                      <label>Basic Salary</label>
+                      <div class="input-with-prefix" v-if="isEditMode">
+                        <span class="prefix">Rp</span>
+                        <input type="number" v-model="selectedMemo.oldSalary.basic" class="form-input" />
+                      </div>
+                      <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.basic ||
+                        0).toLocaleString('id-ID') }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Meal / Transport Allowance</label>
+                      <div class="input-with-prefix" v-if="isEditMode">
+                        <span class="prefix">Rp</span>
+                        <input type="number" v-model="selectedMemo.oldSalary.allowance" class="form-input" />
+                      </div>
+                      <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.allowance ||
+                        0).toLocaleString('id-ID') }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Position Allowance</label>
+                      <div class="input-with-prefix" v-if="isEditMode">
+                        <span class="prefix">Rp</span>
+                        <input type="number" v-model="selectedMemo.oldSalary.position" class="form-input" />
+                      </div>
+                      <div v-else class="detail-value">Rp {{ Number(selectedMemo.oldSalary?.position ||
+                        0).toLocaleString('id-ID') }}</div>
+                    </div>
+                    <div class="detail-group salary-total-group">
+                      <label>Total (Read-Only)</label>
+                      <div class="detail-value font-bold text-blue-600">
+                        Rp {{ (Number(selectedMemo.oldSalary?.basic || 0) + Number(selectedMemo.oldSalary?.allowance ||
+                          0) + Number(selectedMemo.oldSalary?.position || 0)).toLocaleString('id-ID') }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- New Salary Breakdown -->
+                <div class="detail-section">
+                  <h3 class="section-group-title">New Salary Breakdown</h3>
+                  <div class="salary-grid">
+                    <div class="detail-group">
+                      <label>Basic Salary</label>
+                      <div class="input-with-prefix" v-if="isEditMode">
+                        <span class="prefix">Rp</span>
+                        <input type="number" v-model="selectedMemo.newSalary.basic" class="form-input" />
+                      </div>
+                      <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.basic ||
+                        0).toLocaleString('id-ID') }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Meal / Transport Allowance</label>
+                      <div class="input-with-prefix" v-if="isEditMode">
+                        <span class="prefix">Rp</span>
+                        <input type="number" v-model="selectedMemo.newSalary.allowance" class="form-input" />
+                      </div>
+                      <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.allowance ||
+                        0).toLocaleString('id-ID') }}</div>
+                    </div>
+                    <div class="detail-group">
+                      <label>Position Allowance</label>
+                      <div class="input-with-prefix" v-if="isEditMode">
+                        <span class="prefix">Rp</span>
+                        <input type="number" v-model="selectedMemo.newSalary.position" class="form-input" />
+                      </div>
+                      <div v-else class="detail-value">Rp {{ Number(selectedMemo.newSalary?.position ||
+                        0).toLocaleString('id-ID') }}</div>
+                    </div>
+                    <div class="detail-group salary-total-group">
+                      <label>Total (Read-Only)</label>
+                      <div class="detail-value font-bold text-blue-600">
+                        Rp {{ (Number(selectedMemo.newSalary?.basic || 0) + Number(selectedMemo.newSalary?.allowance ||
+                          0) + Number(selectedMemo.newSalary?.position || 0)).toLocaleString('id-ID') }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Effective Date -->
+                <div class="detail-section">
+                  <h3 class="section-group-title">Effective Date</h3>
+                  <div class="detail-group">
+                    <label>Effective starting from</label>
+                    <div v-if="isEditMode" class="date-input-group">
+                      <input type="text" v-model="selectedMemo.hrEffectiveDate" placeholder="YYYY-MM-DD"
+                        class="form-input" />
+                      <div class="date-picker-trigger">
+                        <Calendar class="icon-small" />
+                        <input type="date" v-model="selectedMemo.hrEffectiveDate" class="hidden-date-picker" />
+                      </div>
+                    </div>
+                    <div v-else class="detail-value font-medium">{{ selectedMemo.hrEffectiveDate || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 5: Workflow & Files -->
+              <div v-if="!isCreateMode" class="detail-section">
+                <h3 class="section-group-title">Workflow & History</h3>
+
+                <div class="detail-group" style="position: relative; z-index: 10;">
+                  <label>Approval Chain</label>
+                  <div class="modal-approval-chain-container">
+                    <div class="modal-approval-chain">
+                      <template v-for="(tier, tierIdx) in selectedMemo.approvalChain" :key="tierIdx">
+                        <div class="tier-group" :class="{ 'is-quorum': tier.approvers.length > 1 }">
+                          <div v-if="tier.approvers.length > 1" class="tier-label">
+                            {{ tier.type === 'quorum' ? `Any ${tier.requiredApprovals} of ${tier.approvers.length}` :
+                              'All Required' }}
+                          </div>
+                          <div class="tier-nodes">
+                            <template v-for="(approver, approverIdx) in tier.approvers" :key="approverIdx">
+                              <div class="approver-node-compact" :class="getStatusColor(approver.status)">
+                                <div class="node-icon-overlay">
+                                  <component :is="getStatusIcon(approver.status)" class="node-mini-icon" />
+                                </div>
+                                <span class="approver-initials">{{ approver.name.substring(0, 1) }}</span>
+                                <div class="approver-tooltip">
+                                  <div class="tooltip-name">{{ approver.name }}</div>
+                                  <div class="tooltip-role">{{ approver.role }}</div>
+                                  <div class="tooltip-status" :class="getStatusColor(approver.status)">{{
+                                    approver.status }}</div>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+                        <div v-if="tierIdx < selectedMemo.approvalChain.length - 1" class="chain-connector-compact">
+                          <ChevronRight class="chain-arrow-compact" />
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- History Section -->
+                <div v-if="!isCreateMode && selectedMemo.history && selectedMemo.history.length > 0"
+                  class="mt-4 history-collapsible border-t pt-4 border-dashed border-slate-200">
+                  <button class="section-toggle-header" @click="isHistoryCollapsed = !isHistoryCollapsed">
+                    <h3 class="section-group-title m-0">Memo History</h3>
+                    <div class="history-toggle-icon" :class="{ 'is-open': !isHistoryCollapsed }">
+                      <ChevronRight class="icon-small" />
+                    </div>
+                  </button>
+
+                  <div v-if="!isHistoryCollapsed" class="history-content-wrap mt-4">
+                    <div class="history-timeline">
+                      <div v-for="(item, idx) in selectedMemo.history" :key="idx" class="timeline-item">
+                        <div class="timeline-visual">
+                          <div class="timeline-dot" :class="getHistoryDotColor(item.action)"></div>
+                          <div v-if="idx < selectedMemo.history.length - 1" class="timeline-connector"></div>
+                        </div>
+                        <div class="timeline-content">
+                          <div class="timeline-header">
+                            <span class="timeline-action" :class="getHistoryColor(item.action)">{{ item.action }}</span>
+                            <span class="timeline-date">{{ formatDate(item.at) }}</span>
+                          </div>
+                          <div class="timeline-user">
+                            <span class="font-semibold text-slate-800">{{ item.user }}</span>
+                            <span v-if="item.user === currentUser"
+                              class="text-xs italic text-slate-400 ml-1">(you)</span>
+                          </div>
+                          <div v-if="item.note" class="timeline-note mt-1">
+                            {{ item.note }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
-      </div>
         <div class="modal-footer">
-          <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'" class="modal-actions-left">
+          <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
+            class="modal-actions-left">
             <button class="btn-success" @click="handleApprove">Approve</button>
             <button class="btn-warning" @click="handleRequestChanges">Request Changes</button>
             <button class="btn-danger" @click="handleReject">Reject</button>
           </div>
-          
+
           <template v-if="isEditMode">
             <div class="modal-actions-left">
               <button class="btn-secondary" @click="closeViewModal">Cancel Request</button>
@@ -1572,11 +1553,13 @@ const getHistoryDotColor = (action) => {
             </template>
             <template v-else>
               <button class="btn-draft ml-auto mr-2" @click="handleSaveDraft">Save Draft</button>
-              <button class="btn-primary" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo' }}</button>
+              <button class="btn-primary" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo'
+              }}</button>
             </template>
           </template>
           <template v-else>
-            <button v-if="getActions(selectedMemo).includes('remind')" class="btn-remind" @click="handleRemind(selectedMemo)">
+            <button v-if="getActions(selectedMemo).includes('remind')" class="btn-remind"
+              @click="handleRemind(selectedMemo)">
               <Bell class="icon-small mr-1" /> Remind Approvers
             </button>
             <button class="btn-secondary ml-2" @click="closeViewModal">Close</button>
@@ -1590,7 +1573,9 @@ const getHistoryDotColor = (action) => {
       <div class="modal-content" style="max-width: 480px;">
         <div class="modal-header">
           <h2>{{ reviewModalType === 'Reject' ? 'Reject Memo' : 'Request Changes' }}</h2>
-          <button class="btn-close" @click="cancelReviewAction"><X class="icon" /></button>
+          <button class="btn-close" @click="cancelReviewAction">
+            <X class="icon" />
+          </button>
         </div>
         <div class="modal-body">
           <template v-if="reviewModalType === 'Requested Changes'">
@@ -1601,7 +1586,7 @@ const getHistoryDotColor = (action) => {
                 <option v-for="c in rejectionConcernsList" :key="c" :value="c">{{ c }}</option>
               </select>
             </div>
-            
+
             <div class="detail-group mt-3">
               <label>Concerning Fields (Optional)</label>
               <div class="checkbox-grid">
@@ -1614,15 +1599,16 @@ const getHistoryDotColor = (action) => {
           </template>
 
           <div class="detail-group" :class="{ 'mt-3': reviewModalType === 'Requested Changes' }">
-            <label>{{ reviewModalType === 'Reject' ? 'Rejection Reason Details' : 'Requested Changes Details' }} <span class="text-red-500">*</span></label>
-            <textarea v-model="rejectionReason" class="form-textarea" rows="4" 
-                      :placeholder="reviewModalType === 'Reject' ? 'Explain why this cannot be approved...' : 'Describe what needs to be changed...'"></textarea>
+            <label>{{ reviewModalType === 'Reject' ? 'Rejection Reason Details' : 'Requested Changes Details' }} <span
+                class="text-red-500">*</span></label>
+            <textarea v-model="rejectionReason" class="form-textarea" rows="4"
+              :placeholder="reviewModalType === 'Reject' ? 'Explain why this cannot be approved...' : 'Describe what needs to be changed...'"></textarea>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn-secondary" @click="cancelReviewAction">Cancel</button>
-          <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary' + ' ml-2'" 
-                  @click="confirmReviewAction">
+          <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary' + ' ml-2'"
+            @click="confirmReviewAction">
             {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
           </button>
         </div>
@@ -1708,7 +1694,8 @@ const getHistoryDotColor = (action) => {
 
 .memo-card-title-group {
   flex: 1;
-  min-width: 0; /* Important for text truncation inside flexbox */
+  min-width: 0;
+  /* Important for text truncation inside flexbox */
 }
 
 .memo-card-title {
@@ -1763,7 +1750,7 @@ const getHistoryDotColor = (action) => {
     top: -2px;
     right: -2px;
   }
-  
+
   .reminded-tag {
     width: auto;
     padding: 0 0.5rem;
@@ -1812,11 +1799,36 @@ const getHistoryDotColor = (action) => {
   height: 16px;
 }
 
-.status-approved { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
-.status-pending { background: #fffbeb; color: #d97706; border: 1px solid #fef3c7; }
-.status-rejected { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-.status-requested-changes { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; } /* Red for issues */
-.status-draft { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.status-approved {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #dcfce7;
+}
+
+.status-pending {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fef3c7;
+}
+
+.status-rejected {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+
+.status-requested-changes {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+
+/* Red for issues */
+.status-draft {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
 
 /* Card Body */
 .memo-card-body {
@@ -1833,7 +1845,8 @@ const getHistoryDotColor = (action) => {
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 4.05rem; /* Rigid height for 3 lines (3 * 1.5 * 0.9rem) */
+  height: 4.05rem;
+  /* Rigid height for 3 lines (3 * 1.5 * 0.9rem) */
 }
 
 .memo-details-row {
@@ -1851,7 +1864,8 @@ const getHistoryDotColor = (action) => {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-weight: 500;
-  min-width: 0; /* Allow grid item to shrink below content size */
+  min-width: 0;
+  /* Allow grid item to shrink below content size */
 }
 
 .detail-item span {
@@ -1896,10 +1910,21 @@ const getHistoryDotColor = (action) => {
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.progress-bar-fill.status-approved { background: #10b981; }
-.progress-bar-fill.status-rejected { background: #ef4444; }
-.progress-bar-fill.status-requested-changes { background: #f59e0b; }
-.progress-bar-fill.status-pending { background: #3b82f6; }
+.progress-bar-fill.status-approved {
+  background: #10b981;
+}
+
+.progress-bar-fill.status-rejected {
+  background: #ef4444;
+}
+
+.progress-bar-fill.status-requested-changes {
+  background: #f59e0b;
+}
+
+.progress-bar-fill.status-pending {
+  background: #3b82f6;
+}
 
 .progress-label {
   font-size: 0.7rem;
@@ -1941,7 +1966,10 @@ const getHistoryDotColor = (action) => {
   border-color: #3b82f6;
 }
 
-.mini-action-btn.update:hover { color: #f59e0b; border-color: #f59e0b; }
+.mini-action-btn.update:hover {
+  color: #f59e0b;
+  border-color: #f59e0b;
+}
 
 /* Card Overlay (Quick Actions) */
 .card-overlay {
@@ -1981,10 +2009,25 @@ const getHistoryDotColor = (action) => {
   transition: all 0.2s;
 }
 
-.overlay-main-btn.view { background: #3b82f6; color: white; }
-.overlay-main-btn.edit { background: #f59e0b; color: white; }
-.overlay-main-btn.delete { background: #ef4444; color: white; }
-.overlay-main-btn.remind { background: #6366f1; color: white; }
+.overlay-main-btn.view {
+  background: #3b82f6;
+  color: white;
+}
+
+.overlay-main-btn.edit {
+  background: #f59e0b;
+  color: white;
+}
+
+.overlay-main-btn.delete {
+  background: #ef4444;
+  color: white;
+}
+
+.overlay-main-btn.remind {
+  background: #6366f1;
+  color: white;
+}
 
 .overlay-main-btn:hover {
   filter: brightness(1.1);
@@ -2064,8 +2107,15 @@ const getHistoryDotColor = (action) => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 640px) {
@@ -2079,10 +2129,12 @@ const getHistoryDotColor = (action) => {
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
+
 .approver-node-compact.status-approved {
   border-color: #10b981;
   background: #ecfdf5;
@@ -2110,24 +2162,30 @@ const getHistoryDotColor = (action) => {
 /* Tooltip */
 .approver-tooltip {
   position: absolute;
-  top: calc(100% + 12px); /* Render BELOW the node in the modal */
+  top: calc(100% + 12px);
+  /* Render BELOW the node in the modal */
   left: 50%;
   transform: translateX(-50%) translateY(-10px);
-  background: #0f172a; /* Darker navy */
+  background: #0f172a;
+  /* Darker navy */
   color: white;
   padding: 0.6rem 0.85rem;
-  border-radius: 8px; /* Softer corners */
+  border-radius: 8px;
+  /* Softer corners */
   font-size: 0.75rem;
-  white-space: normal; /* Allow wrapping */
+  white-space: normal;
+  /* Allow wrapping */
   width: max-content;
-  max-width: 180px; /* Prevent it from being too wide */
+  max-width: 180px;
+  /* Prevent it from being too wide */
   text-align: center;
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
   pointer-events: none;
-  z-index: 1000; /* Max z-index for absolute visibility */
+  z-index: 1000;
+  /* Max z-index for absolute visibility */
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -2137,7 +2195,8 @@ const getHistoryDotColor = (action) => {
 .approver-tooltip::after {
   content: '';
   position: absolute;
-  bottom: 100%; /* Arrow on TOP pointing UP */
+  bottom: 100%;
+  /* Arrow on TOP pointing UP */
   left: 50%;
   transform: translateX(-50%);
   border-width: 6px;
@@ -2169,10 +2228,25 @@ const getHistoryDotColor = (action) => {
   font-weight: bold;
 }
 
-.tooltip-status.status-approved { background: rgba(16, 185, 129, 0.2); color: #059669; }
-.tooltip-status.status-rejected { background: rgba(239, 68, 68, 0.2); color: #dc2626; }
-.tooltip-status.status-pending { background: rgba(148, 163, 184, 0.2); color: #64748b; }
-.tooltip-status.status-requested-changes { background: rgba(245, 158, 11, 0.2); color: #d97706; }
+.tooltip-status.status-approved {
+  background: rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+
+.tooltip-status.status-rejected {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+.tooltip-status.status-pending {
+  background: rgba(148, 163, 184, 0.2);
+  color: #64748b;
+}
+
+.tooltip-status.status-requested-changes {
+  background: rgba(245, 158, 11, 0.2);
+  color: #d97706;
+}
 
 .chain-connector-compact {
   display: flex;
@@ -2233,7 +2307,8 @@ const getHistoryDotColor = (action) => {
 .bottom-action-bar {
   position: fixed;
   bottom: 0;
-  left: 250px; /* align with main content, after sidebar */
+  left: 250px;
+  /* align with main content, after sidebar */
   right: 0;
   z-index: 500;
   display: flex;
@@ -2243,7 +2318,7 @@ const getHistoryDotColor = (action) => {
   padding: 0.85rem 1.5rem;
   background: #1e293b;
   color: white;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
   flex-wrap: wrap;
 }
 
@@ -2288,14 +2363,14 @@ const getHistoryDotColor = (action) => {
     border-radius: 12px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   }
-  
+
   .overlay-btn {
     width: 100%;
     justify-content: center;
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
-  
+
   .overlay-btn-close {
     width: 100%;
     justify-content: center;
@@ -2317,10 +2392,27 @@ const getHistoryDotColor = (action) => {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.overlay-btn.view   { background: #3b82f6; color: white; }
-.overlay-btn.edit   { background: #f59e0b; color: white; }
-.overlay-btn.delete { background: #ef4444; color: white; }
-.overlay-btn.remind { background: #6366f1; color: white; } /* Indigo for Remind */
+.overlay-btn.view {
+  background: #3b82f6;
+  color: white;
+}
+
+.overlay-btn.edit {
+  background: #f59e0b;
+  color: white;
+}
+
+.overlay-btn.delete {
+  background: #ef4444;
+  color: white;
+}
+
+.overlay-btn.remind {
+  background: #6366f1;
+  color: white;
+}
+
+/* Indigo for Remind */
 
 .overlay-btn:hover {
   transform: translateY(-2px);
@@ -2339,7 +2431,7 @@ const getHistoryDotColor = (action) => {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .overlay-btn-close:hover {
@@ -2353,6 +2445,7 @@ const getHistoryDotColor = (action) => {
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
@@ -2377,11 +2470,12 @@ const getHistoryDotColor = (action) => {
   background: white;
   border-radius: 12px;
   width: 100%;
-  max-width: 840px; /* Wider for better readability */
+  max-width: 840px;
+  /* Wider for better readability */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px -10px rgba(0,0,0,0.25), 0 8px 16px -6px rgba(0,0,0,0.1);
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.25), 0 8px 16px -6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -2389,6 +2483,7 @@ const getHistoryDotColor = (action) => {
   .modal-overlay {
     padding: 0;
   }
+
   .modal-content {
     max-width: 100% !important;
     height: 100% !important;
@@ -2401,27 +2496,37 @@ const getHistoryDotColor = (action) => {
   .modal-header {
     flex-wrap: wrap;
     gap: 0.75rem;
-    position: relative; /* Added to anchor absolute close button */
-    padding-right: 3.5rem !important; /* Ensure room for close button */
+    position: relative;
+    /* Added to anchor absolute close button */
+    padding-right: 3.5rem !important;
+    /* Ensure room for close button */
   }
+
   .modal-header-left {
     width: 100%;
     gap: 0.5rem;
   }
+
   .modal-header-right {
     width: 100%;
     justify-content: flex-start;
-    padding-right: 0; /* Header-right already has room due to header padding */
+    padding-right: 0;
+    /* Header-right already has room due to header padding */
   }
+
   .btn-close {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    margin: 0 !important; /* Clear ml-3 or other margins */
+    margin: 0 !important;
+    /* Clear ml-3 or other margins */
   }
-  .modal-header, .modal-footer {
+
+  .modal-header,
+  .modal-footer {
     padding: 1rem;
   }
+
   .modal-body {
     padding: 1rem;
     gap: 1.25rem;
@@ -2499,7 +2604,8 @@ const getHistoryDotColor = (action) => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background-color: #f8fafc; /* Subtle background for contrast with sections */
+  background-color: #f8fafc;
+  /* Subtle background for contrast with sections */
 }
 
 .detail-section {
@@ -2507,7 +2613,7 @@ const getHistoryDotColor = (action) => {
   border-radius: 10px;
   padding: 1.25rem;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .section-group-title {
@@ -2521,7 +2627,9 @@ const getHistoryDotColor = (action) => {
   align-items: center;
 }
 
-.section-group-title.m-0 { margin: 0; }
+.section-group-title.m-0 {
+  margin: 0;
+}
 
 .rejection-alert-new {
   background-color: #fef2f2 !important;
@@ -2696,7 +2804,9 @@ const getHistoryDotColor = (action) => {
 }
 
 /* Edit Form Styles */
-.form-input, .form-textarea, .form-select {
+.form-input,
+.form-textarea,
+.form-select {
   width: 100%;
   padding: 0.5rem 0.75rem;
   border: 1px solid #cbd5e1;
@@ -2707,7 +2817,9 @@ const getHistoryDotColor = (action) => {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-input:focus, .form-textarea:focus, .form-select:focus {
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
@@ -2786,7 +2898,8 @@ const getHistoryDotColor = (action) => {
   justify-content: center;
   color: #64748b;
   cursor: pointer;
-  pointer-events: none; /* Let clicks pass through to the hidden input */
+  pointer-events: none;
+  /* Let clicks pass through to the hidden input */
 }
 
 .date-picker-trigger:hover {
@@ -2798,7 +2911,8 @@ const getHistoryDotColor = (action) => {
   inset: 0;
   opacity: 0;
   cursor: pointer;
-  pointer-events: auto; /* Enable clicks on the hidden native picker */
+  pointer-events: auto;
+  /* Enable clicks on the hidden native picker */
   width: 100%;
 }
 
@@ -3078,12 +3192,12 @@ const getHistoryDotColor = (action) => {
     gap: 1rem;
     text-align: center;
   }
-  
+
   .pagination-controls {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .page-buttons {
     width: 100%;
     justify-content: center;
@@ -3170,7 +3284,7 @@ const getHistoryDotColor = (action) => {
 .attachment-card:hover {
   background: #e2e8f0;
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .attachment-icon-box {
@@ -3183,7 +3297,7 @@ const getHistoryDotColor = (action) => {
   justify-content: center;
   margin-bottom: 0.5rem;
   color: #3b82f6;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .attachment-icon-large {
@@ -3215,7 +3329,7 @@ const getHistoryDotColor = (action) => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
 }
 
@@ -3232,24 +3346,29 @@ const getHistoryDotColor = (action) => {
 /* Modal Approval Chain Widen */
 .modal-approval-chain-container {
   width: 100%;
-  overflow: visible; /* Prevent clipping of flipped tooltips */
-  padding: 0.5rem 0.5rem 4rem 0.5rem; /* Large bottom padding for tooltips */
+  overflow: visible;
+  /* Prevent clipping of flipped tooltips */
+  padding: 0.5rem 0.5rem 4rem 0.5rem;
+  /* Large bottom padding for tooltips */
 }
 
 .modal-approval-chain {
   display: inline-flex;
   min-width: 100%;
   align-items: center;
-  gap: 0.75rem; /* Space between tiers/arrows */
+  gap: 0.75rem;
+  /* Space between tiers/arrows */
   justify-content: flex-start;
 }
 
 .modal-approval-chain .tier-nodes {
-  gap: 0.5rem; /* Space between approver nodes in a tier */
+  gap: 0.5rem;
+  /* Space between approver nodes in a tier */
 }
 
 .modal-approval-chain .approver-node-compact:not(:first-child) {
-  margin-left: 0; /* Clear the overlap from global styles */
+  margin-left: 0;
+  /* Clear the overlap from global styles */
 }
 
 /* History Collapsible Styles */
@@ -3288,8 +3407,15 @@ const getHistoryDotColor = (action) => {
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .checkbox-grid {
@@ -3382,16 +3508,45 @@ const getHistoryDotColor = (action) => {
   border-left: 3px solid #e2e8f0;
 }
 
-.text-green-600 { color: #16a34a; }
-.text-blue-600 { color: #2563eb; }
-.text-indigo-600 { color: #4f46e5; }
-.text-amber-600 { color: #d97706; }
-.text-red-600 { color: #dc2626; }
-.bg-green-500 { background-color: #22c55e; }
-.bg-blue-500 { background-color: #3b82f6; }
-.bg-indigo-500 { background-color: #6366f1; }
-.bg-amber-500 { background-color: #f59e0b; }
-.bg-red-500 { background-color: #ef4444; }
+.text-green-600 {
+  color: #16a34a;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.text-indigo-600 {
+  color: #4f46e5;
+}
+
+.text-amber-600 {
+  color: #d97706;
+}
+
+.text-red-600 {
+  color: #dc2626;
+}
+
+.bg-green-500 {
+  background-color: #22c55e;
+}
+
+.bg-blue-500 {
+  background-color: #3b82f6;
+}
+
+.bg-indigo-500 {
+  background-color: #6366f1;
+}
+
+.bg-amber-500 {
+  background-color: #f59e0b;
+}
+
+.bg-red-500 {
+  background-color: #ef4444;
+}
 
 .checkbox-label {
   display: flex;
@@ -3404,6 +3559,7 @@ const getHistoryDotColor = (action) => {
   letter-spacing: normal !important;
   font-weight: 500 !important;
 }
+
 .form-checkbox {
   width: 1rem;
   height: 1rem;
@@ -3411,16 +3567,21 @@ const getHistoryDotColor = (action) => {
 }
 
 @media (max-width: 768px) {
+
   /* Convert Table to Card Layout on Mobile */
-  .simple-table, .simple-table tbody, .simple-table tr, .simple-table td {
+  .simple-table,
+  .simple-table tbody,
+  .simple-table tr,
+  .simple-table td {
     display: block;
     width: 100%;
   }
-  
+
   .simple-table thead {
-    display: none; /* Hide headers */
+    display: none;
+    /* Hide headers */
   }
-  
+
   .simple-table tr {
     margin-bottom: 1rem;
     border: 1px solid #e2e8f0;
@@ -3428,9 +3589,9 @@ const getHistoryDotColor = (action) => {
     background-color: white;
     padding: 1rem;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
-  
+
   .simple-table td {
     padding: 0.5rem 0;
     border-bottom: none;
@@ -3439,7 +3600,7 @@ const getHistoryDotColor = (action) => {
     align-items: center;
     text-align: right;
   }
-  
+
   /* Add simulated headers using data attributes */
   .simple-table td::before {
     content: attr(data-label);
@@ -3448,7 +3609,7 @@ const getHistoryDotColor = (action) => {
     text-align: left;
     margin-right: 1rem;
   }
-  
+
   /* Layout adjustments */
   .title-col {
     flex-direction: column;
@@ -3459,42 +3620,43 @@ const getHistoryDotColor = (action) => {
     padding: 0.75rem !important;
     border-radius: 6px;
   }
-  
+
   .title-col::before {
     content: none !important;
   }
-  
+
   .memo-desc {
     -webkit-line-clamp: 3;
     line-clamp: 3;
     margin-top: 0.25rem;
   }
-  
+
   .num-col {
     color: #3b82f6;
     padding-bottom: 0.25rem !important;
   }
-  
+
   .approvers-col {
     min-width: auto;
   }
-  
+
   .action-col {
     margin-top: 0.5rem;
     padding-top: 0.75rem !important;
     border-top: 1px dashed #e2e8f0;
     justify-content: flex-end;
   }
-  
+
   .action-col::before {
-    content: none !important; /* HideAction label */
+    content: none !important;
+    /* HideAction label */
   }
 
   /* Modal Responsiveness */
   .modal-content {
     max-height: 95vh;
   }
-  
+
   .modal-body {
     padding: 1rem;
     gap: 1rem;
@@ -3510,8 +3672,9 @@ const getHistoryDotColor = (action) => {
     margin-bottom: 0.75rem;
     justify-content: space-between;
   }
-  
-  .btn-success, .btn-danger {
+
+  .btn-success,
+  .btn-danger {
     flex: 1;
   }
 
@@ -3529,6 +3692,7 @@ const getHistoryDotColor = (action) => {
     left: 0;
   }
 }
+
 /* Autocomplete / Intellisense */
 .autocomplete-wrapper {
   position: relative;
@@ -3556,7 +3720,7 @@ const getHistoryDotColor = (action) => {
   max-height: 88vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 64px -12px rgba(0,0,0,0.28);
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.28);
   overflow: hidden;
 }
 
@@ -3624,7 +3788,7 @@ const getHistoryDotColor = (action) => {
 
 .division-card:hover {
   transform: translateX(3px);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
 }
 
 .division-icon-wrap {
@@ -3636,7 +3800,7 @@ const getHistoryDotColor = (action) => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .division-icon {
@@ -3645,7 +3809,9 @@ const getHistoryDotColor = (action) => {
   color: var(--div-color);
 }
 
-.division-info { flex: 1; }
+.division-info {
+  flex: 1;
+}
 
 .division-name {
   font-size: 0.92rem;
@@ -3829,7 +3995,7 @@ const getHistoryDotColor = (action) => {
   align-items: center;
   justify-content: center;
   background: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   z-index: 5;
   border: 1px solid currentColor;
 }
@@ -3846,7 +4012,7 @@ const getHistoryDotColor = (action) => {
   background: white;
   border: 1px solid #cbd5e1;
   border-radius: 10px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   max-height: 260px;
   overflow-y: auto;
 }
