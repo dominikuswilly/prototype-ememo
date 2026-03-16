@@ -37,14 +37,12 @@ const handleFilterChange = (newFilters) => {
 const pageTitle = computed(() => {
   if (activeTab.value === 'my_memos') return 'My Memos';
   if (activeTab.value === 'pending_approval') return 'Pending Approval';
-  if (activeTab.value === 'drafts') return 'Draft Memos';
   return 'All eMemos';
 });
 
 const pageDescription = computed(() => {
-  if (activeTab.value === 'my_memos') return 'Memos created by you.';
+  if (activeTab.value === 'my_memos') return 'Memos created by you, including drafts.';
   if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
-  if (activeTab.value === 'drafts') return 'Memos you have saved but not yet submitted.';
   return 'A simple overview of all memorandums in the system.';
 });
 
@@ -67,8 +65,6 @@ const filteredMemos = computed(() => {
         tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
       );
     });
-  } else if (activeTab.value === 'drafts') {
-    result = result.filter(m => m.requester === currentUser && m.status === 'Draft');
   } else if (activeTab.value === 'all') {
     // Show self + subordinates (excluding drafts of subordinates usually, but here we show all non-drafts)
     const subordinateNames = subordinates.map(s => s.name);
@@ -170,12 +166,12 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       <header class="sticky-page-header">
         <div class="tabs-nav">
           <button 
-            v-for="tab in ['all', 'my_memos', 'pending_approval', 'drafts']" 
+            v-for="tab in ['all', 'my_memos', 'pending_approval']" 
             :key="tab"
             :class="['tab-btn', { active: activeTab === tab }]"
             @click="activeTab = tab"
           >
-            {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : (tab === 'all' ? 'All Memos' : 'Drafts')) }}
+            {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
             <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
           </button>
         </div>

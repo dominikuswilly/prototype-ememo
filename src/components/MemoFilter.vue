@@ -25,7 +25,7 @@ const filters = ref({
   member: ''
 });
 
-const availableStatuses = ['Pending', 'Approved', 'Rejected', 'Requested Changes'];
+const availableStatuses = ['Pending', 'Approved', 'Rejected', 'Requested Changes', 'Draft'];
 
 const toggleStatus = (status) => {
   const index = filters.value.statuses.indexOf(status);
