@@ -150,14 +150,52 @@ const rejectionConcernsList = [
   'Other'
 ];
 const rejectedFields = ref([]);
-const memoFieldsToReject = [
-  'Title',
-  'Description',
-  'Department',
-  'Location',
-  'Amount',
-  'Attachments'
-];
+const memoFieldsToReject = computed(() => {
+  if (!selectedMemo.value) return [];
+  const fields = ['Title', 'Description'];
+
+  const type = selectedMemo.value.categoryType;
+
+  if (type === 'Entertainment Fund') {
+    fields.push('Location');
+    fields.push('Amount');
+  } else if (type === 'Pengajuan Perjalanan Dinas') {
+    fields.push('Timeline');
+  } else if (isHrTemplate(type)) {
+    fields.push('Employee Info');
+    if (selectedMemo.value.hrSalaryChange === 'yes') {
+      fields.push('Salary Details');
+    }
+  } else if (selectedMemo.value.entDebitAmount || selectedMemo.value.entCreditAmount) {
+    fields.push('Amount');
+  }
+
+  fields.push('Attachments');
+  return fields;
+});
+
+const getFieldValue = (fieldName) => {
+  if (!selectedMemo.value) return '';
+  switch (fieldName) {
+    case 'Title': return selectedMemo.value.title;
+    case 'Description': return selectedMemo.value.description;
+    case 'Location': return selectedMemo.value.entLocation || selectedMemo.value.hrBranch || '-';
+    case 'Amount': {
+      const amt = (Number(selectedMemo.value.entDebitAmount || 0) + Number(selectedMemo.value.entCreditAmount || 0));
+      return amt > 0 ? `Rp ${amt.toLocaleString('id-ID')}` : '-';
+    }
+    case 'Timeline': return `${selectedMemo.value.travStartDate || '?'} to ${selectedMemo.value.travEndDate || '?'}`;
+    case 'Employee Info': return selectedMemo.value.hrName || 'Not specified';
+    case 'Salary Details': {
+      const total = Number(selectedMemo.value.newSalary?.basic || 0) +
+        Number(selectedMemo.value.newSalary?.allowance || 0) +
+        Number(selectedMemo.value.newSalary?.position || 0);
+      return `Total Rp ${total.toLocaleString('id-ID')}`;
+    }
+    case 'Attachments': return `${selectedMemo.value.attachmentsCount || 0} files`;
+    default: return '';
+  }
+};
 
 const templateList = [
   // Accounting & Finance
@@ -1612,10 +1650,13 @@ const getHistoryDotColor = (action) => {
 
             <div class="detail-group mt-3">
               <label>Concerning Fields (Optional)</label>
-              <div class="checkbox-grid">
-                <label v-for="field in memoFieldsToReject" :key="field" class="checkbox-label">
+              <div>
+                <label v-for="field in memoFieldsToReject" :key="field" class="checkbox-label-premium">
                   <input type="checkbox" :value="field" v-model="rejectedFields" class="form-checkbox">
-                  <span>{{ field }}</span>
+                  <div class="checkbox-text">
+                    <span class="field-name-sm">{{ field }}</span>
+                    <span class="field-value-sm">{{ getFieldValue(field) }}</span>
+                  </div>
                 </label>
               </div>
             </div>
@@ -1626,14 +1667,19 @@ const getHistoryDotColor = (action) => {
                 class="text-red-500">*</span></label>
             <textarea v-model="rejectionReason" class="form-textarea" rows="4"
               :placeholder="reviewModalType === 'Reject' ? 'Explain why this cannot be approved...' : 'Describe what needs to be changed...'"></textarea>
+            <div class="modal-section-actions">
+              <div class="modal-actions-group is-centered">
+                <button class="btn-secondary" @click="cancelReviewAction">
+                  <X class="icon-small mr-2" /> Cancel
+                </button>
+                <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary'" @click="confirmReviewAction">
+                  <XCircle v-if="reviewModalType === 'Reject'" class="icon-small mr-2" />
+                  <FileEdit v-else class="icon-small mr-2" />
+                  {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-secondary" @click="cancelReviewAction">Cancel</button>
-          <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary' + ' ml-2'"
-            @click="confirmReviewAction">
-            {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
-          </button>
         </div>
       </div>
     </div>
@@ -2904,7 +2950,8 @@ const getHistoryDotColor = (action) => {
   font-size: 0.95rem;
 }
 
-.modal-actions-group.is-centered {
+.modal-actions-group.is-centered,
+.modal-footer.is-centered {
   display: flex !important;
   justify-content: center !important;
   width: 100% !important;
@@ -2912,14 +2959,17 @@ const getHistoryDotColor = (action) => {
   gap: 1.25rem !important;
 }
 
-.modal-actions-group.is-centered button {
+.modal-actions-group.is-centered button,
+.modal-footer.is-centered button {
   flex: 0 0 auto !important;
   max-width: none !important;
   margin: 0 !important;
 }
 
 @media (min-width: 641px) {
-  .modal-actions-group.is-centered button {
+
+  .modal-actions-group.is-centered button,
+  .modal-footer.is-centered button {
     width: 240px !important;
   }
 }
@@ -2991,6 +3041,69 @@ const getHistoryDotColor = (action) => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1.25rem;
+}
+
+/* Checkbox Grid for Review */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.checkbox-label-premium {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0.75rem;
+}
+
+.checkbox-label-premium:last-child {
+  margin-bottom: 0;
+}
+
+.checkbox-label-premium:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.checkbox-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.field-name-sm {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.field-value-sm {
+  font-size: 0.75rem;
+  color: #475569;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.form-checkbox {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.1rem;
+  cursor: pointer;
 }
 
 .section-title {
