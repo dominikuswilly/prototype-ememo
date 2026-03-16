@@ -123,7 +123,7 @@ const openDatePicker = (event) => {
         </div>
 
         <!-- Status Toggles -->
-        <div class="filter-group status-group">
+        <div v-if="activeTab !== 'pending_approval'" class="filter-group status-group">
           <button 
             v-for="status in availableStatuses" 
             :key="status"
