@@ -84,12 +84,8 @@ const openDatePicker = (event) => {
         <div class="filter-group keyword-group">
           <div class="input-icon-wrapper">
             <Search class="input-icon" />
-            <input 
-              type="text" 
-              v-model="filters.keyword" 
-              placeholder="Search by Title, Desc, or Memo#" 
-              class="filter-input"
-            />
+            <input type="text" v-model="filters.keyword" placeholder="Search by Title, Desc, or Memo#"
+              class="filter-input" />
           </div>
         </div>
 
@@ -100,12 +96,7 @@ const openDatePicker = (event) => {
             <div class="date-display-field">
               {{ filters.startDate || 'YYYY-MM-DD' }}
             </div>
-            <input 
-              type="date" 
-              v-model="filters.startDate" 
-              class="hidden-date-input"
-              aria-label="Start Date"
-            />
+            <input type="date" v-model="filters.startDate" class="hidden-date-input" aria-label="Start Date" />
           </div>
           <span class="date-separator">to</span>
           <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
@@ -113,24 +104,15 @@ const openDatePicker = (event) => {
             <div class="date-display-field">
               {{ filters.endDate || 'YYYY-MM-DD' }}
             </div>
-            <input 
-              type="date" 
-              v-model="filters.endDate" 
-              class="hidden-date-input"
-              aria-label="End Date"
-            />
+            <input type="date" v-model="filters.endDate" class="hidden-date-input" aria-label="End Date" />
           </div>
         </div>
 
         <!-- Status Toggles -->
         <div v-if="activeTab !== 'pending_approval'" class="filter-group status-group">
-          <button 
-            v-for="status in availableStatuses" 
-            :key="status"
-            @click="toggleStatus(status)"
+          <button v-for="status in availableStatuses" :key="status" @click="toggleStatus(status)"
             class="status-toggle-btn"
-            :class="['toggle-' + status.toLowerCase().replace(/\s+/g, '-'), { active: filters.statuses.includes(status) }]"
-          >
+            :class="['toggle-' + status.toLowerCase().replace(/\s+/g, '-'), { active: filters.statuses.includes(status) }]">
             {{ status }}
           </button>
         </div>
@@ -143,7 +125,7 @@ const openDatePicker = (event) => {
 .filter-wrapper {
   background: white;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 1.5rem;
   overflow: hidden;
   border: 1px solid #f1f5f9;
@@ -214,7 +196,7 @@ const openDatePicker = (event) => {
   flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
-  padding: 1rem 1.25rem;
+  padding: 1rem 0rem;
 }
 
 .filter-group {
@@ -357,7 +339,7 @@ const openDatePicker = (event) => {
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .filter-group {
     width: 100%;
   }

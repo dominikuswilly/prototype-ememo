@@ -1023,10 +1023,8 @@ const getHistoryDotColor = (action) => {
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Section 1: Core Information -->
-          <div v-else>
+          </div><div v-else class="modal-sections-column">
+            <!-- Section 1: Core Information -->
             <!-- Rejection/Changes (Conditional) - Moved to top -->
             <div
               v-if="!isCreateMode && ['Rejected', 'Requested Changes'].includes(selectedMemo.status) && selectedMemo.rejectionReason"
@@ -1110,7 +1108,7 @@ const getHistoryDotColor = (action) => {
               </div>
             </div>
 
-            <!-- Section 2: Content -->
+              <!-- Section 2: Content -->
             <template v-if="!isCreateMode || (selectedMemo.category && selectedMemo.categoryType)">
               <div class="detail-section">
                 <h3 class="section-group-title">Memo Content</h3>
@@ -1265,7 +1263,7 @@ const getHistoryDotColor = (action) => {
               </div>
 
               <!-- Section 3.6: HR Request Specific -->
-              <div v-if="isHrTemplate(selectedMemo.categoryType)" class="hr-details-container">
+              <div v-if="isHrTemplate(selectedMemo.categoryType)" class="modal-sections-column hr-details-container">
                 <!-- Employee Information -->
                 <div class="detail-section">
                   <h3 class="section-group-title">Employee Information</h3>
@@ -1535,35 +1533,39 @@ const getHistoryDotColor = (action) => {
               </div>
             </template>
           </div>
-        </div>
-        <div class="modal-footer">
-          <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
-            class="modal-actions-left">
-            <button class="btn-success" @click="handleApprove">Approve</button>
-            <button class="btn-warning" @click="handleRequestChanges">Request Changes</button>
-            <button class="btn-danger" @click="handleReject">Reject</button>
-          </div>
 
-          <template v-if="isEditMode">
-            <div class="modal-actions-left">
-              <button class="btn-secondary" @click="closeViewModal">Cancel Request</button>
+          <!-- Action Area (Moved from footer) -->
+          <div class="modal-section-actions mt-6 pt-6 border-t border-slate-200">
+            <div v-if="!isEditMode && activeTab === 'pending_approval' && selectedMemo.status === 'Pending'"
+              class="modal-actions-group">
+              <button class="btn-success" @click="handleApprove">Approve</button>
+              <button class="btn-warning" @click="handleRequestChanges">Request Changes</button>
+              <button class="btn-danger" @click="handleReject">Reject</button>
             </div>
-            <template v-if="isConfirming">
-              <button class="btn-primary ml-auto" @click="handleUpdate">Confirm & Submit</button>
+
+            <template v-if="isEditMode">
+              <div class="modal-actions-group">
+                <template v-if="isConfirming">
+                  <button class="btn-primary w-full" @click="handleUpdate">Confirm & Submit Submission</button>
+                </template>
+                <template v-else>
+                  <button class="btn-draft" @click="handleSaveDraft">Save Draft</button>
+                  <button class="btn-primary flex-1" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo'
+                  }}</button>
+                </template>
+              </div>
             </template>
             <template v-else>
-              <button class="btn-draft ml-auto mr-2" @click="handleSaveDraft">Save Draft</button>
-              <button class="btn-primary" @click="handleUpdate">{{ isCreateMode ? 'Submit Request' : 'Update Memo'
-              }}</button>
+              <button v-if="getActions(selectedMemo).includes('remind')" class="btn-remind w-full"
+                @click="handleRemind(selectedMemo)">
+                <Bell class="icon-small mr-1" /> Remind Approvers
+              </button>
             </template>
-          </template>
-          <template v-else>
-            <button v-if="getActions(selectedMemo).includes('remind')" class="btn-remind"
-              @click="handleRemind(selectedMemo)">
-              <Bell class="icon-small mr-1" /> Remind Approvers
-            </button>
-            <button class="btn-secondary ml-2" @click="closeViewModal">Close</button>
-          </template>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button v-if="isEditMode" class="btn-secondary" @click="closeViewModal">Cancel Edit</button>
+          <button class="btn-secondary ml-auto" @click="closeViewModal">Close</button>
         </div>
       </div>
     </div>
@@ -2456,7 +2458,7 @@ const getHistoryDotColor = (action) => {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: rgba(15, 23, 42, 0.5);
   display: flex;
@@ -2606,6 +2608,12 @@ const getHistoryDotColor = (action) => {
   gap: 1.5rem;
   background-color: #f8fafc;
   /* Subtle background for contrast with sections */
+}
+
+.modal-sections-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .detail-section {
@@ -2786,21 +2794,66 @@ const getHistoryDotColor = (action) => {
   background-color: #2563eb;
 }
 
-.btn-remind {
-  padding: 0.5rem 1rem;
-  background-color: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+/* Action Area (Moved from footer) */
+.modal-section-actions {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.modal-actions-group {
   display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   align-items: center;
 }
 
-.btn-remind:hover {
-  background-color: #4f46e5;
+/* Button size consistency */
+.modal-actions-group button,
+.modal-footer button {
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .modal-actions-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .modal-actions-group button,
+  .modal-footer button {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+.modal-footer {
+  padding: 1rem 1.75rem;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-remind {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 /* Edit Form Styles */

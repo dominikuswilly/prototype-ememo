@@ -48,7 +48,7 @@ const pageDescription = computed(() => {
 
 const pendingCount = computed(() => {
   return memos.value.filter(m => {
-    return m.approvalChain.some(tier => 
+    return m.approvalChain.some(tier =>
       tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
     );
   }).length;
@@ -58,10 +58,10 @@ const filteredMemos = computed(() => {
   let result = memos.value;
 
   if (activeTab.value === 'my_memos') {
-    result = result.filter(m => m.requester === currentUser); 
+    result = result.filter(m => m.requester === currentUser);
   } else if (activeTab.value === 'pending_approval') {
     result = result.filter(m => {
-      return m.approvalChain.some(tier => 
+      return m.approvalChain.some(tier =>
         tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
       );
     });
@@ -90,11 +90,11 @@ const filteredMemos = computed(() => {
     // 3. Date Range Match (createdAt)
     if (filterState.value.startDate || filterState.value.endDate) {
       const memoDateKey = memo.createdAt.substring(0, 10); // Extract YYYY-MM-DD
-      
+
       if (filterState.value.startDate && memoDateKey < filterState.value.startDate) {
         return false;
       }
-      
+
       if (filterState.value.endDate && memoDateKey > filterState.value.endDate) {
         return false;
       }
@@ -149,28 +149,17 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
     <!-- Sidebar -->
     <div :class="['sidebar-wrapper', { 'mobile-open': isMobileMenuOpen }]">
-      <Sidebar 
-        :is-mobile="isMobile"
-        @collapse="handleSidebarCollapse" 
-        @close="isMobileMenuOpen = false"
-      />
+      <Sidebar :is-mobile="isMobile" @collapse="handleSidebarCollapse" @close="isMobileMenuOpen = false" />
     </div>
 
     <!-- Main Content -->
-    <main 
-      class="main-content" 
-      :style="{ marginLeft: isMobile ? '0' : (isSidebarCollapsed ? '80px' : '260px') }"
-    >
+    <main class="main-content" :style="{ marginLeft: isMobile ? '0' : (isSidebarCollapsed ? '80px' : '260px') }">
       <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
 
       <header class="sticky-page-header">
         <div class="tabs-nav">
-          <button 
-            v-for="tab in ['all', 'my_memos', 'pending_approval']" 
-            :key="tab"
-            :class="['tab-btn', { active: activeTab === tab }]"
-            @click="activeTab = tab"
-          >
+          <button v-for="tab in ['all', 'my_memos', 'pending_approval']" :key="tab"
+            :class="['tab-btn', { active: activeTab === tab }]" @click="activeTab = tab">
             {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
             <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
           </button>
@@ -188,21 +177,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
         </div>
 
         <div class="header-filter-wrapper">
-          <MemoFilter 
-            :members="[{ name: currentUser, role: 'you' }, ...subordinates]" 
-            :activeTab="activeTab"
-            @filter-change="handleFilterChange" 
-          />
+          <MemoFilter :members="[{ name: currentUser, role: 'you' }, ...subordinates]" :activeTab="activeTab"
+            @filter-change="handleFilterChange" />
         </div>
       </header>
 
       <div class="list-wrapper">
-        <MemoList 
-          ref="memoListRef" 
-          :memos="filteredMemos" 
-          :activeTab="activeTab" 
-          :currentUser="currentUser" 
-        />
+        <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
       </div>
 
       <footer class="app-footer">
@@ -218,6 +199,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   min-height: 100vh;
   position: relative;
   background-color: var(--bg-app);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .sidebar-wrapper {
@@ -231,9 +214,10 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 .main-content {
   flex: 1;
-  padding: var(--gutter);
   min-width: 0;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .content-header {
@@ -295,7 +279,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   background-color: var(--bg-app);
   z-index: 10;
   padding-bottom: 0px;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .header-main-row {
@@ -379,6 +363,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 .list-wrapper {
   margin-top: 0.5rem;
+  padding: 0 var(--gutter);
 }
 
 /* Mobile styles */
@@ -386,22 +371,29 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   .sidebar-wrapper {
     transform: translateX(-100%);
   }
+
   .sidebar-wrapper.mobile-open {
     transform: translateX(0);
   }
+
   .main-content {
     margin-left: 0 !important;
-    padding-top: 5rem;
+    padding-top: 64px;
+    /* Exactly match mobile-header height */
   }
+
   .content-header {
     margin-bottom: 1.5rem;
   }
+
   .header-titles h1 {
     font-size: 1.5rem;
   }
+
   .header-titles p {
     font-size: 0.875rem;
   }
+
   .mobile-header {
     position: fixed;
     top: 0;
@@ -416,17 +408,20 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     border-bottom: 1px solid #e2e8f0;
     z-index: 90;
   }
+
   .mobile-logo {
     font-weight: 800;
     font-size: 1.25rem;
     color: #3b82f6;
   }
+
   .menu-btn {
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-main);
   }
+
   .mobile-overlay {
     position: fixed;
     inset: 0;
@@ -434,9 +429,11 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     backdrop-filter: blur(4px);
     z-index: 95;
   }
+
   .create-btn span {
     display: none;
   }
+
   .create-btn {
     padding: 0.75rem;
     border-radius: 50%;
@@ -446,48 +443,53 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     z-index: 80;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
   }
+
   .sticky-page-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    /* Standardized to 1rem as requested */
     background-color: white;
-    padding: 0.5rem 1rem 0;
-    margin-left: -1.5rem; /* Compensate for main-content padding */
-    margin-right: -1.5rem;
+    padding: 0;
+    /* Remove top padding to eliminate gap below mobile header */
+    overflow-x: hidden;
   }
+
   .header-filter-wrapper {
     position: sticky;
-    top: 115px; /* Offset for Mobile Header (64px) + Tabs Nav (approx 51px) */
+    top: 115px;
+    /* Offset for Mobile Header (64px) + Tabs Nav (approx 51px) */
     background-color: white;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
     padding: 0.75rem 1.5rem;
     z-index: 70;
     border-bottom: 1px solid #f1f5f9;
   }
+
   .header-main-row {
-    position: static; /* Revert stickiness */
+    position: static;
+    /* Revert stickiness */
     background-color: white;
-    padding: 1rem 1.5rem;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
+    padding: 0.5rem 1.5rem;
     margin-bottom: 0;
     border-bottom: none;
   }
+
   .tabs-nav {
     position: sticky;
-    top: 64px;
+    top: 8px;
     background-color: white;
     z-index: 75;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
-    padding: 0.5rem 1.5rem 0;
+    padding: 0.25rem 1.5rem 0;
+    /* Add slight top padding for better visual balance */
     border-bottom: 1px solid #f1f5f9;
   }
+
   .header-titles h1 {
     font-size: 1.25rem;
     margin-bottom: 0;
   }
+
   .header-titles p {
-    display: none; /* Hide description on mobile when sticky to save space */
+    display: none;
+    /* Hide description on mobile when sticky to save space */
   }
 }
 
@@ -509,9 +511,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 @media (max-width: 768px) {
   .app-footer {
-    padding-bottom: 6rem; /* Space for fab button */
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
+    padding-bottom: 6rem;
+    /* Space for fab button */
   }
 }
 </style>
