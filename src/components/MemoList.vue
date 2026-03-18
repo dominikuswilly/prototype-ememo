@@ -2990,16 +2990,24 @@ const getHistoryDotColor = (action) => {
 }
 
 @media (max-width: 640px) {
-  .modal-actions-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
   .modal-actions-group button,
   .modal-footer button {
-    width: 100%;
+    width: 100% !important;
+    max-width: none !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    flex: 0 0 auto !important;
+    /* Ensure they don't shrink */
+    height: 3rem !important;
+    /* Slightly taller for mobile touch targets */
+    font-size: 1rem !important;
+  }
+
+  .modal-actions-group.is-centered,
+  .modal-footer.is-centered {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
   }
 }
 
