@@ -1134,7 +1134,7 @@ const getHistoryDotColor = (action) => {
 
               <div class="detail-group">
                 <label>Purposing of Memo</label>
-                <div v-if="isEditMode" class="autocomplete-wrapper">
+                <div v-if="isCreateMode" class="autocomplete-wrapper">
                   <input ref="templateInputRef" type="text" class="form-input"
                     placeholder="Search template by name or division..." v-model="templateSearch"
                     @focus="handleTemplateFocus" @blur="handleTemplateBlur" @input="handleTemplateInput"
