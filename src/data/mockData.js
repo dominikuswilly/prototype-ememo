@@ -657,5 +657,37 @@ export const mockMemos = [
       { at: "2026-03-15T12:00:00Z", action: "Approved Tier 2", user: "Angela Moss" },
       { at: "2026-03-15T12:05:00Z", action: "Approved Tier 2", user: "Darlene Alderson" }
     ]
+  },
+  {
+    id: 23,
+    title: "Project Alpha Budget Update",
+    description: "Request for additional budget for the Project Alpha development phase.",
+    category: "Accounting & Finance",
+    categoryType: "Internal Memo Accounting & Finance",
+    department: "Engineering",
+    createdAt: "2026-03-18T10:00:00Z",
+    requester: "Willy",
+    status: "Requested Changes",
+    rejectionConcern: "Scope / Objective",
+    rejectionReason: "The budget allocation is not clear enough. Please specify the breakdown for each sub-module.",
+    markerDescriptions: {
+      'Title': 'Please ensure the project code is included in the title.',
+      'Description': 'This section needs a more granular breakdown of the requested funds per developer role.'
+    },
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Requested Changes",
+        requiredApprovals: 1,
+        approvers: [{ name: "Phillip Price", role: "CEO", status: "Requested Changes" }]
+      }
+    ],
+    attachmentsCount: 2,
+    memoNumber: "FIN-2026-115",
+    history: [
+      { at: "2026-03-18T10:00:00Z", action: "Created", user: "Willy", note: "Initial budget request." },
+      { at: "2026-03-18T14:00:00Z", action: "Requested Changes", user: "Phillip Price", note: "Please refine the description with more details." }
+    ]
   }
 ];

@@ -1166,12 +1166,21 @@ const getHistoryDotColor = (action) => {
                 <div class="detail-group">
                   <label>Title</label>
                   <input v-if="isEditMode" type="text" v-model="selectedMemo.title" class="form-input" />
+                  <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Title']" class="marker-description-alert">
+                    <AlertCircle class="icon-tiny" />
+                    <span>{{ selectedMemo.markerDescriptions['Title'] }}</span>
+                  </div>
                   <div v-else class="detail-value font-semibold text-lg">{{ selectedMemo.title }}</div>
                 </div>
                 <div class="detail-group">
                   <label>Description</label>
                   <textarea v-if="isEditMode" v-model="selectedMemo.description" class="form-textarea"
                     rows="4"></textarea>
+                  <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Description']"
+                    class="marker-description-alert">
+                    <AlertCircle class="icon-tiny" />
+                    <span>{{ selectedMemo.markerDescriptions['Description'] }}</span>
+                  </div>
                   <div v-else class="detail-value leading-relaxed">{{ selectedMemo.description }}</div>
                 </div>
                 <!-- Attachments Section -->
@@ -1217,6 +1226,11 @@ const getHistoryDotColor = (action) => {
                   <label>Location</label>
                   <input v-if="isEditMode" type="text" v-model="selectedMemo.entLocation" class="form-input"
                     placeholder="Type a place or click the map to pin a location..." />
+                  <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Location']"
+                    class="marker-description-alert">
+                    <AlertCircle class="icon-tiny" />
+                    <span>{{ selectedMemo.markerDescriptions['Location'] }}</span>
+                  </div>
 
                   <div class="map-container mt-2">
                     <MapPicker :locationQuery="isEditMode ? selectedMemo.entLocation : ''" :lat="selectedMemo.entLat"
@@ -4290,6 +4304,38 @@ const getHistoryDotColor = (action) => {
 .node-mini-icon {
   width: 10px;
   height: 10px;
+}
+
+.marker-description-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  animation: slideInDown 0.3s ease-out;
+}
+
+.marker-description-alert .icon-tiny {
+  color: #d97706;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 
