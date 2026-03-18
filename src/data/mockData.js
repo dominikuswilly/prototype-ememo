@@ -672,7 +672,7 @@ export const mockMemos = [
     rejectionReason: "The budget allocation is not clear enough. Please specify the breakdown for each sub-module.",
     markerDescriptions: {
       'Title': 'Please ensure the project code is included in the title.',
-      'Description': 'This section needs a more granular breakdown of the requested funds per developer role.'
+      'Description': 'This section needs a more granular breakdown of the requested funds per developer role. We need to see how much is allocated for frontend, backend, and DevOps individually to ensure budget alignment with the Q3 roadmap. Please also include the justification for any hardware-related expenses mentioned in the sub-tasks.'
     },
     approvalChain: [
       {

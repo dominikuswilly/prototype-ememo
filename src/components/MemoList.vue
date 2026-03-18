@@ -1165,23 +1165,27 @@ const getHistoryDotColor = (action) => {
                 <h3 class="section-group-title">Memo Content</h3>
                 <div class="detail-group">
                   <label>Title</label>
-                  <input v-if="isEditMode" type="text" v-model="selectedMemo.title" class="form-input" />
-                  <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Title']" class="marker-description-alert">
-                    <AlertCircle class="icon-tiny" />
-                    <span>{{ selectedMemo.markerDescriptions['Title'] }}</span>
+                  <div class="field-with-marker-wrapper">
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.title" class="form-input" />
+                    <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Title']" class="marker-description-alert">
+                      <AlertCircle class="icon-tiny" />
+                      <span class="marker-text">{{ selectedMemo.markerDescriptions['Title'] }}</span>
+                    </div>
                   </div>
-                  <div v-else class="detail-value font-semibold text-lg">{{ selectedMemo.title }}</div>
+                  <div v-if="!isEditMode" class="detail-value font-semibold text-lg">{{ selectedMemo.title }}</div>
                 </div>
                 <div class="detail-group">
                   <label>Description</label>
-                  <textarea v-if="isEditMode" v-model="selectedMemo.description" class="form-textarea"
-                    rows="4"></textarea>
-                  <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Description']"
-                    class="marker-description-alert">
-                    <AlertCircle class="icon-tiny" />
-                    <span>{{ selectedMemo.markerDescriptions['Description'] }}</span>
+                  <div class="field-with-marker-wrapper">
+                    <textarea v-if="isEditMode" v-model="selectedMemo.description" class="form-textarea"
+                      rows="4"></textarea>
+                    <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Description']"
+                      class="marker-description-alert">
+                      <AlertCircle class="icon-tiny" />
+                      <span class="marker-text">{{ selectedMemo.markerDescriptions['Description'] }}</span>
+                    </div>
                   </div>
-                  <div v-else class="detail-value leading-relaxed">{{ selectedMemo.description }}</div>
+                  <div v-if="!isEditMode" class="detail-value leading-relaxed">{{ selectedMemo.description }}</div>
                 </div>
                 <!-- Attachments Section -->
                 <div class="detail-group mt-4 attachments-collapsible">
@@ -1224,12 +1228,14 @@ const getHistoryDotColor = (action) => {
 
                 <div class="detail-group">
                   <label>Location</label>
-                  <input v-if="isEditMode" type="text" v-model="selectedMemo.entLocation" class="form-input"
-                    placeholder="Type a place or click the map to pin a location..." />
-                  <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Location']"
-                    class="marker-description-alert">
-                    <AlertCircle class="icon-tiny" />
-                    <span>{{ selectedMemo.markerDescriptions['Location'] }}</span>
+                  <div class="field-with-marker-wrapper">
+                    <input v-if="isEditMode" type="text" v-model="selectedMemo.entLocation" class="form-input"
+                      placeholder="Type a place or click the map to pin a location..." />
+                    <div v-if="isEditMode && selectedMemo.markerDescriptions?.['Location']"
+                      class="marker-description-alert">
+                      <AlertCircle class="icon-tiny" />
+                      <span class="marker-text">{{ selectedMemo.markerDescriptions['Location'] }}</span>
+                    </div>
                   </div>
 
                   <div class="map-container mt-2">
@@ -4319,12 +4325,26 @@ const getHistoryDotColor = (action) => {
   font-size: 0.85rem;
   line-height: 1.4;
   animation: slideInDown 0.3s ease-out;
+  width: 100%;
 }
 
 .marker-description-alert .icon-tiny {
   color: #d97706;
   margin-top: 2px;
   flex-shrink: 0;
+}
+
+.marker-text {
+  flex: 1;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.field-with-marker-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
 }
 
 @keyframes slideInDown {

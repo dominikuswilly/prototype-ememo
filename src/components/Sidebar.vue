@@ -31,7 +31,7 @@ const handleNavClick = () => {
 <template>
   <aside :class="['sidebar', { collapsed: isCollapsed }]">
     <div class="sidebar-header">
-      <h2 v-if="!isCollapsed">eMemo</h2>
+      <h2 v-if="!isCollapsed">JS</h2>
       <div v-else class="logo-collapsed">eM</div>
       
       <!-- Desktop Collapse Toggle -->
