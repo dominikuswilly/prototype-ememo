@@ -1671,17 +1671,17 @@ const getHistoryDotColor = (action) => {
                 class="text-red-500">*</span></label>
             <textarea v-model="rejectionReason" class="form-textarea" rows="4"
               :placeholder="reviewModalType === 'Reject' ? 'Explain why this cannot be approved...' : 'Describe what needs to be changed...'"></textarea>
-            <div class="modal-section-actions">
-              <div class="modal-actions-group is-centered">
-                <button class="btn-secondary" @click="cancelReviewAction">
-                  <X class="icon-small mr-2" /> Cancel
-                </button>
-                <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary'" @click="confirmReviewAction">
-                  <XCircle v-if="reviewModalType === 'Reject'" class="icon-small mr-2" />
-                  <FileEdit v-else class="icon-small mr-2" />
-                  {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
-                </button>
-              </div>
+          </div>
+          <div class="modal-section-actions">
+            <div class="modal-actions-group is-centered">
+              <button class="btn-secondary" @click="cancelReviewAction">
+                <X class="icon-small mr-2" /> Cancel
+              </button>
+              <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary'" @click="confirmReviewAction">
+                <XCircle v-if="reviewModalType === 'Reject'" class="icon-small mr-2" />
+                <FileEdit v-else class="icon-small mr-2" />
+                {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
+              </button>
             </div>
           </div>
         </div>
