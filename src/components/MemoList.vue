@@ -3114,12 +3114,7 @@ const getHistoryDotColor = (action) => {
   font-size: 0.75rem;
   color: #475569;
   line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
+  word-break: break-word;
 }
 
 .form-checkbox {
