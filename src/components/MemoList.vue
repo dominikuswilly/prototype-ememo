@@ -1623,8 +1623,12 @@ const getHistoryDotColor = (action) => {
           </div>
         </div>
         <div class="modal-footer">
-          <button v-if="isEditMode" class="btn-secondary" @click="closeViewModal">Cancel Edit</button>
-          <button class="btn-secondary ml-auto" @click="closeViewModal">Close</button>
+          <button v-if="isEditMode" class="btn-secondary" @click="closeViewModal">
+            <XCircle class="icon-small mr-2" /> Cancel Edit
+          </button>
+          <button class="btn-secondary ml-auto" @click="closeViewModal">
+            <X class="icon-small mr-2" /> Close
+          </button>
         </div>
       </div>
     </div>
@@ -2826,12 +2830,13 @@ const getHistoryDotColor = (action) => {
 }
 
 .modal-footer {
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 2rem;
   border-top: 1px solid #e2e8f0;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   background-color: #f8fafc;
+  gap: 1rem;
 }
 
 .modal-actions-left {
@@ -2888,17 +2893,27 @@ const getHistoryDotColor = (action) => {
 .btn-secondary {
   padding: 0.5rem 1rem;
   background-color: white;
-  border: 1px solid #cbd5e1;
-  color: #475569;
-  border-radius: 6px;
-  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-secondary:hover {
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   color: #0f172a;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
@@ -2989,7 +3004,7 @@ const getHistoryDotColor = (action) => {
 }
 
 .modal-footer {
-  padding: 1rem 1.75rem;
+  padding: 1.25rem 2rem;
   background-color: #f8fafc;
   border-top: 1px solid #e2e8f0;
   display: flex;
