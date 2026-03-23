@@ -10,6 +10,8 @@ export const mockMemos = [
     requester: "John Doe",
     status: "Pending",
     isReminded: true,
+    externalSystem: "Finance System",
+    externalStatus: "In Process",
     approvalChain: [
       {
         tier: 1,
@@ -44,6 +46,8 @@ export const mockMemos = [
     createdAt: "2026-03-08T14:30:00Z",
     requester: "Willy",
     status: "Approved",
+    externalSystem: "Finance System",
+    externalStatus: "Closed",
     approvalChain: [
       {
         tier: 1,
@@ -71,6 +75,8 @@ export const mockMemos = [
     requester: "Pam Beesly",
     status: "Pending",
     isReminded: true,
+    externalSystem: "HRD System",
+    externalStatus: "In Process",
     approvalChain: [
       {
         tier: 1,
@@ -145,6 +151,8 @@ export const mockMemos = [
     createdAt: "2026-03-01T10:00:00Z",
     requester: "Angela Moss",
     status: "Approved",
+    externalSystem: "IT System",
+    externalStatus: "Closed",
     approvalChain: [
       {
         tier: 1,
@@ -317,6 +325,8 @@ export const mockMemos = [
     createdAt: "2026-03-15T09:00:00Z",
     requester: "Willy",
     status: "Pending",
+    externalSystem: "HRD System",
+    externalStatus: "In Process",
     approvalChain: [
       {
         tier: 1,
@@ -387,6 +397,8 @@ export const mockMemos = [
     requester: "Willy",
     status: "Pending",
     isReminded: true,
+    externalSystem: "HRD System",
+    externalStatus: "In Process",
     approvalChain: [
       {
         tier: 1,

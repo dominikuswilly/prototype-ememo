@@ -749,6 +749,13 @@ const getHistoryDotColor = (action) => {
                   <User class="detail-icon" />
                   <span>{{ memo.requester }}</span>
                 </div>
+                <!-- External Status Badge (Premium) -->
+                <div v-if="memo.externalStatus" class="detail-item" :title="`System: ${memo.externalSystem}`">
+                  <div :class="['external-status-indicator', memo.externalStatus.toLowerCase() === 'closed' ? 'status-closed' : 'status-process']">
+                    <component :is="memo.externalStatus.toLowerCase() === 'closed' ? Check : Clock" class="icon-tiny mr-1" />
+                    <span>{{ memo.externalStatus }}</span>
+                  </div>
+                </div>
                 <div class="detail-item" title="Created Date">
                   <Calendar class="detail-icon" />
                   <span>{{ formatDate(memo.createdAt) }}</span>
@@ -1155,6 +1162,29 @@ const getHistoryDotColor = (action) => {
                 <div v-else class="detail-value">
                   <div class="font-semibold">{{ selectedMemo.categoryType || '-' }}</div>
                   <div v-if="selectedMemo.category" class="template-division-badge">{{ selectedMemo.category }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- External System Status (New Parameter) -->
+            <div v-if="selectedMemo.externalSystem" class="detail-section external-system-info">
+              <h3 class="section-group-title">External System Information</h3>
+              <div class="detail-row">
+                <div class="detail-group">
+                  <label>System Name</label>
+                  <div class="detail-value flex-align-center">
+                    <Monitor class="icon-tiny mr-2 text-slate-400" />
+                    {{ selectedMemo.externalSystem }}
+                  </div>
+                </div>
+                <div class="detail-group">
+                  <label>Current Status</label>
+                  <div class="detail-value">
+                    <div :class="['external-status-indicator', selectedMemo.externalStatus.toLowerCase() === 'closed' ? 'status-closed' : 'status-process']">
+                      <component :is="selectedMemo.externalStatus.toLowerCase() === 'closed' ? CheckCircle : Clock" class="icon-tiny mr-1" />
+                      <span>{{ selectedMemo.externalStatus }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1951,6 +1981,43 @@ const getHistoryDotColor = (action) => {
   gap: 0.5rem;
   border-top: 1px solid #f1f5f9;
   padding-top: 1rem;
+}
+
+/* External Status Indicators (New) */
+.external-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  width: fit-content;
+}
+
+.status-process {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.status-closed {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.external-system-info {
+  background-color: #f8fafc !important;
+  border-left: 4px solid #3b82f6 !important;
+  margin-top: 1rem;
+}
+
+.flex-align-center {
+  display: flex;
+  align-items: center;
 }
 
 .detail-item {
