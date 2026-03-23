@@ -30,7 +30,8 @@ export const mockMemos = [
     memoNumber: "FIN-2026-001",
     history: [
       { at: "2026-03-10T09:00:00Z", action: "Created", user: "John Doe", note: "Initial request for Q3 marketing budget." },
-      { at: "2026-03-10T11:30:00Z", action: "Approved Tier 1", user: "Sarah Connor", note: "Approved. Budget aligns with campaign goals." }
+      { at: "2026-03-10T11:30:00Z", action: "Approved Tier 1", user: "Sarah Connor", note: "Approved. Budget aligns with campaign goals." },
+      { at: "2026-03-11T10:00:00Z", action: "Reminded", user: "John Doe", note: "Sent reminder to Willy (Finance Dir) for Tier 2 approval." }
     ]
   },
   {
@@ -101,7 +102,8 @@ export const mockMemos = [
     hrEffectiveDate: '',
     history: [
       { at: "2026-03-11T11:15:00Z", action: "Created", user: "Pam Beesly", note: "Budget for CS expansion approved." },
-      { at: "2026-03-12T08:30:00Z", action: "Approved (Quorum)", user: "Michael Scott", note: "We need more people!" }
+      { at: "2026-03-12T08:30:00Z", action: "Approved (Quorum)", user: "Michael Scott", note: "We need more people!" },
+      { at: "2026-03-13T09:00:00Z", action: "Reminded", user: "Pam Beesly", note: "Reminded pending approvers (Toby and Willy) to reach quorum." }
     ]
   },
   {
@@ -422,7 +424,8 @@ export const mockMemos = [
     hrEffectiveDate: '',
     history: [
       { at: "2026-03-11T16:00:00Z", action: "Created", user: "Willy", note: "Infrastructure security lead hire." },
-      { at: "2026-03-12T09:00:00Z", action: "Approved Tier 1", user: "Alan Turing", note: "Critical hire for Project 505." }
+      { at: "2026-03-12T09:00:00Z", action: "Approved Tier 1", user: "Alan Turing", note: "Critical hire for Project 505." },
+      { at: "2026-03-13T14:00:00Z", action: "Reminded", user: "Willy", note: "Sent reminder to Tier 2 (Sarah Connor and Phillip Price)." }
     ]
   },
   {
