@@ -250,8 +250,6 @@ const templateList = [
   { name: 'Pengajuan/Perpanjangan Lisensi', division: 'IT' },
   { name: 'Pengajuan/Perpanjangan Maintenance', division: 'IT' },
   { name: 'Service Hardware/Software', division: 'IT' },
-  { name: 'Template Test PJDNS 1.76.7', division: 'IT' },
-  { name: 'Template Test STD 1.76.8', division: 'IT' },
   // Legal
   { name: 'Internal Memo Legal', division: 'Legal' },
   { name: 'Pengisian Dokumen Non PKS', division: 'Legal' },
