@@ -140,7 +140,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   <div class="app-layout">
     <!-- Mobile Header -->
     <header class="mobile-header">
-      <div class="mobile-logo">JS</div>
+      <div class="mobile-logo">eMemo</div>
       <button @click="toggleMenu" class="menu-btn">
         <Menu v-if="!isMobileMenuOpen" class="icon-small" />
         <X v-else class="icon-small" />
