@@ -4074,9 +4074,9 @@ const getHistoryDotColor = (action) => {
 }
 
 .division-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
 }
 
 .division-card {
@@ -4094,7 +4094,7 @@ const getHistoryDotColor = (action) => {
 }
 
 .division-card:hover {
-  transform: translateX(3px);
+  transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.09);
 }
 
@@ -4114,6 +4114,41 @@ const getHistoryDotColor = (action) => {
   width: 18px;
   height: 18px;
   color: var(--div-color);
+}
+
+@media (max-width: 560px) {
+  .wizard-modal {
+    max-height: 95vh;
+  }
+  .wizard-header {
+    padding: 0.75rem 1rem;
+    min-height: 64px;
+  }
+  .wizard-body {
+    padding: 1rem;
+  }
+  .division-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .division-card {
+    padding: 0.65rem 0.85rem;
+  }
+  .division-icon-wrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+  }
+  .division-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .division-name {
+    font-size: 0.85rem;
+  }
+  .division-count {
+    font-size: 0.7rem;
+  }
 }
 
 .division-info {
