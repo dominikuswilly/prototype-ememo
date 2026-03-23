@@ -704,5 +704,40 @@ export const mockMemos = [
       { at: "2026-03-18T10:00:00Z", action: "Created", user: "Willy", note: "Initial budget request." },
       { at: "2026-03-18T14:00:00Z", action: "Requested Changes", user: "Phillip Price", note: "Please refine the description with more details." }
     ]
+  },
+  {
+    id: 24,
+    title: "Scenario Y: Resubmitted After Changes Requested",
+    description: "Testing scenario where Tier 2 requested changes, the requester updated the memo, and now approval restarts from Tier 1.",
+    category: "IT",
+    categoryType: "Template Test STD 1.76.9",
+    department: "Engineering",
+    createdAt: "2026-03-16T08:00:00Z",
+    requester: "Willy",
+    status: "Pending",
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Elliot Alderson", role: "Lead", status: "Pending" }]
+      },
+      {
+        tier: 2,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Phillip Price", role: "CEO", status: "Pending" }]
+      }
+    ],
+    attachmentsCount: 2,
+    memoNumber: "TST-2026-1000",
+    history: [
+      { at: "2026-03-16T08:00:00Z", action: "Created", user: "Willy", note: "Initial submission." },
+      { at: "2026-03-16T09:30:00Z", action: "Approved Tier 1", user: "Elliot Alderson", note: "Approved, moving to Tier 2." },
+      { at: "2026-03-16T11:00:00Z", action: "Requested Changes", user: "Phillip Price", note: "Scope is unclear, please revise the document before approval." },
+      { at: "2026-03-17T10:00:00Z", action: "Changes Submitted", user: "Willy", note: "Document revised based on feedback. Resubmitting for approval from the beginning." }
+    ]
   }
 ];
