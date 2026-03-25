@@ -20,7 +20,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['view-list', 'view-pending']);
+const emit = defineEmits(['view-list', 'view-pending', 'view-my-pending']);
 
 const stats = computed(() => {
   const total = props.memos.length;
@@ -123,7 +123,7 @@ const getStatusColorClass = (status) => {
         </div>
       </div>
 
-      <div class="stat-card">
+      <div class="stat-card" @click="emit('view-my-pending')">
         <div class="stat-icon-wrap pending">
           <Clock class="stat-icon" />
         </div>

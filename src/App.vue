@@ -200,6 +200,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             :currentUser="currentUser" 
             @view-list="activeView = 'list'; activeTab = 'all'" 
             @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
+            @view-my-pending="activeView = 'list'; activeTab = 'my_memos'; filterState.statuses = ['Pending']"
           />
         </template>
         <template v-else-if="activeView === 'list'">
