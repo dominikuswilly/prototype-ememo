@@ -9,7 +9,6 @@ export const mockMemos = [
     createdAt: "2026-03-10T09:00:00Z",
     requester: "John Doe",
     status: "Approved",
-    isReminded: true,
     externalSystem: "Finance System",
     externalStatus: "Sent",
     externalReceiptNumber: "RCT-FIN-001",
@@ -76,7 +75,6 @@ export const mockMemos = [
     createdAt: "2026-03-11T11:15:00Z",
     requester: "Pam Beesly",
     status: "Approved",
-    isReminded: true,
     externalSystem: "HRD System",
     externalStatus: "Waiting",
     approvalChain: [
@@ -399,7 +397,6 @@ export const mockMemos = [
     createdAt: "2026-03-11T16:00:00Z",
     requester: "Willy",
     status: "Approved",
-    isReminded: true,
     externalSystem: "HRD System",
     externalStatus: "Waiting",
     approvalChain: [
@@ -741,6 +738,87 @@ export const mockMemos = [
       { at: "2026-03-16T09:30:00Z", action: "Approved Tier 1", user: "Elliot Alderson", note: "Approved, moving to Tier 2." },
       { at: "2026-03-16T11:00:00Z", action: "Requested Changes", user: "Phillip Price", note: "Scope is unclear, please revise the document before approval." },
       { at: "2026-03-17T10:00:00Z", action: "Changes Submitted", user: "Willy", note: "Document revised based on feedback. Resubmitting for approval from the beginning." }
+    ]
+  },
+  {
+    id: 25,
+    title: "Software License Upgrade - Windows 11 Enterprise",
+    description: "Upgrade request for the development team to ensure compatibility with new security protocols.",
+    category: "IT",
+    categoryType: "Pengajuan Hardware/Software",
+    department: "Engineering",
+    createdAt: "2026-03-20T09:00:00Z",
+    requester: "Willy",
+    status: "Pending",
+    isReminded: true,
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Sarah Connor", role: "IT Dir", status: "Pending" }]
+      }
+    ],
+    attachmentsCount: 1,
+    memoNumber: "IT-2026-155",
+    history: [
+      { at: "2026-03-20T09:00:00Z", action: "Created", user: "Willy", note: "Need enterprise features for virtualization." },
+      { at: "2026-03-21T10:00:00Z", action: "Reminded", user: "Willy", note: "Sent follow-up reminder to Sarah Connor." }
+    ]
+  },
+  {
+    id: 26,
+    title: "Team Building Dinner - Q2 Engineering",
+    description: "Budget request for the quarterly team building dinner scheduled for next month.",
+    category: "Accounting & Finance",
+    categoryType: "Internal Memo Accounting & Finance",
+    department: "Engineering",
+    createdAt: "2026-03-22T14:00:00Z",
+    requester: "Elliot Alderson",
+    status: "Pending",
+    isReminded: true,
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Angela Moss", role: "Manager", status: "Pending" }]
+      }
+    ],
+    attachmentsCount: 1,
+    memoNumber: "FIN-2026-201",
+    history: [
+      { at: "2026-03-22T14:00:00Z", action: "Created", user: "Elliot Alderson", note: "Proposed venue: The Red Wheelbarrow." },
+      { at: "2026-03-23T09:30:00Z", action: "Reminded", user: "Elliot Alderson", note: "Requested approval from Angela for venue booking." }
+    ]
+  },
+  {
+    id: 27,
+    title: "Ergonomic Office Equipment - Standing Desks",
+    description: "Request for 5 ergonomic standing desks for the operations team to improve workplace wellness.",
+    category: "General Affair",
+    categoryType: "Pembelian Barang",
+    department: "Operations",
+    createdAt: "2026-03-24T11:00:00Z",
+    requester: "Pam Beesly",
+    status: "Pending",
+    isReminded: true,
+    approvalChain: [
+      {
+        tier: 1,
+        type: "single",
+        status: "Pending",
+        requiredApprovals: 1,
+        approvers: [{ name: "Willy", role: "Ops Lead", status: "Pending" }]
+      }
+    ],
+    attachmentsCount: 2,
+    memoNumber: "GA-2026-305",
+    history: [
+      { at: "2026-03-24T11:00:00Z", action: "Created", user: "Pam Beesly", note: "Based on team feedback for better ergonomics." },
+      { at: "2026-03-25T08:00:00Z", action: "Reminded", user: "Pam Beesly", note: "Sent reminder to Willy for procurement approval." }
     ]
   }
 ];
