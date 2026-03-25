@@ -52,7 +52,7 @@ const pageDescription = computed(() => {
 
 const pendingCount = computed(() => {
   return memos.value.filter(m => {
-    return m.approvalChain.some(tier =>
+    return m.status !== 'Approved' && m.approvalChain.some(tier =>
       tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
     );
   }).length;
@@ -65,7 +65,7 @@ const filteredMemos = computed(() => {
     result = result.filter(m => m.requester === currentUser);
   } else if (activeTab.value === 'pending_approval') {
     result = result.filter(m => {
-      return m.approvalChain.some(tier =>
+      return m.status !== 'Approved' && m.approvalChain.some(tier =>
         tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
       );
     });

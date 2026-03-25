@@ -30,7 +30,7 @@ const stats = computed(() => {
   const requestedChanges = props.memos.filter(m => m.status === 'Requested Changes').length;
 
   const pendingApproval = props.memos.filter(m => {
-    return m.approvalChain.some(tier =>
+    return m.status !== 'Approved' && m.approvalChain.some(tier =>
       tier.approvers.some(a => a.name === props.currentUser && a.status === 'Pending')
     );
   }).length;
