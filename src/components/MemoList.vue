@@ -264,6 +264,17 @@ const templateList = [
   { name: 'Sponsorship', division: 'Technical' },
 ];
 
+const targetDeptMap = {
+  'Accounting & Finance': 'Finance',
+  'Claim': 'HR',
+  'Employee Benefit': 'HR',
+  'General Affair': 'GA',
+  'HRD': 'HR',
+  'IT': 'IT',
+  'Legal': 'Legal',
+  'Technical': 'Medical'
+};
+
 const templateSearch = ref('');
 const showSuggestions = ref(false);
 
@@ -290,7 +301,8 @@ const isHrTemplate = (name) => HR_TEMPLATES.includes(name);
 const selectTemplate = (item) => {
   selectedMemo.value.categoryType = item.name;
   selectedMemo.value.category = item.division;
-  selectedMemo.value.department = item.division;
+  selectedMemo.value.requesterDepartment = props.currentUser === 'Willy' ? 'Engineering' : 'Staff';
+  selectedMemo.value.targetDepartment = targetDeptMap[item.division] || item.division;
 
   // Initialize Travel fields if applicable
   if (item.name === 'Pengajuan Perjalanan Dinas') {
@@ -428,7 +440,8 @@ const selectWizardTemplate = (item) => {
     description: '',
     category: item.division,
     categoryType: item.name,
-    department: item.division,
+    requesterDepartment: props.currentUser === 'Willy' ? 'Engineering' : 'Staff',
+    targetDepartment: targetDeptMap[item.division] || item.division,
     attachmentsCount: 0,
     status: 'Pending',
     approvalChain: [],
@@ -761,9 +774,9 @@ const getHistoryDotColor = (action) => {
                   <Calendar class="detail-icon" />
                   <span>{{ formatDate(memo.createdAt) }}</span>
                 </div>
-                <div class="detail-item" title="Department">
+                <div class="detail-item" title="Requester → Target Dept">
                   <Layers class="detail-icon" />
-                  <span>{{ memo.department }}</span>
+                  <span class="text-xs">{{ memo.requesterDepartment }} → {{ memo.targetDepartment }}</span>
                 </div>
               </div>
             </div>
@@ -1021,8 +1034,12 @@ const getHistoryDotColor = (action) => {
                   <div class="summary-value">{{ selectedMemo.categoryType }}</div>
                 </div>
                 <div class="summary-item mt-3">
-                  <label>Division/Department</label>
-                  <div class="summary-value">{{ selectedMemo.department }}</div>
+                  <label>Departments</label>
+                  <div class="summary-value">
+                    <span class="font-medium">{{ selectedMemo.requesterDepartment }}</span>
+                    <ChevronRight class="icon-tiny inline mx-1 text-slate-400" />
+                    <span class="font-medium text-blue-600">{{ selectedMemo.targetDepartment }}</span>
+                  </div>
                 </div>
               </div>
 
@@ -1121,13 +1138,22 @@ const getHistoryDotColor = (action) => {
               <h3 class="section-group-title">General Information</h3>
               <div class="detail-row">
                 <div class="detail-group">
-                  <label>{{ isCreateMode ? 'Department' : 'Requester' }}</label>
-                  <div v-if="isCreateMode" class="detail-value">{{ selectedMemo.department }}</div>
+                  <label>Requester</label>
+                  <div v-if="isCreateMode" class="detail-value font-medium text-slate-400 italic">Self ({{ currentUser }})</div>
                   <div v-else class="detail-value requester-info-row">
+                    <User class="icon-tiny mr-1 text-slate-400" />
                     <span class="requester-name">{{ selectedMemo.requester }}</span>
-                    <span class="department-marker">
-                      <Building2 class="icon-tiny" style="margin: 0 0.25rem;" />
-                      {{ selectedMemo.department }}
+                  </div>
+                </div>
+                <div class="detail-group">
+                  <label>Departments</label>
+                  <div class="detail-value dept-flow-row">
+                    <span class="department-marker" title="Requester Department">
+                      {{ selectedMemo.requesterDepartment }}
+                    </span>
+                    <ChevronRight class="icon-tiny mx-1 text-slate-400" />
+                    <span class="department-marker target" title="Target Department">
+                      {{ selectedMemo.targetDepartment }}
                     </span>
                   </div>
                 </div>
@@ -2901,7 +2927,7 @@ const getHistoryDotColor = (action) => {
 .requester-info-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .requester-name {
@@ -2913,12 +2939,23 @@ const getHistoryDotColor = (action) => {
   display: inline-flex;
   align-items: center;
   font-size: 0.75rem;
-  color: #4338ca;
-  background: #e0e7ff;
+  color: #475569;
+  background: #f1f5f9;
   padding: 2px 8px;
   border-radius: 99px;
-  margin-left: 0.6rem;
   font-weight: 600;
+  border: 1px solid #e2e8f0;
+}
+
+.department-marker.target {
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.dept-flow-row {
+  display: flex;
+  align-items: center;
 }
 
 .header-memo-number {
