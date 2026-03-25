@@ -1,8 +1,8 @@
 <script setup>
 import { computed } from 'vue';
-import { 
-  BarChart2, CheckCircle, Clock, XCircle, FileText, 
-  TrendingUp, Users, Calendar, ArrowRight
+import {
+  CheckCircle, Clock, XCircle, FileText,
+  Users, Calendar, ArrowRight
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -13,6 +13,10 @@ const props = defineProps({
   members: {
     type: Array,
     default: () => []
+  },
+  currentUser: {
+    type: String,
+    default: ''
   }
 });
 
@@ -24,13 +28,20 @@ const stats = computed(() => {
   const pending = props.memos.filter(m => m.status === 'Pending').length;
   const rejected = props.memos.filter(m => m.status === 'Rejected').length;
   const requestedChanges = props.memos.filter(m => m.status === 'Requested Changes').length;
-  
+
+  const pendingApproval = props.memos.filter(m => {
+    return m.approvalChain.some(tier =>
+      tier.approvers.some(a => a.name === props.currentUser && a.status === 'Pending')
+    );
+  }).length;
+
   return {
     total,
     approved,
     pending,
     rejected,
     requestedChanges,
+    pendingApproval,
     completionRate: total > 0 ? Math.round((approved / total) * 100) : 0
   };
 });
@@ -40,7 +51,7 @@ const categoryStats = computed(() => {
   props.memos.forEach(m => {
     counts[m.category] = (counts[m.category] || 0) + 1;
   });
-  
+
   return Object.entries(counts)
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
@@ -55,12 +66,12 @@ const recentMemos = computed(() => {
 
 const memberStats = computed(() => {
   if (!props.members || props.members.length === 0) return [];
-  
+
   return props.members.map(member => {
     const memberMemos = props.memos.filter(m => m.requester === member.name);
     const approved = memberMemos.filter(m => m.status === 'Approved').length;
     const pending = memberMemos.filter(m => m.status === 'Pending').length;
-    
+
     return {
       ...member,
       total: memberMemos.length,
@@ -91,6 +102,17 @@ const getStatusColorClass = (status) => {
   <div class="summary-container">
     <!-- Grid Stats -->
     <div class="stats-grid">
+      <div class="stat-card wide highlight">
+        <div class="stat-icon-wrap approval">
+          <Users class="stat-icon" />
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Pending Approval</span>
+          <h2 class="stat-value">{{ stats.pendingApproval }}</h2>
+        </div>
+        <div class="stat-sublabel">Your Action Needed</div>
+      </div>
+
       <div class="stat-card">
         <div class="stat-icon-wrap total">
           <FileText class="stat-icon" />
@@ -98,10 +120,6 @@ const getStatusColorClass = (status) => {
         <div class="stat-info">
           <span class="stat-label">Total Memos</span>
           <h2 class="stat-value">{{ stats.total }}</h2>
-        </div>
-        <div class="stat-trending up">
-          <TrendingUp class="trending-icon" />
-          <span>+12%</span>
         </div>
       </div>
 
@@ -145,25 +163,6 @@ const getStatusColorClass = (status) => {
     </div>
 
     <div class="summary-main-content">
-      <!-- Category Breakdown -->
-      <div class="summary-section category-breakdown">
-        <div class="section-header">
-          <h3>Category Distribution</h3>
-          <BarChart2 class="icon-muted" />
-        </div>
-        <div class="category-list">
-          <div v-for="cat in categoryStats" :key="cat.name" class="category-item">
-            <div class="category-info">
-              <span class="category-name">{{ cat.name }}</span>
-              <span class="category-count">{{ cat.count }}</span>
-            </div>
-            <div class="category-progress-bar">
-              <div class="bar-fill" :style="{ width: (cat.count / stats.total * 100) + '%' }"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Member Statistics (Team Overview) -->
       <div v-if="memberStats.length > 0" class="summary-section team-overview">
         <div class="section-header">
@@ -203,7 +202,8 @@ const getStatusColorClass = (status) => {
         <div class="section-header">
           <h3>Recent Memos</h3>
           <button class="btn-text-link" @click="emit('view-list')">
-            View All <ArrowRight class="icon-tiny" />
+            View All
+            <ArrowRight class="icon-tiny" />
           </button>
         </div>
         <div class="recent-list">
@@ -238,26 +238,35 @@ const getStatusColorClass = (status) => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+}
+
+.stat-card.wide {
+  grid-column: span 2;
+}
+
+.stat-card.highlight {
+  border: 1px solid #4f46e5;
+  background: linear-gradient(to right, #ffffff, #f5f7ff);
 }
 
 @media (max-width: 640px) {
   .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 540px) {
-  .stats-grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 }
@@ -309,16 +318,37 @@ const getStatusColorClass = (status) => {
     border-radius: 10px;
     margin-bottom: 0.75rem;
   }
+
   .stat-icon {
     width: 18px;
     height: 18px;
   }
 }
 
-.stat-icon-wrap.total { background: #eff6ff; color: #2563eb; }
-.stat-icon-wrap.pending { background: #fffbeb; color: #d97706; }
-.stat-icon-wrap.approved { background: #f0fdf4; color: #16a34a; }
-.stat-icon-wrap.rejected { background: #fef2f2; color: #dc2626; }
+.stat-icon-wrap.total {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.stat-icon-wrap.pending {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.stat-icon-wrap.approval {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.stat-icon-wrap.approved {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.stat-icon-wrap.rejected {
+  background: #fef2f2;
+  color: #dc2626;
+}
 
 .stat-label {
   font-size: 0.875rem;
@@ -339,6 +369,7 @@ const getStatusColorClass = (status) => {
   .stat-value {
     font-size: 1.5rem;
   }
+
   .stat-label {
     font-size: 0.75rem;
   }
@@ -357,7 +388,10 @@ const getStatusColorClass = (status) => {
   border-radius: 99px;
 }
 
-.stat-trending.up { background: #ecfdf5; color: #059669; }
+.stat-trending.up {
+  background: #ecfdf5;
+  color: #059669;
+}
 
 .stat-sublabel {
   font-size: 0.75rem;
@@ -409,6 +443,7 @@ const getStatusColorClass = (status) => {
   .summary-container {
     gap: 1rem;
   }
+
   .summary-section {
     padding: 1.25rem;
   }
@@ -527,7 +562,8 @@ const getStatusColorClass = (status) => {
   align-items: center;
   margin-bottom: 0.25rem;
   gap: 0.5rem;
-  min-width: 0; /* Allow container to shrink for children truncation */
+  min-width: 0;
+  /* Allow container to shrink for children truncation */
 }
 
 .memo-title-sm {
@@ -538,7 +574,8 @@ const getStatusColorClass = (status) => {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
-  min-width: 0; /* Allow child to be smaller than its content */
+  min-width: 0;
+  /* Allow child to be smaller than its content */
 }
 
 .status-pill {
@@ -548,7 +585,8 @@ const getStatusColorClass = (status) => {
   border-radius: 6px;
   text-transform: uppercase;
   white-space: nowrap;
-  flex-shrink: 0; /* Prevent pill from shrinking */
+  flex-shrink: 0;
+  /* Prevent pill from shrinking */
 }
 
 .memo-meta {
@@ -714,6 +752,17 @@ const getStatusColorClass = (status) => {
   gap: 0.4rem;
 }
 
-.dot-green { width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
-.dot-amber { width: 6px; height: 6px; background: #f59e0b; border-radius: 50%; }
+.dot-green {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+.dot-amber {
+  width: 6px;
+  height: 6px;
+  background: #f59e0b;
+  border-radius: 50%;
+}
 </style>
