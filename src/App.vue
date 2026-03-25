@@ -198,7 +198,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             :memos="memos" 
             :members="subordinates" 
             :currentUser="currentUser" 
-            @view-list="activeView = 'list'" 
+            @view-list="activeView = 'list'; activeTab = 'all'" 
             @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
           />
         </template>

@@ -113,7 +113,7 @@ const getStatusColorClass = (status) => {
         <div class="stat-sublabel">Your Action Needed</div>
       </div>
 
-      <div class="stat-card">
+      <div class="stat-card" @click="emit('view-list')">
         <div class="stat-icon-wrap total">
           <FileText class="stat-icon" />
         </div>
