@@ -20,7 +20,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['view-list']);
+const emit = defineEmits(['view-list', 'view-pending']);
 
 const stats = computed(() => {
   const total = props.memos.length;
@@ -102,7 +102,7 @@ const getStatusColorClass = (status) => {
   <div class="summary-container">
     <!-- Grid Stats -->
     <div class="stats-grid">
-      <div class="stat-card wide highlight">
+      <div class="stat-card wide highlight pointer" @click="emit('view-pending')">
         <div class="stat-icon-wrap approval">
           <Users class="stat-icon" />
         </div>
@@ -282,6 +282,7 @@ const getStatusColorClass = (status) => {
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
   border: 1px solid #f1f5f9;
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {

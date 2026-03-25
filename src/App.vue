@@ -194,7 +194,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
       <div class="list-wrapper">
         <template v-if="activeView === 'summary'">
-          <MemoSummary :memos="memos" :members="subordinates" :currentUser="currentUser" @view-list="activeView = 'list'" />
+          <MemoSummary 
+            :memos="memos" 
+            :members="subordinates" 
+            :currentUser="currentUser" 
+            @view-list="activeView = 'list'" 
+            @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
+          />
         </template>
         <template v-else-if="activeView === 'list'">
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
