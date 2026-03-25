@@ -721,9 +721,15 @@ const getHistoryDotColor = (action) => {
           @dragstart="onDragStart(memo.id)" @dragover="onDragOver" @drop="onDrop(memo.id)">
           <div class="memo-card" :class="{ active: selectedRow && selectedRow.id === memo.id }"
             @click="selectedRow = selectedRow?.id === memo.id ? null : memo">
-            <!-- External Receipt Number on Outer Line -->
-            <div v-if="memo.externalReceiptNumber" class="outer-receipt-number">
-              {{ memo.externalReceiptNumber }}
+            <!-- External Info on Outer Line (Top Right) -->
+            <div v-if="memo.externalReceiptNumber || memo.externalStatus" class="outer-external-info">
+              <div v-if="memo.externalReceiptNumber" class="external-badge receipt">
+                {{ memo.externalReceiptNumber }}
+              </div>
+              <div v-if="memo.externalStatus" :class="['external-badge status', memo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']" :title="`System: ${memo.externalSystem}`">
+                <component :is="memo.externalStatus.toLowerCase() === 'sent' ? Check : Clock" class="icon-tiny mr-1" />
+                {{ memo.externalStatus }}
+              </div>
             </div>
             <!-- Card Header: Title and Status -->
             <div class="memo-card-header">
@@ -750,13 +756,6 @@ const getHistoryDotColor = (action) => {
                 <div class="detail-item" title="Requester">
                   <User class="detail-icon" />
                   <span>{{ memo.requester }}</span>
-                </div>
-                <!-- External Status Badge (Premium) -->
-                <div v-if="memo.externalStatus" class="detail-item" :title="`System: ${memo.externalSystem}`">
-                  <div :class="['external-status-indicator', memo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
-                    <component :is="memo.externalStatus.toLowerCase() === 'sent' ? Check : Clock" class="icon-tiny mr-1" />
-                    <span>{{ memo.externalStatus }}</span>
-                  </div>
                 </div>
                 <div class="detail-item" title="Created Date">
                   <Calendar class="detail-icon" />
@@ -1168,28 +1167,6 @@ const getHistoryDotColor = (action) => {
               </div>
             </div>
 
-            <!-- External System Status (New Parameter) -->
-            <div v-if="selectedMemo.externalSystem" class="detail-section external-system-info">
-              <h3 class="section-group-title">External System Information</h3>
-              <div class="detail-row">
-                <div class="detail-group">
-                  <label>System Name</label>
-                  <div class="detail-value flex-align-center">
-                    <Monitor class="icon-tiny mr-2 text-slate-400" />
-                    {{ selectedMemo.externalSystem }}
-                  </div>
-                </div>
-                <div class="detail-group">
-                  <label>Current Status</label>
-                  <div class="detail-value">
-                    <div :class="['external-status-indicator', selectedMemo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
-                      <component :is="selectedMemo.externalStatus.toLowerCase() === 'sent' ? CheckCircle : Clock" class="icon-tiny mr-1" />
-                      <span>{{ selectedMemo.externalStatus }}<span v-if="selectedMemo.externalReceiptNumber"> ({{ selectedMemo.externalReceiptNumber }})</span></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <!-- Section 2: Content -->
             <template v-if="!isCreateMode || (selectedMemo.category && selectedMemo.categoryType)">
@@ -1634,6 +1611,29 @@ const getHistoryDotColor = (action) => {
                   </div>
                 </div>
               </div>
+
+              <!-- External System Status (Moved to Bottom) -->
+              <div v-if="selectedMemo.externalSystem" class="detail-section external-system-info mt-4">
+                <h3 class="section-group-title">External System Information</h3>
+                <div class="detail-row">
+                  <div class="detail-group">
+                    <label>System Name</label>
+                    <div class="detail-value flex-align-center">
+                      <Monitor class="icon-tiny mr-2 text-slate-400" />
+                      {{ selectedMemo.externalSystem }}
+                    </div>
+                  </div>
+                  <div class="detail-group">
+                    <label>Current Status</label>
+                    <div class="detail-value">
+                      <div :class="['external-status-indicator', selectedMemo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
+                        <component :is="selectedMemo.externalStatus.toLowerCase() === 'sent' ? CheckCircle : Clock" class="icon-tiny mr-1" />
+                        <span>{{ selectedMemo.externalStatus }}<span v-if="selectedMemo.externalReceiptNumber"> ({{ selectedMemo.externalReceiptNumber }})</span></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </template>
           </div>
 
@@ -1802,22 +1802,44 @@ const getHistoryDotColor = (action) => {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1), var(--shadow-md);
 }
 
-.outer-receipt-number {
+.outer-external-info {
   position: absolute;
   top: 0;
   right: 1.5rem;
   transform: translateY(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.external-badge {
   background: white;
   padding: 2px 8px;
   font-size: 0.7rem;
   font-weight: 700;
-  color: #64748b;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  font-family: monospace;
-  z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  font-family: monospace;
+}
+
+.external-badge.receipt {
+  color: #64748b;
+}
+
+.external-badge.status.status-process {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.external-badge.status.status-closed {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
 }
 
 /* Card Header */
