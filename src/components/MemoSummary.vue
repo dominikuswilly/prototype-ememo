@@ -142,12 +142,6 @@ const getStatusColorClass = (status) => {
           <span class="stat-label">Approved</span>
           <h2 class="stat-value">{{ stats.approved }}</h2>
         </div>
-        <div class="stat-progress">
-          <div class="progress-track">
-            <div class="progress-fill" :style="{ width: stats.completionRate + '%' }"></div>
-          </div>
-          <span>{{ stats.completionRate }}% Rate</span>
-        </div>
       </div>
 
       <div class="stat-card">
