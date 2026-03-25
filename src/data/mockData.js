@@ -26,7 +26,7 @@ export const mockMemos = [
         type: "single",
         status: "Pending",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "Finance Dir", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
       }
     ],
     attachmentsCount: 3,
@@ -34,7 +34,7 @@ export const mockMemos = [
     history: [
       { at: "2026-03-10T09:00:00Z", action: "Created", user: "John Doe", note: "Initial request for Q3 marketing budget." },
       { at: "2026-03-10T11:30:00Z", action: "Approved Tier 1", user: "Sarah Connor", note: "Approved. Budget aligns with campaign goals." },
-      { at: "2026-03-11T10:00:00Z", action: "Reminded", user: "John Doe", note: "Sent reminder to Willy (Finance Dir) for Tier 2 approval." }
+      { at: "2026-03-11T10:00:00Z", action: "Reminded", user: "John Doe", note: "Sent reminder to Willy (CTO) for Tier 2 approval." }
     ]
   },
   {
@@ -89,7 +89,7 @@ export const mockMemos = [
         approvers: [
           { name: "Michael Scott", role: "Regional Manager", status: "Approved" },
           { name: "Toby Flenderson", role: "HR Lead", status: "Pending" },
-          { name: "Willy", role: "Admin", status: "Pending" }
+          { name: "Willy", role: "CTO", status: "Pending" }
         ]
       }
     ],
@@ -238,7 +238,7 @@ export const mockMemos = [
         type: "quorum",
         status: "Pending",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "Ops Lead", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
       }
     ],
     attachmentsCount: 1,
@@ -349,7 +349,7 @@ export const mockMemos = [
         approvers: [
           { name: "John Smith", role: "Benefits Lead", status: "Approved" },
           { name: "Sarah Connor", role: "HR Dir", status: "Pending" },
-          { name: "Willy", role: "Specialist", status: "Pending" }
+          { name: "Willy", role: "CTO", status: "Pending" }
         ]
       }
     ],
@@ -471,7 +471,7 @@ export const mockMemos = [
         type: "single",
         status: "Pending",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "VP Tech", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
       }
     ],
     attachmentsCount: 1,
@@ -499,7 +499,7 @@ export const mockMemos = [
         requiredApprovals: 1,
         approvers: [
           { name: "Phillip Price", role: "CEO", status: "Pending" },
-          { name: "Willy", role: "Specialist", status: "Pending" }
+          { name: "Willy", role: "CTO", status: "Pending" }
         ]
       }
     ],
@@ -838,7 +838,7 @@ export const mockMemos = [
         type: "single",
         status: "Pending",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "Ops Lead", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
       }
     ],
     attachmentsCount: 2,
