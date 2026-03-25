@@ -9,11 +9,15 @@ const props = defineProps({
   isMobile: {
     type: Boolean,
     default: false
+  },
+  activeView: {
+    type: String,
+    default: 'summary'
   }
 });
 
 const isCollapsed = ref(false);
-const emit = defineEmits(['collapse', 'close']);
+const emit = defineEmits(['collapse', 'close', 'change-view']);
 
 const toggleCollapse = () => {
   if (props.isMobile) return;
@@ -21,7 +25,8 @@ const toggleCollapse = () => {
   emit('collapse', isCollapsed.value);
 };
 
-const handleNavClick = () => {
+const handleNavClick = (view) => {
+  emit('change-view', view);
   if (props.isMobile) {
     emit('close');
   }
@@ -46,20 +51,20 @@ const handleNavClick = () => {
       </button>
     </div>
     <nav class="sidebar-nav">
-      <a href="#" class="nav-link active" title="Memo List" @click.prevent="handleNavClick">
+      <a href="#" :class="['nav-link', { active: activeView === 'summary' }]" title="Summary" @click.prevent="handleNavClick('summary')">
+        <BarChart2 class="nav-icon" />
+        <span v-if="!isCollapsed">Summary</span>
+      </a>
+      <a href="#" :class="['nav-link', { active: activeView === 'list' }]" title="Memo List" @click.prevent="handleNavClick('list')">
         <LayoutGrid class="nav-icon" />
         <span v-if="!isCollapsed">Memo List</span>
       </a>
-      <a href="#" class="nav-link" title="Analytics" @click.prevent="handleNavClick">
-        <BarChart2 class="nav-icon" />
-        <span v-if="!isCollapsed">Analytics</span>
-      </a>
-      <a href="#" class="nav-link" title="Notifications" @click.prevent="handleNavClick">
+      <div class="nav-divider"></div>
+      <a href="#" class="nav-link" title="Notifications" @click.prevent="handleNavClick('notifications')">
         <Bell class="nav-icon" />
         <span v-if="!isCollapsed">Notifications</span>
       </a>
-      <div class="nav-divider"></div>
-      <a href="#" class="nav-link" title="Settings" @click.prevent="handleNavClick">
+      <a href="#" class="nav-link" title="Settings" @click.prevent="handleNavClick('settings')">
         <Settings class="nav-icon" />
         <span v-if="!isCollapsed">Settings</span>
       </a>

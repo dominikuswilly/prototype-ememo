@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import Sidebar from './components/Sidebar.vue';
 import MemoFilter from './components/MemoFilter.vue';
 import MemoList from './components/MemoList.vue';
+import MemoSummary from './components/MemoSummary.vue';
 import { mockMemos } from './data/mockData';
 import { Menu, X, Plus } from 'lucide-vue-next';
 
@@ -10,6 +11,7 @@ const memoListRef = ref(null);
 const memos = ref([...mockMemos]);
 const isMobileMenuOpen = ref(false);
 const activeTab = ref('all');
+const activeView = ref('summary'); // New view state
 
 // Mock user for "Pending Approval" logic
 // Mock user for hierarchy
@@ -35,12 +37,14 @@ const handleFilterChange = (newFilters) => {
 };
 
 const pageTitle = computed(() => {
+  if (activeView.value === 'summary') return 'Memo Summary';
   if (activeTab.value === 'my_memos') return 'My Memos';
   if (activeTab.value === 'pending_approval') return 'Pending Approval';
   return 'All Memos';
 });
 
 const pageDescription = computed(() => {
+  if (activeView.value === 'summary') return 'High-level overview of memorandum activities and statistics.';
   if (activeTab.value === 'my_memos') return 'Memos created by you, including drafts.';
   if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
   return 'A simple overview of all memorandums in the system.';
@@ -149,7 +153,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
     <!-- Sidebar -->
     <div :class="['sidebar-wrapper', { 'mobile-open': isMobileMenuOpen }]">
-      <Sidebar :is-mobile="isMobile" @collapse="handleSidebarCollapse" @close="isMobileMenuOpen = false" />
+      <Sidebar 
+        :is-mobile="isMobile" 
+        :active-view="activeView"
+        @collapse="handleSidebarCollapse" 
+        @close="isMobileMenuOpen = false" 
+        @change-view="activeView = $event"
+      />
     </div>
 
     <!-- Main Content -->
@@ -157,7 +167,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
 
       <header class="sticky-page-header">
-        <div class="tabs-nav">
+        <div v-if="activeView === 'list'" class="tabs-nav">
           <button v-for="tab in ['all', 'my_memos', 'pending_approval']" :key="tab"
             :class="['tab-btn', { active: activeTab === tab }]" @click="activeTab = tab">
             {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
@@ -170,20 +180,30 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             <h1>{{ pageTitle }}</h1>
             <p>{{ pageDescription }}</p>
           </div>
-          <button class="create-btn" @click="triggerCreateModal">
+          <button v-if="activeView === 'list'" class="create-btn" @click="triggerCreateModal">
             <Plus class="icon-small" />
             <span>New Request</span>
           </button>
         </div>
 
-        <div class="header-filter-wrapper">
+        <div v-if="activeView === 'list'" class="header-filter-wrapper">
           <MemoFilter :members="[{ name: currentUser, role: 'you' }, ...subordinates]" :activeTab="activeTab"
             @filter-change="handleFilterChange" />
         </div>
       </header>
 
       <div class="list-wrapper">
-        <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
+        <template v-if="activeView === 'summary'">
+          <MemoSummary :memos="memos" :members="subordinates" @view-list="activeView = 'list'" />
+        </template>
+        <template v-else-if="activeView === 'list'">
+          <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
+        </template>
+        <template v-else>
+          <div class="placeholder-view">
+            <h3>{{ activeView.charAt(0).toUpperCase() + activeView.slice(1) }} view coming soon...</h3>
+          </div>
+        </template>
       </div>
 
       <footer class="app-footer">
