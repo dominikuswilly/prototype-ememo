@@ -36,8 +36,8 @@ const handleNavClick = (view) => {
 <template>
   <aside :class="['sidebar', { collapsed: isCollapsed }]">
     <div class="sidebar-header">
-      <h2 v-if="!isCollapsed">eMemo</h2>
-      <div v-else class="logo-collapsed">eM</div>
+      <h2 v-if="!isCollapsed" @click="handleNavClick('summary')" style="cursor: pointer;">eMemo</h2>
+      <div v-else class="logo-collapsed" @click="handleNavClick('summary')" style="cursor: pointer;">eM</div>
       
       <!-- Desktop Collapse Toggle -->
       <button v-if="!isMobile" class="collapse-toggle" @click="toggleCollapse">
