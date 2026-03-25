@@ -721,6 +721,10 @@ const getHistoryDotColor = (action) => {
           @dragstart="onDragStart(memo.id)" @dragover="onDragOver" @drop="onDrop(memo.id)">
           <div class="memo-card" :class="{ active: selectedRow && selectedRow.id === memo.id }"
             @click="selectedRow = selectedRow?.id === memo.id ? null : memo">
+            <!-- External Receipt Number on Outer Line -->
+            <div v-if="memo.externalReceiptNumber" class="outer-receipt-number">
+              {{ memo.externalReceiptNumber }}
+            </div>
             <!-- Card Header: Title and Status -->
             <div class="memo-card-header">
               <div class="memo-card-header-top">
@@ -751,7 +755,7 @@ const getHistoryDotColor = (action) => {
                 <div v-if="memo.externalStatus" class="detail-item" :title="`System: ${memo.externalSystem}`">
                   <div :class="['external-status-indicator', memo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
                     <component :is="memo.externalStatus.toLowerCase() === 'sent' ? Check : Clock" class="icon-tiny mr-1" />
-                    <span>{{ memo.externalStatus }}<span v-if="memo.externalReceiptNumber"> ({{ memo.externalReceiptNumber }})</span></span>
+                    <span>{{ memo.externalStatus }}</span>
                   </div>
                 </div>
                 <div class="detail-item" title="Created Date">
@@ -1796,6 +1800,24 @@ const getHistoryDotColor = (action) => {
 .memo-card.active {
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1), var(--shadow-md);
+}
+
+.outer-receipt-number {
+  position: absolute;
+  top: 0;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  background: white;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-family: monospace;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  pointer-events: none;
 }
 
 /* Card Header */
