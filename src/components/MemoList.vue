@@ -749,9 +749,9 @@ const getHistoryDotColor = (action) => {
                 </div>
                 <!-- External Status Badge (Premium) -->
                 <div v-if="memo.externalStatus" class="detail-item" :title="`System: ${memo.externalSystem}`">
-                  <div :class="['external-status-indicator', memo.externalStatus.toLowerCase() === 'closed' ? 'status-closed' : 'status-process']">
-                    <component :is="memo.externalStatus.toLowerCase() === 'closed' ? Check : Clock" class="icon-tiny mr-1" />
-                    <span>{{ memo.externalStatus }}</span>
+                  <div :class="['external-status-indicator', memo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
+                    <component :is="memo.externalStatus.toLowerCase() === 'sent' ? Check : Clock" class="icon-tiny mr-1" />
+                    <span>{{ memo.externalStatus }}<span v-if="memo.externalReceiptNumber"> ({{ memo.externalReceiptNumber }})</span></span>
                   </div>
                 </div>
                 <div class="detail-item" title="Created Date">
@@ -1178,9 +1178,9 @@ const getHistoryDotColor = (action) => {
                 <div class="detail-group">
                   <label>Current Status</label>
                   <div class="detail-value">
-                    <div :class="['external-status-indicator', selectedMemo.externalStatus.toLowerCase() === 'closed' ? 'status-closed' : 'status-process']">
-                      <component :is="selectedMemo.externalStatus.toLowerCase() === 'closed' ? CheckCircle : Clock" class="icon-tiny mr-1" />
-                      <span>{{ selectedMemo.externalStatus }}</span>
+                    <div :class="['external-status-indicator', selectedMemo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
+                      <component :is="selectedMemo.externalStatus.toLowerCase() === 'sent' ? CheckCircle : Clock" class="icon-tiny mr-1" />
+                      <span>{{ selectedMemo.externalStatus }}<span v-if="selectedMemo.externalReceiptNumber"> ({{ selectedMemo.externalReceiptNumber }})</span></span>
                     </div>
                   </div>
                 </div>

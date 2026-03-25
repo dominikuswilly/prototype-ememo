@@ -11,7 +11,8 @@ export const mockMemos = [
     status: "Approved",
     isReminded: true,
     externalSystem: "Finance System",
-    externalStatus: "In Process",
+    externalStatus: "Sent",
+    externalReceiptNumber: "RCT-FIN-001",
     approvalChain: [
       {
         tier: 1,
@@ -47,7 +48,8 @@ export const mockMemos = [
     requester: "Willy",
     status: "Approved",
     externalSystem: "Finance System",
-    externalStatus: "Closed",
+    externalStatus: "Sent",
+    externalReceiptNumber: "RCT-FIN-042",
     approvalChain: [
       {
         tier: 1,
@@ -76,7 +78,7 @@ export const mockMemos = [
     status: "Approved",
     isReminded: true,
     externalSystem: "HRD System",
-    externalStatus: "In Process",
+    externalStatus: "Waiting",
     approvalChain: [
       {
         tier: 1,
@@ -152,7 +154,8 @@ export const mockMemos = [
     requester: "Angela Moss",
     status: "Approved",
     externalSystem: "IT System",
-    externalStatus: "Closed",
+    externalStatus: "Sent",
+    externalReceiptNumber: "RCT-IT-004",
     approvalChain: [
       {
         tier: 1,
@@ -326,7 +329,7 @@ export const mockMemos = [
     requester: "Willy",
     status: "Approved",
     externalSystem: "HRD System",
-    externalStatus: "In Process",
+    externalStatus: "Waiting",
     approvalChain: [
       {
         tier: 1,
@@ -398,7 +401,7 @@ export const mockMemos = [
     status: "Approved",
     isReminded: true,
     externalSystem: "HRD System",
-    externalStatus: "In Process",
+    externalStatus: "Waiting",
     approvalChain: [
       {
         tier: 1,
