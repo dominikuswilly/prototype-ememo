@@ -304,7 +304,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 .sticky-page-header {
   background-color: var(--bg-app);
-  z-index: 10;
+  z-index: 110; /* Increased to stay above list items and cards */
   padding-bottom: 0px;
   margin-bottom: 1rem;
 }
@@ -329,8 +329,9 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   position: sticky;
   top: 0;
   background-color: var(--bg-app);
-  z-index: 80;
+  z-index: 120; /* Above sticky-page-header (110) */
   border-bottom: 1px solid #e2e8f0;
+  overflow: visible;
 }
 
 /* Deep override for MemoFilter when inside sticky header */
@@ -473,11 +474,9 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
   .sticky-page-header {
     margin-bottom: 1rem;
-    /* Standardized to 1rem as requested */
     background-color: white;
     padding: 0;
-    /* Remove top padding to eliminate gap below mobile header */
-    overflow-x: hidden;
+    overflow: visible; /* Crucial: allow dropdowns to show */
   }
 
   .header-filter-wrapper {
@@ -486,7 +485,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     /* Offset for Mobile Header (64px) + Tabs Nav (approx 51px) */
     background-color: white;
     padding: 0.75rem 1.5rem;
-    z-index: 70;
+    z-index: 100;
     border-bottom: 1px solid #f1f5f9;
   }
 
