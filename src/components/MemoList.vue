@@ -2,7 +2,7 @@
 import { ref, defineProps, defineExpose, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import {
   ChevronRight, Eye, Edit, Trash2, X, Paperclip, Plus, ArrowLeft, DollarSign, FileText, Shield, Building2, Users, Monitor, Briefcase, Wrench, Loader2, Bell, Search, Calendar,
-  CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check, XCircle
+  CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check, XCircle, Zap, ExternalLink
 } from 'lucide-vue-next';
 import MapPicker from './MapPicker.vue';
 
@@ -734,16 +734,6 @@ const getHistoryDotColor = (action) => {
           @dragstart="onDragStart(memo.id)" @dragover="onDragOver" @drop="onDrop(memo.id)">
           <div class="memo-card" :class="{ active: selectedRow && selectedRow.id === memo.id }"
             @click="selectedRow = selectedRow?.id === memo.id ? null : memo">
-            <!-- External Info on Outer Line (Top Right) -->
-            <div v-if="memo.externalReceiptNumber || memo.externalStatus" class="outer-external-info">
-              <div v-if="memo.externalReceiptNumber" class="external-badge receipt">
-                {{ memo.externalReceiptNumber }}
-              </div>
-              <div v-if="memo.externalStatus" :class="['external-badge status', memo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']" :title="`System: ${memo.externalSystem}`">
-                <component :is="memo.externalStatus.toLowerCase() === 'sent' ? Check : Clock" class="icon-tiny mr-1" />
-                {{ memo.externalStatus }}
-              </div>
-            </div>
             <!-- Card Header: Title and Status -->
             <div class="memo-card-header">
               <div class="memo-card-header-top">
@@ -781,33 +771,51 @@ const getHistoryDotColor = (action) => {
               </div>
             </div>
 
+
             <!-- Card Footer: Progress & Actions -->
             <div class="memo-card-footer">
-              <div class="progress-container" v-if="memo.status !== 'Draft'">
-                <div class="progress-bar-wrapper">
-                  <div class="progress-bar-fill" :class="getStatusColor(memo.status)"
-                    :style="{ width: getApprovalProgress(memo) + '%' }"></div>
+              <div class="footer-bottom-row">
+                <div class="progress-container" v-if="memo.status !== 'Draft'">
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-bar-fill" :class="getStatusColor(memo.status)"
+                      :style="{ width: getApprovalProgress(memo) + '%' }"></div>
+                  </div>
+                  <span class="progress-label">{{ getProgressLabel(memo) }}</span>
                 </div>
-                <span class="progress-label">{{ getProgressLabel(memo) }}</span>
-              </div>
-              <div v-else class="draft-indicator">
-                <FileText class="icon-tiny text-slate-400" />
-                <span>Not Submitted</span>
+                <div v-else class="draft-indicator">
+                  <FileText class="icon-tiny text-slate-400" />
+                  <span>Not Submitted</span>
+                </div>
+
+                <div class="card-actions-mini">
+                  <button class="mini-action-btn view" @click.stop="openViewModal(memo, false)" title="View Details">
+                    <Eye class="icon-tiny" />
+                  </button>
+                  <button v-if="getActions(memo).includes('edit')" class="mini-action-btn edit"
+                    @click.stop="openViewModal(memo, true)" title="Edit Draft">
+                    <Edit class="icon-tiny" />
+                  </button>
+                  <button v-if="getActions(memo).includes('update')" class="mini-action-btn update"
+                    @click.stop="openViewModal(memo, true)" title="Update/Review">
+                    <Edit class="icon-tiny" />
+                  </button>
+                </div>
               </div>
 
-              <div class="card-actions-mini">
-                <button class="mini-action-btn view" @click.stop="openViewModal(memo, false)" title="View Details">
-                  <Eye class="icon-tiny" />
-                </button>
-                <button v-if="getActions(memo).includes('edit')" class="mini-action-btn edit"
-                  @click.stop="openViewModal(memo, true)" title="Edit Draft">
-                  <Edit class="icon-tiny" />
-                </button>
-                <button v-if="getActions(memo).includes('update')" class="mini-action-btn update"
-                  @click.stop="openViewModal(memo, true)" title="Update/Review">
-                  <Edit class="icon-tiny" />
-                </button>
-              </div>
+              <!-- Separator and External Info -->
+              <template v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem">
+                <div class="card-footer-separator"></div>
+                <div class="footer-external-row-vertical">
+                  <div class="external-system-name-row">
+                    {{ memo.externalSystem || 'External System' }}
+                  </div>
+                  <div class="external-status-ref-row">
+                    <span class="ext-status">{{ memo.externalStatus || 'Unknown' }}</span>
+                    <span class="ext-sep">:</span>
+                    <span class="ext-ref">{{ memo.externalReceiptNumber || '-' }}</span>
+                  </div>
+                </div>
+              </template>
             </div>
 
             <!-- Selection Overlay (Quick Actions on Click) -->
@@ -1828,44 +1836,109 @@ const getHistoryDotColor = (action) => {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1), var(--shadow-md);
 }
 
-.outer-external-info {
-  position: absolute;
-  top: 0;
-  right: 1.5rem;
-  transform: translateY(-50%);
-  display: flex;
-  gap: 0.5rem;
-  z-index: 10;
-  pointer-events: none;
+.card-footer-separator {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 0.25rem 0;
 }
 
-.external-badge {
-  background: white;
-  padding: 2px 8px;
-  font-size: 0.7rem;
+.footer-external-row-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.25rem 0;
+}
+
+.external-system-name-row {
+  font-size: 0.65rem;
   font-weight: 700;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.external-status-ref-row {
   display: flex;
   align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ext-status {
+  color: #3b82f6;
+}
+
+.ext-sep {
+  color: #94a3b8;
+}
+
+.ext-ref {
+  color: #1e293b;
   font-family: monospace;
 }
 
-.external-badge.receipt {
-  color: #64748b;
+.footer-external-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-.external-badge.status.status-process {
+.external-system-info-group {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+}
+
+.external-system-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  margin-right: 0.4rem;
+}
+
+.external-receipt-code {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #dbeafe;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.external-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.external-status-badge.status-process {
   background-color: #eff6ff;
   color: #2563eb;
-  border-color: #bfdbfe;
+  border: 1px solid #bfdbfe;
 }
 
-.external-badge.status.status-closed {
+.external-status-badge.status-closed {
   background-color: #f0fdf4;
   color: #16a34a;
-  border-color: #bbf7d0;
+  border: 1px solid #bbf7d0;
 }
 
 /* Card Header */
@@ -2114,10 +2187,17 @@ const getHistoryDotColor = (action) => {
 /* Card Footer & Progress */
 .memo-card-footer {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.footer-bottom-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-top: 0.5rem;
 }
 
 .progress-container {
@@ -2352,6 +2432,29 @@ const getHistoryDotColor = (action) => {
 @media (max-width: 640px) {
   .memo-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .memo-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .memo-card-title {
+    font-size: 1rem;
+  }
+
+  .memo-card-desc {
+    font-size: 0.85rem;
+    height: auto;
+    min-height: 2.5rem;
+    max-height: 3.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .memo-details-row {
+      padding-top: 0.75rem;
   }
 }
 
