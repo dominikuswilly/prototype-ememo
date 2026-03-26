@@ -802,10 +802,12 @@ const getHistoryDotColor = (action) => {
                 </div>
               </div>
 
-              <!-- Separator and External Info -->
-              <template v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem">
-                <div class="card-footer-separator"></div>
-                <div class="footer-external-row-vertical">
+              <!-- Separator (Always Visible for "Finished" Look) -->
+              <div class="card-footer-separator"></div>
+
+              <!-- External Info Area -->
+              <div class="footer-external-area">
+                <div v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem" class="footer-external-row-vertical">
                   <div class="external-system-name-row">
                     {{ memo.externalSystem || 'External System' }}
                   </div>
@@ -815,7 +817,10 @@ const getHistoryDotColor = (action) => {
                     <span class="ext-ref">{{ memo.externalReceiptNumber || '-' }}</span>
                   </div>
                 </div>
-              </template>
+                <div v-else class="footer-external-empty">
+                  <!-- Empty placeholder to maintain consistent spacing and "finished" feel -->
+                </div>
+              </div>
             </div>
 
             <!-- Selection Overlay (Quick Actions on Click) -->
@@ -1839,14 +1844,25 @@ const getHistoryDotColor = (action) => {
 .card-footer-separator {
   height: 1px;
   background: #f1f5f9;
-  margin: 0.25rem 0;
+  margin: 0.5rem 0; /* Consistent distance */
+}
+
+.footer-external-area {
+  min-height: 2.25rem; /* Maintain scale even if empty */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.footer-external-empty {
+  height: 0.5rem; /* Subtle space at bottom */
 }
 
 .footer-external-row-vertical {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 0.25rem 0;
+  padding: 0;
 }
 
 .external-system-name-row {
@@ -1866,7 +1882,7 @@ const getHistoryDotColor = (action) => {
 }
 
 .ext-status {
-  color: #3b82f6;
+  color: #2563eb; /* Higher contrast blue */
 }
 
 .ext-sep {
@@ -1906,7 +1922,7 @@ const getHistoryDotColor = (action) => {
   font-family: monospace;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #3b82f6;
+  color: #2563eb; /* Higher contrast blue */
   background: #eff6ff;
   padding: 2px 8px;
   border-radius: 4px;
@@ -2198,6 +2214,7 @@ const getHistoryDotColor = (action) => {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  min-height: 40px; /* Force vertical alignment of action buttons across cards */
 }
 
 .progress-container {
