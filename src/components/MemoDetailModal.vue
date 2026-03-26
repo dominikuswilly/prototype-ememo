@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import {
-  X, ArrowLeft, FileText, Bell, CheckCircle, Clock, AlertCircle, FileEdit, User, ChevronRight,
+  X, ArrowLeft, ChevronLeft, FileText, Bell, CheckCircle, Clock, AlertCircle, FileEdit, User, ChevronRight,
   Monitor, XCircle, Plus, AlertTriangle, Loader2, Calendar, MapPin
 } from 'lucide-vue-next';
 import MapPicker from './MapPicker.vue';
@@ -30,7 +30,7 @@ const isHistoryCollapsed = ref(true);
 const isAttachmentsCollapsed = ref(true);
 
 const isMobile = ref(false);
-const checkMobile = () => { isMobile.value = window.innerWidth <= 768; };
+const checkMobile = () => { isMobile.value = window.innerWidth <= 1024; };
 
 onMounted(() => {
   checkMobile();
@@ -438,31 +438,31 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
         <div class="modal-header">
           <div class="modal-header-left">
             <button v-if="isConfirming" class="btn-back mr-2" @click="cancelConfirmation">
-              <ArrowLeft class="icon" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <button v-else-if="isCreateMode" class="btn-back mr-2" @click="goBackToWizard">
-              <ArrowLeft class="icon" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
-            <button v-else-if="isMobile" class="btn-back mr-2" @click="closeViewModal">
-              <ArrowLeft class="icon" />
+            <button v-else class="btn-back mr-2 mobile-back-btn" @click="closeViewModal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <h2 v-if="isConfirming">Review Submission</h2>
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
-            <span v-if="!isCreateMode && localMemo && !isMobile" class="header-memo-number">{{ localMemo.memoNumber }}</span>
+            <span v-if="!isCreateMode && localMemo" class="header-memo-number hide-on-mobile">{{ localMemo.memoNumber }}</span>
           </div>
           <div class="modal-header-right">
             <div v-if="localMemo && localMemo.isReminded" class="reminded-tag mr-2"
               title="Approvers have been reminded">
               <Bell class="icon-tiny" />
-              <span v-if="!isEditMode && !isMobile" class="tag-text">REMINDED</span>
+              <span v-if="!isEditMode" class="tag-text hide-on-mobile">REMINDED</span>
             </div>
             <div v-if="!isCreateMode" :class="['status-badge-premium', getStatusColor(localMemo.status)]"
               :title="localMemo.status">
               <component :is="getStatusIcon(localMemo.status)" class="status-icon" />
-              <span v-if="!isEditMode && !isMobile" class="badge-text">{{ localMemo.status }}</span>
+              <span v-if="!isEditMode" class="badge-text hide-on-mobile">{{ localMemo.status }}</span>
             </div>
-            <button v-if="!isMobile" class="btn-close ml-3" @click="closeViewModal">
+            <button class="btn-close desktop-close-btn ml-3" @click="closeViewModal">
               <X class="icon" />
             </button>
           </div>
@@ -1152,14 +1152,6 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
             </template>
           </div>
         </div>
-        <div class="modal-footer">
-          <button v-if="isEditMode" class="btn-secondary" @click="closeViewModal">
-            <XCircle class="icon-small mr-2" /> Cancel Edit
-          </button>
-          <button class="btn-secondary ml-auto" @click="closeViewModal">
-            <X class="icon-small mr-2" /> Close
-          </button>
-        </div>
       </div>
     </div>
 
@@ -1312,11 +1304,14 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 }
 
 .btn-back {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
   border: 1px solid #e2e8f0;
   background: white;
   color: #64748b;
+  flex-shrink: 0;
+  padding: 0;
 }
 
 .btn-back:hover {
@@ -1335,6 +1330,14 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 .btn-close:hover {
   background-color: #f1f5f9;
   color: #0f172a;
+}
+
+.mobile-back-btn { display: none !important; }
+
+@media (max-width: 1024px) {
+  .mobile-back-btn { display: flex !important; }
+  .desktop-close-btn { display: none !important; }
+  .hide-on-mobile { display: none !important; }
 }
 
 /* Modal Body & Sections */
