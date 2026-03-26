@@ -194,7 +194,7 @@ const getFieldValue = (fieldName) => {
       const amt = (Number(localMemo.value.entDebitAmount || 0) + Number(localMemo.value.entCreditAmount || 0));
       return amt > 0 ? `Rp ${amt.toLocaleString('id-ID')}` : '-';
     }
-    case 'Timeline': return `${localMemo.value.travStartDate || '?'} to ${localMemo.value.travEndDate || '?'}`;
+    case 'Timeline': return `${normalizeTravelDate(localMemo.value.travStartDate)} to ${normalizeTravelDate(localMemo.value.travEndDate)}`;
     case 'Employee Info': return localMemo.value.hrName || 'Not specified';
     case 'Salary Details': {
       const total = Number(localMemo.value.newSalary?.basic || 0) +
@@ -348,11 +348,14 @@ const goBackToWizard = () => {
 
 const cancelConfirmation = () => { isConfirming.value = false; };
 
-const formatDate = (dateString) => {
+const formatDate = (dateString, includeTime = false) => {
   if (!dateString) return '-';
   const d = new Date(dateString);
+  if (isNaN(d.getTime())) return dateString;
   const pad = (n) => n.toString().padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  const datePart = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  if (!includeTime) return datePart;
+  return `${datePart} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
 
 const getStatusColor = (status) => {
@@ -438,11 +441,36 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 // Normalize date string to YYYY-MM-DD regardless of input format
 const normalizeTravelDate = (dateStr) => {
   if (!dateStr) return '-';
-  // Already YYYY-MM-DD
+  
+  // If already YYYY-MM-DD, return as is
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-  // Convert DD-MM-YYYY → YYYY-MM-DD
-  const parts = dateStr.split('-');
-  if (parts.length === 3 && parts[0].length === 2) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  
+  // Handle DD-MM-YYYY or DD/MM/YYYY
+  const parts = dateStr.split(/[-/]/);
+  if (parts.length === 3) {
+    // DD-MM-YYYY
+    if (parts[0].length <= 2 && parts[2].length === 4) {
+      const d = parts[0].padStart(2, '0');
+      const m = parts[1].padStart(2, '0');
+      const y = parts[2];
+      return `${y}-${m}-${d}`;
+    }
+    // YYYY-MM-DD (with slash or already detected but extra check)
+    if (parts[0].length === 4 && parts[2].length <= 2) {
+      const y = parts[0];
+      const m = parts[1].padStart(2, '0');
+      const d = parts[2].padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+  }
+
+  // Fallback to native Date parsing if possible
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
   return dateStr;
 };
 
@@ -731,23 +759,31 @@ const normalizeTravelDate = (dateStr) => {
                     class="detail-group-stacked">
                     <label>Travel Period</label>
                     <div class="travel-date-range">
-                      <div class="travel-date-card">
+                      <div class="travel-date-card" :class="{ 'edit-mode': isEditMode }" @click="isEditMode && openDatePicker($event)">
                         <div class="travel-date-label">
                           <Calendar class="icon-tiny mr-1" />
                           Start Date
                         </div>
-                        <input v-if="isEditMode" type="date" v-model="localMemo.travStartDate"
-                          class="form-input travel-date-input" />
+                        <div v-if="isEditMode" class="travel-date-input-wrapper">
+                          <div class="travel-date-visual-display">
+                            {{ localMemo.travStartDate ? normalizeTravelDate(localMemo.travStartDate) : 'YYYY-MM-DD' }}
+                          </div>
+                          <input type="date" v-model="localMemo.travStartDate" class="travel-date-hidden-input" />
+                        </div>
                         <div v-else class="travel-date-value">{{ normalizeTravelDate(localMemo.travStartDate) }}</div>
                       </div>
                       <div class="travel-date-arrow">→</div>
-                      <div class="travel-date-card">
+                      <div class="travel-date-card" :class="{ 'edit-mode': isEditMode }" @click="isEditMode && openDatePicker($event)">
                         <div class="travel-date-label">
                           <Calendar class="icon-tiny mr-1" />
                           End Date
                         </div>
-                        <input v-if="isEditMode" type="date" v-model="localMemo.travEndDate"
-                          class="form-input travel-date-input" />
+                        <div v-if="isEditMode" class="travel-date-input-wrapper">
+                          <div class="travel-date-visual-display">
+                            {{ localMemo.travEndDate ? normalizeTravelDate(localMemo.travEndDate) : 'YYYY-MM-DD' }}
+                          </div>
+                          <input type="date" v-model="localMemo.travEndDate" class="travel-date-hidden-input" />
+                        </div>
                         <div v-else class="travel-date-value">{{ normalizeTravelDate(localMemo.travEndDate) }}</div>
                       </div>
                     </div>
@@ -1093,7 +1129,7 @@ const normalizeTravelDate = (dateStr) => {
                             <span class="timeline-action font-bold" :class="getHistoryColor(item.action)">{{ item.action
                             }}</span>
                             <span class="timeline-date" style="color: #64748b; font-size: 0.75rem;">{{
-                              formatDate(item.at) }}</span>
+                              formatDate(item.at, true) }}</span>
                           </div>
                           <div class="timeline-user mt-1">
                             <span class="font-semibold text-slate-800">{{ item.user }}</span>
@@ -1877,6 +1913,55 @@ button {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 0.75rem 1rem;
+  transition: all 0.2s;
+}
+
+.travel-date-card.edit-mode {
+  cursor: pointer;
+  border-color: #3b82f6;
+  background: #f0f7ff;
+}
+
+.travel-date-card.edit-mode:hover {
+  background: #e0efff;
+}
+
+.travel-date-input-wrapper {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.travel-date-visual-display {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e40af;
+  width: 100%;
+}
+
+.travel-date-hidden-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.travel-date-hidden-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
 }
 
 .travel-date-label {

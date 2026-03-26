@@ -90,11 +90,14 @@ const processedMemos = computed(() => {
 });
 
 // Actions & Helpers
-const formatDate = (dateString) => {
+const formatDate = (dateString, includeTime = false) => {
   if (!dateString) return '-';
   const d = new Date(dateString);
+  if (isNaN(d.getTime())) return dateString;
   const pad = (n) => n.toString().padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const datePart = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  if (!includeTime) return datePart;
+  return `${datePart} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
 
 const getStatusColor = (status) => {
@@ -181,7 +184,10 @@ const selectWizardTemplate = (item) => {
       status: 'Draft', 
       approvalChain: [],
       requesterDepartment: 'IT',
-      targetDepartment: item.division
+      targetDepartment: item.division,
+      travStartDate: '',
+      travEndDate: '',
+      uploadedFiles: []
     };
     isEditMode.value = true; isCreateMode.value = true; isModalOpen.value = true;
 };
