@@ -597,21 +597,21 @@ const formatDate = (dateString) => {
 
 const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
-    case 'approved': return 'status-approved';
-    case 'rejected': return 'status-rejected';
-    case 'pending': return 'status-pending';
-    case 'requested changes': return 'status-requested-changes';
-    case 'draft': return 'status-draft';
-    default: return 'status-default';
+    case 'approved': return 'approved';
+    case 'rejected': return 'rejected';
+    case 'pending': return 'pending';
+    case 'requested changes': return 'requested-changes';
+    case 'draft': return 'draft';
+    default: return 'default';
   }
 };
 
 const getStatusIcon = (status) => {
   switch (status.toLowerCase()) {
     case 'approved': return CheckCircle;
-    case 'rejected': return AlertCircle;
+    case 'rejected': return XCircle;
     case 'pending': return Clock;
-    case 'requested changes': return FileEdit;
+    case 'requested changes': return AlertCircle;
     case 'draft': return FileText;
     default: return FileText;
   }
@@ -732,62 +732,48 @@ const getHistoryDotColor = (action) => {
       <div v-if="processedMemos.length > 0" class="memo-grid">
         <div v-for="memo in processedMemos" :key="memo.id" class="memo-card-wrapper" draggable="true"
           @dragstart="onDragStart(memo.id)" @dragover="onDragOver" @drop="onDrop(memo.id)">
-          <div class="memo-card" :class="{ active: selectedRow && selectedRow.id === memo.id }"
+          <div class="memo-card" :class="['status-' + getStatusColor(memo.status), { active: selectedRow && selectedRow.id === memo.id }]"
             @click="selectedRow = selectedRow?.id === memo.id ? null : memo">
-            <!-- Card Header: Title and Status -->
-            <div class="memo-card-header">
-              <div class="memo-card-header-top">
-                <div class="memo-card-title-group">
-                  <h3 class="memo-card-title">{{ memo.title }}</h3>
-                  <span class="memo-card-number">#{{ memo.memoNumber }}</span>
-                </div>
-                <div class="header-right-group">
-                  <div v-if="memo.isReminded" class="reminded-tag" title="Approvers have been reminded">
-                    <Bell class="icon-tiny" />
-                  </div>
-                  <div :class="['status-badge-premium', getStatusColor(memo.status)]" :title="memo.status">
-                    <component :is="getStatusIcon(memo.status)" class="status-icon" />
-                  </div>
+            
+            <!-- Card Header: Title/ID Left, Status Icon Right -->
+            <div class="memo-card-header-new">
+              <div class="header-left">
+                <h3 class="memo-card-title-new">{{ memo.title }}</h3>
+                <span class="memo-card-number-new">#{{ memo.memoNumber }}</span>
+              </div>
+              <div class="header-right">
+                <div class="status-icon-ghost">
+                  <component :is="getStatusIcon(memo.status)" class="status-icon-large" />
                 </div>
               </div>
             </div>
 
-            <!-- Card Body: Metadata -->
-            <div class="memo-card-body">
-              <p class="memo-card-desc">{{ memo.description }}</p>
-              <div class="memo-details-row">
-                <div class="detail-item" title="Requester">
-                  <User class="detail-icon" />
-                  <span>{{ memo.requester }}</span>
-                </div>
-                <div class="detail-item" title="Created Date">
-                  <Calendar class="detail-icon" />
-                  <span>{{ formatDate(memo.createdAt) }}</span>
-                </div>
-                <div class="detail-item" title="Requester → Target Dept">
-                  <Layers class="detail-icon" />
-                  <span class="text-xs">{{ memo.requesterDepartment }} → {{ memo.targetDepartment }}</span>
-                </div>
+            <!-- Card Body: 2-Column Grid -->
+            <div class="memo-card-body-grid">
+              <div class="grid-item">
+                <User class="grid-icon" />
+                <span class="grid-text">{{ memo.requester }}</span>
+              </div>
+              <div class="grid-item">
+                <Layers class="grid-icon" />
+                <span class="grid-text">{{ memo.requesterDepartment }} → {{ memo.targetDepartment }}</span>
+              </div>
+              <div class="grid-item full-width">
+                <Calendar class="grid-icon" />
+                <span class="grid-text">{{ formatDate(memo.createdAt) }}</span>
               </div>
             </div>
 
+            <div class="card-footer-separator-new"></div>
 
-            <!-- Card Footer: Progress & Actions -->
-            <div class="memo-card-footer">
-              <div class="footer-bottom-row">
-                <div class="progress-container" v-if="memo.status !== 'Draft'">
-                  <div class="progress-bar-wrapper">
-                    <div class="progress-bar-fill" :class="getStatusColor(memo.status)"
-                      :style="{ width: getApprovalProgress(memo) + '%' }"></div>
-                  </div>
-                  <span class="progress-label">{{ getProgressLabel(memo) }}</span>
+            <!-- Card Footer: Progress Label + Actions (Right Aligned) -->
+            <div class="memo-card-footer-new">
+              <div class="progress-row-new">
+                <div class="progress-label-wrap">
+                  <span class="progress-label-new">{{ getProgressLabel(memo) }}</span>
                 </div>
-                <div v-else class="draft-indicator">
-                  <FileText class="icon-tiny text-slate-400" />
-                  <span>Not Submitted</span>
-                </div>
-
-                <div class="card-actions-mini">
+                
+                <div class="card-actions-mini-new">
                   <button class="mini-action-btn view" @click.stop="openViewModal(memo, false)" title="View Details">
                     <Eye class="icon-tiny" />
                   </button>
@@ -802,22 +788,24 @@ const getHistoryDotColor = (action) => {
                 </div>
               </div>
 
-              <!-- Separator and External Info (Only if data exists) -->
-              <template v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem">
-                <div class="card-footer-separator"></div>
-                <div class="footer-external-area">
-                  <div class="footer-external-row-vertical">
-                    <div class="external-system-name-row">
-                      {{ memo.externalSystem || 'External System' }}
-                    </div>
-                    <div class="external-status-ref-row">
-                      <span class="ext-status">{{ memo.externalStatus || 'Unknown' }}</span>
-                      <span class="ext-sep">:</span>
-                      <span class="ext-ref">{{ memo.externalReceiptNumber || '-' }}</span>
-                    </div>
+              <!-- Progress Bar -->
+              <div class="progress-bar-container-new" v-if="memo.status !== 'Draft'">
+                <div class="progress-bar-wrapper-new">
+                  <div class="progress-bar-fill-new" :style="{ width: getApprovalProgress(memo) + '%' }"></div>
+                </div>
+              </div>
+
+              <!-- Finance Well (Light Blue Box) -->
+              <div v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem" class="finance-well">
+                <div class="finance-well-content">
+                  <div class="finance-system-name">{{ memo.externalSystem || 'External System' }}</div>
+                  <div class="finance-status-ref">
+                    <span class="finance-status">{{ memo.externalStatus || 'Sent' }}</span>
+                    <span class="finance-sep">:</span>
+                    <span class="finance-ref">{{ memo.externalReceiptNumber }}</span>
                   </div>
                 </div>
-              </template>
+              </div>
             </div>
 
             <!-- Selection Overlay (Quick Actions on Click) -->
@@ -1812,170 +1800,71 @@ const getHistoryDotColor = (action) => {
   perspective: 1000px;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   STATUS-FIRST REDESIGN STYLES
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Status Colors & Tokens */
+:root {
+  --status-approved-primary: #10b981;
+  --status-approved-ghost: rgba(16, 185, 129, 0.08);
+  --status-pending-primary: #f59e0b;
+  --status-pending-ghost: rgba(245, 158, 11, 0.08);
+  --status-draft-primary: #64748b;
+  --status-draft-ghost: rgba(100, 116, 139, 0.08);
+  --status-requested-changes-primary: #f97316;
+  --status-requested-changes-ghost: rgba(249, 115, 22, 0.08);
+  --status-rejected-primary: #dc2626;
+  --status-rejected-ghost: rgba(220, 38, 38, 0.08);
+}
+
 .memo-card {
   background: white;
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   border: 1px solid #e2e8f0;
-  padding: 1.5rem;
-  position: relative;
+  padding: 1.25rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
   height: 100%;
 }
 
 .memo-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #3b82f6;
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
 }
 
 .memo-card.active {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1), var(--shadow-md);
+  background-color: #f8fafc;
 }
 
-.card-footer-separator {
-  height: 1px;
-  background: #f1f5f9;
-  margin: 0.5rem 0;
-}
-
-.footer-external-area {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.footer-external-row-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0;
-}
-
-.external-system-name-row {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.external-status-ref-row {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.ext-status {
-  color: #2563eb; /* Higher contrast blue */
-}
-
-.ext-sep {
-  color: #94a3b8;
-}
-
-.ext-ref {
-  color: #1e293b;
-  font-family: monospace;
-}
-
-.footer-external-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.external-system-info-group {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  flex: 1;
-}
-
-.external-system-name {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-  margin-right: 0.4rem;
-}
-
-.external-receipt-code {
-  font-family: monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #2563eb; /* Higher contrast blue */
-  background: #eff6ff;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid #dbeafe;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.external-status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px;
-  border-radius: 99px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.external-status-badge.status-process {
-  background-color: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
-}
-
-.external-status-badge.status-closed {
-  background-color: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
-}
-
-/* Card Header */
-.memo-card-header {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.memo-card-header-top {
+/* Header Redesign */
+.memo-card-header-new {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
 }
 
-.memo-card-title-group {
-  flex: 1;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   min-width: 0;
-  /* Important for text truncation inside flexbox */
 }
 
-.memo-card-title {
-  font-size: 1.1rem;
+.memo-card-title-new {
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--text-main);
+  color: #0f172a;
+  margin: 0;
   line-height: 1.3;
-  margin-bottom: 0.35rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -1983,126 +1872,189 @@ const getHistoryDotColor = (action) => {
   overflow: hidden;
 }
 
-.memo-card-number {
-  font-size: 0.8rem;
+.memo-card-number-new {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--text-muted);
-  font-family: monospace;
+  color: #64748b;
 }
 
-.header-right-group {
-  display: flex;
-  align-items: center;
+.header-right {
   flex-shrink: 0;
-  margin-left: 0.75rem;
-  margin-right: 0.25rem;
 }
 
-.reminded-tag {
+.status-icon-ghost {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fdf2f8;
-  color: #db2777;
-  padding: 0 0.5rem;
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid #fbcfe8;
   transition: all 0.2s;
-  gap: 0.35rem;
-  margin-right: 0.25rem;
 }
 
-.tag-text {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.025em;
+.status-icon-large {
+  width: 22px;
+  height: 22px;
 }
 
-@media (max-width: 640px) {
-  .header-right-group {
-    margin-left: 0.5rem;
-    margin-right: 0;
-  }
+/* Status Variations */
+.status-approved .status-icon-ghost { background: var(--status-approved-ghost); color: var(--status-approved-primary); }
+.status-approved .progress-bar-fill-new { background: var(--status-approved-primary); }
 
-  .reminded-tag {
-    width: auto;
-    padding: 0 0.5rem;
-    height: 28px;
-    border-radius: 6px;
-  }
+.status-pending .status-icon-ghost { background: var(--status-pending-ghost); color: var(--status-pending-primary); }
+.status-pending .progress-bar-fill-new { background: var(--status-pending-primary); }
+
+.status-draft .status-icon-ghost { background: var(--status-draft-ghost); color: var(--status-draft-primary); }
+.status-draft .progress-bar-fill-new { background: var(--status-draft-primary); }
+
+.status-requested-changes .status-icon-ghost { background: var(--status-requested-changes-ghost); color: var(--status-requested-changes-primary); }
+.status-requested-changes .progress-bar-fill-new { background: var(--status-requested-changes-primary); }
+
+.status-rejected .status-icon-ghost { background: var(--status-rejected-ghost); color: var(--status-rejected-primary); }
+.status-rejected .progress-bar-fill-new { background: var(--status-rejected-primary); }
+
+/* Body Grid System */
+.memo-card-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
-.responsive-tag {
+.grid-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.grid-item.full-width {
+  grid-column: span 2;
+  padding-top: 0.25rem;
+}
+
+.grid-icon {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
   flex-shrink: 0;
 }
 
-/* Premium Status Badge */
-.status-badge-premium {
+.grid-text {
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Footer & Progress */
+.card-footer-separator-new {
+  height: 1px;
+  background: linear-gradient(to right, #e2e8f0, #f1f5f9, #e2e8f0);
+}
+
+.memo-card-footer-new {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.progress-row-new {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  padding: 0 0.6rem;
-  min-width: 28px;
-  height: 28px;
-  border-radius: 8px;
+}
+
+.progress-label-new {
   font-size: 0.75rem;
   font-weight: 700;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  white-space: nowrap;
-  flex-shrink: 0;
-  gap: 0.35rem;
-  margin-left: 0.25rem;
 }
 
-.badge-text {
-  font-size: 0.7rem;
+.card-actions-mini-new {
+  display: flex;
+  gap: 0.5rem;
 }
 
-@media (max-width: 640px) {
-  .status-badge-premium {
-    width: auto;
-    padding: 0 0.6rem;
-    height: 28px;
-    border-radius: 6px;
-  }
-}
-
-.status-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.status-approved {
-  background: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #dcfce7;
-}
-
-.status-pending {
-  background: #fffbeb;
-  color: #d97706;
-  border: 1px solid #fef3c7;
-}
-
-.status-rejected {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fee2e2;
-}
-
-.status-requested-changes {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fee2e2;
-}
-
-/* Red for issues */
-.status-draft {
-  background: #f1f5f9;
-  color: #475569;
+.mini-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.mini-action-btn:hover {
+  background: #f8fafc;
+  color: #3b82f6;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.progress-bar-container-new {
+  width: 100%;
+}
+
+.progress-bar-wrapper-new {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill-new {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Finance Well */
+.finance-well {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.finance-system-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.finance-status-ref {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.finance-status {
+  color: #2563eb;
+}
+
+.finance-sep {
+  color: #93c5fd;
+}
+
+.finance-ref {
+  color: #1e3a8a;
+  font-family: monospace;
 }
 
 /* Card Body */
@@ -2167,117 +2119,6 @@ const getHistoryDotColor = (action) => {
 .flex-align-center {
   display: flex;
   align-items: center;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  min-width: 0;
-  /* Allow grid item to shrink below content size */
-}
-
-.detail-item span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.detail-icon {
-  width: 14px;
-  height: 14px;
-  color: #94a3b8;
-}
-
-/* Card Footer & Progress */
-.memo-card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed #e2e8f0;
-}
-
-.footer-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 40px; /* Force vertical alignment of action buttons across cards */
-}
-
-.progress-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.progress-bar-wrapper {
-  height: 6px;
-  background: #f1f5f9;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: #3b82f6;
-  border-radius: 999px;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.progress-bar-fill.status-approved {
-  background: #10b981;
-}
-
-.progress-bar-fill.status-rejected {
-  background: #ef4444;
-}
-
-.progress-bar-fill.status-requested-changes {
-  background: #f59e0b;
-}
-
-.progress-bar-fill.status-pending {
-  background: #3b82f6;
-}
-
-.progress-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.draft-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.card-actions-mini {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.mini-action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
 .mini-action-btn:hover {
