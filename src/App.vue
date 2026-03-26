@@ -235,7 +235,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   left: 0;
   top: 0;
   height: 100vh;
-  z-index: 100;
+  z-index: 1020; /* Higher than mobile header */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -434,7 +434,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     justify-content: space-between;
     padding: 0 var(--gutter);
     border-bottom: 1px solid #e2e8f0;
-    z-index: 90;
+    z-index: 1000; /* Ensure it stays above dashboard sections */
   }
 
   .mobile-logo {
@@ -455,7 +455,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     inset: 0;
     background: rgba(15, 23, 42, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 95;
+    z-index: 1010; /* Above mobile header but below sidebar */
   }
 
   .create-btn span {

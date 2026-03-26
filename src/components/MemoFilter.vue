@@ -179,7 +179,6 @@ onUnmounted(() => {
   margin-bottom: 1.5rem;
   border: 1px solid #f1f5f9;
   position: relative;
-  z-index: 100; /* Ensure filter bar stays above list items */
 }
 
 .filter-header {
