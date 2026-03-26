@@ -22,18 +22,53 @@ const templateListFull = [
   { name: 'Internal Memo Accounting & Finance', division: 'Accounting & Finance' },
   { name: 'LPJ Cash Advance diatas Rp. 10.000.000,-', division: 'Accounting & Finance' },
   { name: 'LPJ Cash Advance dibawah Rp. 2.500.000,-', division: 'Accounting & Finance' },
+  { name: 'LPJ Cash Advance Rp. 2.500.000,- s/d Rp. 10.000.000,-', division: 'Accounting & Finance' },
+  { name: 'Pembelian Karangan Bunga', division: 'Accounting & Finance' },
+  { name: 'Pengajuan Fee Agent', division: 'Accounting & Finance' },
+  { name: 'Pengajuan Kartu Kredit Corporate', division: 'Accounting & Finance' },
+  { name: 'Pengajuan Pembukaan Rekening Perusahaan', division: 'Accounting & Finance' },
+  { name: 'Pengajuan Sewa Kantor', division: 'Accounting & Finance' },
+  { name: 'Pertanggung Jawaban Perjalanan Dinas', division: 'Accounting & Finance' },
+  { name: 'Reimburse Entertain diatas Rp. 10.000.000,-', division: 'Accounting & Finance' },
+  { name: 'Reimburse Entertain dibawah Rp. 500.000,-', division: 'Accounting & Finance' },
+  { name: 'Reimburse Entertain Rp. 2.500.000,- s/d Rp. 10.000.000,-', division: 'Accounting & Finance' },
+  { name: 'Reimburse Entertain Rp. 500.000,- s/d Rp. 2.500.000,-', division: 'Accounting & Finance' },
+  { name: 'Sponsorship', division: 'Accounting & Finance' },
+  { name: 'Internal Memo', division: 'Claim' },
   { name: 'Penggunaan Asuransi', division: 'Employee Benefit' },
+  { name: 'Internal Memo General Affair', division: 'General Affair' },
   { name: 'Pembelian Barang', division: 'General Affair' },
   { name: 'Peminjaman Kendaraan', division: 'General Affair' },
+  { name: 'Peminjaman Perangkat', division: 'General Affair' },
+  { name: 'Penarikan kendaraan', division: 'General Affair' },
+  { name: 'Pengajuan Pulsa', division: 'General Affair' },
   { name: 'Internal Memo HRD', division: 'HRD' },
-  { name: 'Pengajuan Karyawan', division: 'HRD' },
+  { name: 'Pengajuan Karyawan Kontrak Khusus Trainee', division: 'HRD' },
+  { name: 'Pengajuan Karyawan Magang', division: 'HRD' },
+  { name: 'Pengajuan Mitra', division: 'HRD' },
+  { name: 'Pengajuan Mutasi Karyawan', division: 'HRD' },
+  { name: 'Pengajuan Perjalanan Dinas', division: 'HRD' },
+  { name: 'Pengajuan/Perpanjangan Karyawan Kontrak', division: 'HRD' },
+  { name: 'Pengajuan Traning/Peserta Training', division: 'HRD' },
+  { name: 'Pengangkatan/Pengajuan Karyawan (Diatas Staff)', division: 'HRD' },
+  { name: 'Pengangkatan/Pengajuan Karyawan (Staff)', division: 'HRD' },
   { name: 'Perjalanan Dinas', division: 'HRD' },
+  { name: 'Perpanjangan Masa Jabatan', division: 'HRD' },
   { name: 'Pembelian Hardware/Software', division: 'IT' },
+  { name: 'Pembelian Hardware/Software Diatas 4 Juta', division: 'IT' },
+  { name: 'Pengajuan/Perpanjangan Lisensi', division: 'IT' },
+  { name: 'Pengajuan/Perpanjangan Maintenance', division: 'IT' },
+  { name: 'Service Hardware/Software', division: 'IT' },
   { name: 'Internal Memo Legal', division: 'Legal' },
+  { name: 'Pengisian Dokumen Non PKS', division: 'Legal' },
+  { name: 'Pengisian Form Data Vendor', division: 'Legal' },
   { name: 'Permintaan NDA', division: 'Legal' },
-  { name: 'Permintaan PKS', division: 'Legal' },
+  { name: 'Permintaan PKS (Biasa)', division: 'Legal' },
+  { name: 'Permintaan PKS (Persetujuan Khusus)', division: 'Legal' },
+  { name: 'Review / Drafting PKS', division: 'Legal' },
   { name: 'Penggunaan Asuransi', division: 'Technical' },
   { name: 'Self Insurance', division: 'Technical' },
+  { name: 'Sponsorship', division: 'Technical' },
 ];
 
 const isSearchingInWizard = computed(() => wizardSearch.value.trim().length > 0);
@@ -93,7 +128,8 @@ const selectWizardTemplate = (item) => {
           </button>
           <div class="wizard-search-container">
             <Search class="search-icon" />
-            <input v-model="wizardSearch" type="text" placeholder="Search templates..." class="wizard-search-input" autofocus />
+            <input v-model="wizardSearch" type="text" placeholder="Search templates..." class="wizard-search-input"
+              autofocus />
           </div>
         </div>
         <button class="btn-close" @click="closeWizard">
@@ -102,7 +138,8 @@ const selectWizardTemplate = (item) => {
       </div>
       <div class="wizard-body">
         <div v-if="isSearchingInWizard" class="template-list">
-          <button v-for="tpl in wizardFilteredTemplates" :key="tpl.name" class="template-item" @click="selectWizardTemplate(tpl)">
+          <button v-for="tpl in wizardFilteredTemplates" :key="tpl.name" class="template-item"
+            @click="selectWizardTemplate(tpl)">
             <span class="font-semibold text-slate-800">{{ tpl.name }}</span>
             <span class="text-xs text-slate-500 ml-2">({{ tpl.division }})</span>
           </button>
@@ -123,7 +160,8 @@ const selectWizardTemplate = (item) => {
           </button>
         </div>
         <div v-else class="template-list">
-          <button v-for="tpl in wizardDivisionTemplates" :key="tpl.name" class="template-item" @click="selectWizardTemplate(tpl)">
+          <button v-for="tpl in wizardDivisionTemplates" :key="tpl.name" class="template-item"
+            @click="selectWizardTemplate(tpl)">
             <span class="font-semibold text-slate-800">{{ tpl.name }}</span>
           </button>
         </div>
@@ -203,7 +241,8 @@ const selectWizardTemplate = (item) => {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.btn-back, .btn-close {
+.btn-back,
+.btn-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -217,7 +256,8 @@ const selectWizardTemplate = (item) => {
   transition: all 0.2s;
 }
 
-.btn-back:hover, .btn-close:hover {
+.btn-back:hover,
+.btn-close:hover {
   background: #f1f5f9;
   color: #0f172a;
 }
@@ -226,6 +266,7 @@ const selectWizardTemplate = (item) => {
   border: none;
   background: transparent;
 }
+
 .btn-close:hover {
   background: #e2e8f0;
   color: #ef4444;
@@ -270,7 +311,7 @@ const selectWizardTemplate = (item) => {
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .division-icon {

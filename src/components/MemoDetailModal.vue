@@ -213,7 +213,7 @@ const selectTemplate = (item) => {
   localMemo.value.requesterDepartment = props.currentUser === 'Willy' ? 'Engineering' : 'Staff';
   localMemo.value.targetDepartment = targetDeptMap[item.division] || item.division;
 
-  if (item.name === 'Pengajuan Perjalanan Dinas') {
+  if (['Pengajuan Perjalanan Dinas', 'Perjalanan Dinas'].includes(item.name)) {
     if (localMemo.value.travStartDate === undefined) {
       localMemo.value.travStartDate = '';
       localMemo.value.travEndDate = '';
@@ -435,6 +435,17 @@ const getActions = (memo) => {
 
 const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${memo.memoNumber}`); };
 
+// Normalize date string to YYYY-MM-DD regardless of input format
+const normalizeTravelDate = (dateStr) => {
+  if (!dateStr) return '-';
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  // Convert DD-MM-YYYY → YYYY-MM-DD
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 2) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  return dateStr;
+};
+
 </script>
 
 <template>
@@ -466,7 +477,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
             <span v-if="!isCreateMode && localMemo" class="header-memo-number hide-on-mobile">{{ localMemo.memoNumber
-              }}</span>
+            }}</span>
           </div>
           <div class="modal-header-right">
             <div v-if="localMemo && localMemo.isReminded" class="reminded-tag mr-2"
@@ -608,7 +619,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                 <div class="detail-group-stacked">
                   <label>Requester</label>
                   <div v-if="isCreateMode" class="detail-value font-medium text-slate-400 italic">Self ({{ currentUser
-                    }})</div>
+                  }})</div>
                   <div v-else class="detail-value requester-info-row" style="display: flex; align-items: center;">
                     <User class="icon-tiny mr-1 text-slate-400" />
                     <span class="requester-name font-medium">{{ localMemo.requester }}</span>
@@ -688,17 +699,15 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 
                   <!-- Attachments Section -->
                   <div class="detail-group-stacked">
-                    <label>Attachment ({{ localMemo.attachmentsCount }})</label>
+                    <label>Attachment(s) ({{ (localMemo.uploadedFiles || []).length }})</label>
                     <div class="mt-2">
-                      <div v-if="localMemo.attachmentsCount > 0" class="attachments-grid">
-                        <div v-for="n in localMemo.attachmentsCount" :key="n" class="attachment-card"
-                          :class="{ 'is-edit': isEditMode }">
-                          <div class="attachment-icon-box">
-                            <FileText class="attachment-icon-large" />
-                          </div>
-                          <span class="attachment-name">Doc {{ n }}</span>
-                          <button v-if="isEditMode" class="btn-remove-attachment-abs" title="Remove"
-                            @click.prevent="localMemo.attachmentsCount--">
+                      <div v-if="(localMemo.uploadedFiles || []).length > 0" class="attachment-list">
+                        <div v-for="(file, idx) in (localMemo.uploadedFiles || [])" :key="idx"
+                          class="attachment-list-item">
+                          <FileText class="icon-small text-slate-400 flex-shrink-0" />
+                          <span class="attachment-list-name" :title="file">{{ file }}</span>
+                          <button v-if="isEditMode" class="btn-remove-attachment-inline" title="Remove"
+                            @click.prevent="localMemo.uploadedFiles.splice(idx, 1)">
                             <X class="icon-tiny" />
                           </button>
                         </div>
@@ -706,9 +715,40 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                       <div v-else class="detail-value text-muted italic">No attachments included.</div>
 
                       <div v-if="isEditMode" class="mt-3">
-                        <button class="btn-upload" @click.prevent="localMemo.attachmentsCount++">
+                        <input ref="fileInputRef" type="file" multiple style="display: none" @change="(e) => {
+                          if (!localMemo.uploadedFiles) localMemo.uploadedFiles = [];
+                          Array.from(e.target.files).forEach(f => localMemo.uploadedFiles.push(f.name));
+                          e.target.value = '';
+                        }" />
+                        <button class="btn-upload" @click.prevent="$refs.fileInputRef.click()">
                           <Plus class="icon-small" /> Add Document
                         </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Travel Period (conditional) -->
+                  <div v-if="['Pengajuan Perjalanan Dinas', 'Perjalanan Dinas'].includes(localMemo.categoryType)"
+                    class="detail-group-stacked">
+                    <label>Travel Period</label>
+                    <div class="travel-date-range">
+                      <div class="travel-date-card">
+                        <div class="travel-date-label">
+                          <Calendar class="icon-tiny mr-1" />
+                          Start Date
+                        </div>
+                        <input v-if="isEditMode" type="date" v-model="localMemo.travStartDate"
+                          class="form-input travel-date-input" />
+                        <div v-else class="travel-date-value">{{ normalizeTravelDate(localMemo.travStartDate) }}</div>
+                      </div>
+                      <div class="travel-date-arrow">→</div>
+                      <div class="travel-date-card">
+                        <div class="travel-date-label">
+                          <Calendar class="icon-tiny mr-1" />
+                          End Date
+                        </div>
+                        <input v-if="isEditMode" type="date" v-model="localMemo.travEndDate"
+                          class="form-input travel-date-input" />
+                        <div v-else class="travel-date-value">{{ normalizeTravelDate(localMemo.travEndDate) }}</div>
                       </div>
                     </div>
                   </div>
@@ -796,35 +836,6 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                 </div>
               </div>
 
-              <!-- Section 3.5: Travel Request Specific -->
-              <div v-if="localMemo.categoryType === 'Pengajuan Perjalanan Dinas'" class="detail-section">
-                <h3 class="section-group-title">Travel Period</h3>
-                <div class="detail-row">
-                  <div class="detail-group">
-                    <label>Start Date</label>
-                    <div v-if="isEditMode" class="date-input-group">
-                      <input type="text" v-model="localMemo.travStartDate" placeholder="YYYY-MM-DD"
-                        class="form-input" />
-                      <div class="date-picker-trigger">
-                        <Calendar class="icon-small" />
-                        <input type="date" v-model="localMemo.travStartDate" class="hidden-date-picker" />
-                      </div>
-                    </div>
-                    <div v-else class="detail-value font-medium">{{ localMemo.travStartDate || '-' }}</div>
-                  </div>
-                  <div class="detail-group">
-                    <label>End Date</label>
-                    <div v-if="isEditMode" class="date-input-group">
-                      <input type="text" v-model="localMemo.travEndDate" placeholder="YYYY-MM-DD" class="form-input" />
-                      <div class="date-picker-trigger">
-                        <Calendar class="icon-small" />
-                        <input type="date" v-model="localMemo.travEndDate" class="hidden-date-picker" />
-                      </div>
-                    </div>
-                    <div v-else class="detail-value font-medium">{{ localMemo.travEndDate || '-' }}</div>
-                  </div>
-                </div>
-              </div>
 
               <!-- Section 3.6: HR Request Specific -->
               <div v-if="isHrTemplate(localMemo.categoryType)" class="modal-sections-column hr-details-container">
@@ -1080,7 +1091,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                           <div class="timeline-header"
                             style="justify-content: flex-start; gap: 8px; align-items: center;">
                             <span class="timeline-action font-bold" :class="getHistoryColor(item.action)">{{ item.action
-                              }}</span>
+                            }}</span>
                             <span class="timeline-date" style="color: #64748b; font-size: 0.75rem;">{{
                               formatDate(item.at) }}</span>
                           </div>
@@ -1804,5 +1815,105 @@ button {
 .suggestion-division {
   font-size: 0.75rem;
   color: #64748b;
+}
+
+/* Attachment List */
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attachment-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #334155;
+}
+
+.attachment-list-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.btn-remove-attachment-inline {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s;
+}
+
+.btn-remove-attachment-inline:hover {
+  background: #fee2e2;
+}
+
+/* Travel Date Range */
+.travel-date-range {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.travel-date-card {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.travel-date-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 0.4rem;
+}
+
+.travel-date-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.travel-date-arrow {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .travel-date-range {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .travel-date-arrow {
+    transform: rotate(90deg);
+    align-self: center;
+  }
 }
 </style>
