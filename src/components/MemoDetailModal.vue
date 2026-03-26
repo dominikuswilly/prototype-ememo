@@ -1079,11 +1079,11 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                           <div v-if="idx < localMemo.history.length - 1" class="timeline-connector"></div>
                         </div>
                         <div class="timeline-content">
-                          <div class="timeline-header">
-                            <span class="timeline-action" :class="getHistoryColor(item.action)">{{ item.action }}</span>
-                            <span class="timeline-date">{{ formatDate(item.at) }}</span>
+                          <div class="timeline-header" style="justify-content: flex-start; gap: 8px; align-items: center;">
+                            <span class="timeline-action font-bold" :class="getHistoryColor(item.action)">{{ item.action }}</span>
+                            <span class="timeline-date" style="color: #64748b; font-size: 0.75rem;">{{ formatDate(item.at) }}</span>
                           </div>
-                          <div class="timeline-user">
+                          <div class="timeline-user mt-1">
                             <span class="font-semibold text-slate-800">{{ item.user }}</span>
                             <span v-if="item.user === currentUser"
                               class="text-xs italic text-slate-400 ml-1">(you)</span>
