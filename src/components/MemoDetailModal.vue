@@ -71,6 +71,13 @@ watch(() => props.memo, (newMemo) => {
     isEditMode.value = props.isEdit;
     isCreateMode.value = props.isCreate;
     isConfirming.value = false;
+
+    // Auto-populate Purposing of Memo
+    if (newMemo.categoryType) {
+      templateSearch.value = newMemo.categoryType;
+    } else {
+      templateSearch.value = '';
+    }
   }
 }, { immediate: true });
 
@@ -438,18 +445,28 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
         <div class="modal-header">
           <div class="modal-header-left">
             <button v-if="isConfirming" class="btn-back mr-2" @click="cancelConfirmation">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
             </button>
             <button v-else-if="isCreateMode" class="btn-back mr-2" @click="goBackToWizard">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
             </button>
             <button v-else class="btn-back mr-2 mobile-back-btn" @click="closeViewModal">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
             </button>
             <h2 v-if="isConfirming">Review Submission</h2>
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
-            <span v-if="!isCreateMode && localMemo" class="header-memo-number hide-on-mobile">{{ localMemo.memoNumber }}</span>
+            <span v-if="!isCreateMode && localMemo" class="header-memo-number hide-on-mobile">{{ localMemo.memoNumber
+              }}</span>
           </div>
           <div class="modal-header-right">
             <div v-if="localMemo && localMemo.isReminded" class="reminded-tag mr-2"
@@ -580,8 +597,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
               </div>
               <div class="detail-group mt-3">
                 <label>{{ localMemo.status === 'Rejected' ? 'Reason for Rejection' : 'Request Details' }}</label>
-                <div class="detail-value"
-                  :class="localMemo.status === 'Rejected' ? 'text-red-900' : 'text-amber-900'">
+                <div class="detail-value" :class="localMemo.status === 'Rejected' ? 'text-red-900' : 'text-amber-900'">
                   {{ localMemo.rejectionReason }}
                 </div>
               </div>
@@ -591,7 +607,8 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
               <div style="display: flex; flex-direction: column; gap: 1.25rem;">
                 <div class="detail-group-stacked">
                   <label>Requester</label>
-                  <div v-if="isCreateMode" class="detail-value font-medium text-slate-400 italic">Self ({{ currentUser }})</div>
+                  <div v-if="isCreateMode" class="detail-value font-medium text-slate-400 italic">Self ({{ currentUser
+                    }})</div>
                   <div v-else class="detail-value requester-info-row" style="display: flex; align-items: center;">
                     <User class="icon-tiny mr-1 text-slate-400" />
                     <span class="requester-name font-medium">{{ localMemo.requester }}</span>
@@ -618,35 +635,16 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 
                 <div class="detail-group-stacked">
                   <label>Purposing of Memo</label>
-                  <div v-if="isCreateMode" class="autocomplete-wrapper">
-                    <input ref="templateInputRef" type="text" class="form-input"
-                      placeholder="Search template by name or division..." v-model="templateSearch"
-                      @focus="handleTemplateFocus" @blur="handleTemplateBlur" @input="handleTemplateInput"
-                      autocomplete="off" />
-                    <Teleport to="body">
-                      <div v-if="showSuggestions" class="suggestions-dropdown-teleport" :style="dropdownStyle">
-                        <template v-if="filteredTemplates.length > 0">
-                          <div v-for="(item, idx) in filteredTemplates" :key="idx" class="suggestion-item"
-                            @mousedown.prevent="selectTemplate(item)">
-                            <span class="suggestion-name">{{ item.name }}</span>
-                            <span class="suggestion-division">{{ item.division }}</span>
-                          </div>
-                        </template>
-                        <div v-else class="suggestion-empty">No templates found</div>
-                      </div>
-                    </Teleport>
-                  </div>
-                  <div v-else class="detail-value">
+                  <div class="detail-value">
                     <div class="font-semibold">{{ localMemo.categoryType || '-' }}</div>
-                    <div v-if="localMemo.category" class="template-division-badge mt-1 inline-block">{{ localMemo.category }}</div>
                   </div>
                 </div>
 
                 <div v-if="!isCreateMode" class="detail-group-stacked">
                   <label>Status</label>
                   <div class="detail-value flex-align-center" style="display: flex; align-items: center;">
-                    <div :class="['status-badge-premium', getStatusColor(localMemo.status)]"
-                      :title="localMemo.status" style="width: max-content;">
+                    <div :class="['status-badge-premium', getStatusColor(localMemo.status)]" :title="localMemo.status"
+                      style="width: max-content;">
                       <component :is="getStatusIcon(localMemo.status)" class="status-icon" />
                       <span class="badge-text" style="margin-left: 4px;">{{ localMemo.status }}</span>
                     </div>
@@ -665,14 +663,15 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                     <label>Title</label>
                     <div class="field-with-marker-wrapper">
                       <input v-if="isEditMode" type="text" v-model="localMemo.title" class="form-input" />
-                      <div v-if="isEditMode && localMemo.markerDescriptions?.['Title']" class="marker-description-alert">
+                      <div v-if="isEditMode && localMemo.markerDescriptions?.['Title']"
+                        class="marker-description-alert">
                         <AlertCircle class="icon-tiny" />
                         <span class="marker-text">{{ localMemo.markerDescriptions['Title'] }}</span>
                       </div>
                     </div>
                     <div v-if="!isEditMode" class="detail-value font-semibold text-lg">{{ localMemo.title }}</div>
                   </div>
-                  
+
                   <div class="detail-group-stacked">
                     <label>Description</label>
                     <div class="field-with-marker-wrapper">
@@ -686,7 +685,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                     </div>
                     <div v-if="!isEditMode" class="detail-value leading-relaxed">{{ localMemo.description }}</div>
                   </div>
-                  
+
                   <!-- Attachments Section -->
                   <div class="detail-group-stacked">
                     <label>Attachment ({{ localMemo.attachmentsCount }})</label>
@@ -816,8 +815,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                   <div class="detail-group">
                     <label>End Date</label>
                     <div v-if="isEditMode" class="date-input-group">
-                      <input type="text" v-model="localMemo.travEndDate" placeholder="YYYY-MM-DD"
-                        class="form-input" />
+                      <input type="text" v-model="localMemo.travEndDate" placeholder="YYYY-MM-DD" class="form-input" />
                       <div class="date-picker-trigger">
                         <Calendar class="icon-small" />
                         <input type="date" v-model="localMemo.travEndDate" class="hidden-date-picker" />
@@ -1079,9 +1077,12 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                           <div v-if="idx < localMemo.history.length - 1" class="timeline-connector"></div>
                         </div>
                         <div class="timeline-content">
-                          <div class="timeline-header" style="justify-content: flex-start; gap: 8px; align-items: center;">
-                            <span class="timeline-action font-bold" :class="getHistoryColor(item.action)">{{ item.action }}</span>
-                            <span class="timeline-date" style="color: #64748b; font-size: 0.75rem;">{{ formatDate(item.at) }}</span>
+                          <div class="timeline-header"
+                            style="justify-content: flex-start; gap: 8px; align-items: center;">
+                            <span class="timeline-action font-bold" :class="getHistoryColor(item.action)">{{ item.action
+                              }}</span>
+                            <span class="timeline-date" style="color: #64748b; font-size: 0.75rem;">{{
+                              formatDate(item.at) }}</span>
                           </div>
                           <div class="timeline-user mt-1">
                             <span class="font-semibold text-slate-800">{{ item.user }}</span>
@@ -1112,9 +1113,12 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                   <div class="detail-group">
                     <label>Current Status</label>
                     <div class="detail-value">
-                      <div :class="['external-status-indicator', localMemo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
-                        <component :is="localMemo.externalStatus.toLowerCase() === 'sent' ? CheckCircle : Clock" class="icon-tiny mr-1" />
-                        <span>{{ localMemo.externalStatus }}<span v-if="localMemo.externalReceiptNumber"> ({{ localMemo.externalReceiptNumber }})</span></span>
+                      <div
+                        :class="['external-status-indicator', localMemo.externalStatus.toLowerCase() === 'sent' ? 'status-closed' : 'status-process']">
+                        <component :is="localMemo.externalStatus.toLowerCase() === 'sent' ? CheckCircle : Clock"
+                          class="icon-tiny mr-1" />
+                        <span>{{ localMemo.externalStatus }}<span v-if="localMemo.externalReceiptNumber"> ({{
+                          localMemo.externalReceiptNumber }})</span></span>
                       </div>
                     </div>
                   </div>
@@ -1252,6 +1256,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   .modal-overlay {
     padding: 0;
   }
+
   .modal-content {
     max-width: 100% !important;
     height: 100% !important;
@@ -1302,7 +1307,8 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 }
 
 /* Buttons */
-.btn-back, .btn-close {
+.btn-back,
+.btn-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1340,12 +1346,22 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   color: #0f172a;
 }
 
-.mobile-back-btn { display: none !important; }
+.mobile-back-btn {
+  display: none !important;
+}
 
 @media (max-width: 1024px) {
-  .mobile-back-btn { display: flex !important; }
-  .desktop-close-btn { display: none !important; }
-  .hide-on-mobile { display: none !important; }
+  .mobile-back-btn {
+    display: flex !important;
+  }
+
+  .desktop-close-btn {
+    display: none !important;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
 }
 
 /* Modal Body & Sections */
@@ -1426,7 +1442,9 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 }
 
 /* Forms */
-.form-input, .form-textarea, .form-select {
+.form-input,
+.form-textarea,
+.form-select {
   width: 100%;
   padding: 0.5rem 0.75rem;
   border: 1px solid #cbd5e1;
@@ -1437,7 +1455,9 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-input:focus, .form-textarea:focus, .form-select:focus {
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
@@ -1556,11 +1576,30 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   text-transform: uppercase;
 }
 
-.approved { background: #ecfdf5; color: #10b981; }
-.pending { background: #fffbeb; color: #f59e0b; }
-.rejected { background: #fef2f2; color: #ef4444; }
-.requested-changes { background: #fff7ed; color: #f97316; }
-.draft { background: #f8fafc; color: #64748b; }
+.approved {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.pending {
+  background: #fffbeb;
+  color: #f59e0b;
+}
+
+.rejected {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.requested-changes {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.draft {
+  background: #f8fafc;
+  color: #64748b;
+}
 
 .modal-section-actions {
   margin-top: auto;
@@ -1585,12 +1624,41 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   gap: 1rem;
 }
 
-.btn-success { background: #10b981; color: white; border: none; }
-.btn-danger { background: #ef4444; color: white; border: none; }
-.btn-warning { background: #f59e0b; color: white; border: none; }
-.btn-primary { background: #3b82f6; color: white; border: none; }
-.btn-secondary { background: white; border: 1px solid #e2e8f0; color: #64748b; }
-.btn-draft { background: white; border: 1px solid #cbd5e1; color: #475569; }
+.btn-success {
+  background: #10b981;
+  color: white;
+  border: none;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.btn-warning {
+  background: #f59e0b;
+  color: white;
+  border: none;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.btn-secondary {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.btn-draft {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
 
 button {
   padding: 0.6rem 1.2rem;
@@ -1603,19 +1671,50 @@ button {
   justify-content: center;
 }
 
-.ml-3 { margin-left: 0.75rem; }
-.ml-auto { margin-left: auto; }
-.mr-2 { margin-right: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-3 { margin-top: 0.75rem; }
-.text-blue-600 { color: #2563eb; }
-.font-bold { font-weight: 700; }
+.ml-3 {
+  margin-left: 0.75rem;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.font-bold {
+  font-weight: 700;
+}
 
 @media (max-width: 640px) {
-  .detail-group { grid-template-columns: 1fr; }
-  .detail-row { grid-template-columns: 1fr; }
-  .modal-actions-group { flex-direction: column; }
-  .modal-actions-group button { width: 100%; }
+  .detail-group {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions-group {
+    flex-direction: column;
+  }
+
+  .modal-actions-group button {
+    width: 100%;
+  }
 }
 
 /* History */
@@ -1623,27 +1722,32 @@ button {
   display: flex;
   gap: 1rem;
 }
+
 .timeline-visual {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 16px;
 }
+
 .timeline-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   margin-top: 0.4rem;
 }
+
 .timeline-connector {
   flex: 1;
   width: 2px;
   background: #f1f5f9;
 }
+
 .timeline-content {
   flex: 1;
   padding-bottom: 1.25rem;
 }
+
 .timeline-header {
   display: flex;
   justify-content: space-between;
@@ -1663,8 +1767,11 @@ button {
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
+
 @media (max-width: 768px) {
-  .salary-grid { grid-template-columns: 1fr; }
+  .salary-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Autocomplete Suggestions */
@@ -1677,13 +1784,25 @@ button {
   overflow-y: auto;
   max-height: 240px;
 }
+
 .suggestion-item {
   padding: 0.6rem 1rem;
   cursor: pointer;
   display: flex;
   flex-direction: column;
 }
-.suggestion-item:hover { background: #f8fafc; }
-.suggestion-name { font-weight: 600; color: #1e293b; }
-.suggestion-division { font-size: 0.75rem; color: #64748b; }
+
+.suggestion-item:hover {
+  background: #f8fafc;
+}
+
+.suggestion-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.suggestion-division {
+  font-size: 0.75rem;
+  color: #64748b;
+}
 </style>

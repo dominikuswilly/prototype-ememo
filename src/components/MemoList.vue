@@ -173,7 +173,16 @@ const goBackToWizard = () => { isModalOpen.value = false; isWizardOpen.value = t
 
 const selectWizardTemplate = (item) => {
     isWizardOpen.value = false;
-    selectedMemo.value = { title: '', description: '', category: item.division, categoryType: item.name, status: 'Draft', approvalChain: [] };
+    selectedMemo.value = { 
+      title: '', 
+      description: '', 
+      category: item.division, 
+      categoryType: item.name, 
+      status: 'Draft', 
+      approvalChain: [],
+      requesterDepartment: 'IT',
+      targetDepartment: item.division
+    };
     isEditMode.value = true; isCreateMode.value = true; isModalOpen.value = true;
 };
 
