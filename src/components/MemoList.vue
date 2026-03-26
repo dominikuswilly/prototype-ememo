@@ -5,6 +5,7 @@ import {
   CheckCircle, Clock, AlertCircle, FileEdit, Hash, User, Layout, Layers, Check, XCircle, Zap, ExternalLink
 } from 'lucide-vue-next';
 import MemoDetailModal from './MemoDetailModal.vue';
+import MemoWizard from './MemoWizard.vue';
 
 const props = defineProps({
   memos: { type: Array, required: true },
@@ -22,9 +23,6 @@ const selectedRow = ref(null);
 
 // Wizard State
 const isWizardOpen = ref(false);
-const wizardStep = ref(1);
-const wizardDivision = ref('');
-const wizardSearch = ref('');
 
 // Pagination State
 const currentPage = ref(1);
@@ -167,60 +165,12 @@ const openViewModal = (memo, edit = false) => {
 
 const openCreateModal = () => {
     isWizardOpen.value = true;
-    wizardStep.value = 1;
 };
 
 const closeWizard = () => isWizardOpen.value = false;
 const onMemoSave = (memoData) => { emit('update-memo', memoData); isModalOpen.value = false; };
 const goBackToWizard = () => { isModalOpen.value = false; isWizardOpen.value = true; };
 
-// Template Data
-const templateListFull = [
-  { name: 'Cash Advance', division: 'Accounting & Finance' },
-  { name: 'Housing Loan', division: 'Accounting & Finance' },
-  { name: 'Internal Memo Accounting & Finance', division: 'Accounting & Finance' },
-  { name: 'LPJ Cash Advance diatas Rp. 10.000.000,-', division: 'Accounting & Finance' },
-  { name: 'LPJ Cash Advance dibawah Rp. 2.500.000,-', division: 'Accounting & Finance' },
-  { name: 'Penggunaan Asuransi', division: 'Employee Benefit' },
-  { name: 'Pembelian Barang', division: 'General Affair' },
-  { name: 'Peminjaman Kendaraan', division: 'General Affair' },
-  { name: 'Internal Memo HRD', division: 'HRD' },
-  { name: 'Pengajuan Karyawan', division: 'HRD' },
-  { name: 'Perjalanan Dinas', division: 'HRD' },
-  { name: 'Pembelian Hardware/Software', division: 'IT' },
-  { name: 'Internal Memo Legal', division: 'Legal' },
-  { name: 'Permintaan NDA', division: 'Legal' },
-  { name: 'Permintaan PKS', division: 'Legal' },
-  { name: 'Penggunaan Asuransi', division: 'Technical' },
-  { name: 'Self Insurance', division: 'Technical' },
-];
-
-const isSearchingInWizard = computed(() => wizardSearch.value.trim().length > 0);
-const wizardFilteredTemplates = computed(() => {
-    const q = wizardSearch.value.trim().toLowerCase();
-    if (!q) return [];
-    return templateListFull.filter(t => t.name.toLowerCase().includes(q) || t.division.toLowerCase().includes(q));
-});
-
-const divisionMeta = {
-  'Accounting & Finance': { color: '#2563eb', bg: '#eff6ff', borderColor: '#bfdbfe', component: DollarSign },
-  'Claim': { color: '#7c3aed', bg: '#f5f3ff', borderColor: '#ddd6fe', component: FileText },
-  'Employee Benefit': { color: '#059669', bg: '#ecfdf5', borderColor: '#a7f3d0', component: Shield },
-  'General Affair': { color: '#d97706', bg: '#fffbeb', borderColor: '#fde68a', component: Building2 },
-  'HRD': { color: '#db2777', bg: '#fdf2f8', borderColor: '#fbcfe8', component: Users },
-  'IT': { color: '#0891b2', bg: '#ecfeff', borderColor: '#a5f3fc', component: Monitor },
-  'Legal': { color: '#475569', bg: '#f8fafc', borderColor: '#cbd5e1', component: Briefcase },
-  'Technical': { color: '#dc2626', bg: '#fef2f2', borderColor: '#fecaca', component: Wrench },
-};
-
-const divisions = computed(() => {
-  const map = {};
-  templateListFull.forEach(t => { map[t.division] = (map[t.division] || 0) + 1; });
-  return Object.entries(map).map(([name, count]) => ({ name, count, ...divisionMeta[name] }));
-});
-
-const selectWizardDivision = (division) => { wizardDivision.value = division; wizardStep.value = 2; };
-const wizardDivisionTemplates = computed(() => templateListFull.filter(t => t.division === wizardDivision.value));
 const selectWizardTemplate = (item) => {
     isWizardOpen.value = false;
     selectedMemo.value = { title: '', description: '', category: item.division, categoryType: item.name, status: 'Draft', approvalChain: [] };
@@ -346,40 +296,11 @@ defineExpose({ openCreateModal });
     </div>
 
     <!-- Wizard -->
-    <div v-if="isWizardOpen" class="modal-overlay" @click.self="closeWizard">
-      <div class="wizard-modal">
-        <div class="wizard-header">
-          <div class="wizard-header-left">
-            <button v-if="wizardStep === 2 && !isSearchingInWizard" class="btn-back" @click="wizardStep = 1"><ArrowLeft class="icon" /></button>
-            <div class="wizard-search-container">
-              <Search class="search-icon" />
-              <input v-model="wizardSearch" type="text" placeholder="Search templates..." class="wizard-search-input" autofocus />
-            </div>
-          </div>
-          <button class="btn-close" @click="closeWizard"><X class="icon" /></button>
-        </div>
-        <div class="wizard-body">
-          <div v-if="isSearchingInWizard" class="template-list">
-            <button v-for="tpl in wizardFilteredTemplates" :key="tpl.name" class="template-item" @click="selectWizardTemplate(tpl)">
-                {{ tpl.name }} ({{ tpl.division }})
-            </button>
-          </div>
-          <div v-else-if="wizardStep === 1" class="division-grid">
-            <button v-for="div in divisions" :key="div.name" class="division-card" @click="selectWizardDivision(div.name)"
-                :style="{ '--div-color': div.color, '--div-bg': div.bg, '--div-border': div.borderColor }">
-              <div class="division-icon-wrap"><component :is="div.component" class="division-icon" /></div>
-              <div class="division-info">
-                <div class="division-name">{{ div.name }}</div>
-                <div class="division-count">{{ div.count }} items</div>
-              </div>
-            </button>
-          </div>
-          <div v-else class="template-list">
-            <button v-for="tpl in wizardDivisionTemplates" :key="tpl.name" class="template-item" @click="selectWizardTemplate(tpl)">{{ tpl.name }}</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <MemoWizard 
+      :isOpen="isWizardOpen"
+      @close="closeWizard"
+      @select-template="selectWizardTemplate"
+    />
 
     <MemoDetailModal
       v-model="isModalOpen"
@@ -485,23 +406,6 @@ defineExpose({ openCreateModal });
 .overlay-main-btn.remind { background: #10b981; color: white; }
 .overlay-main-btn.delete { background: #ef4444; color: white; }
 .overlay-close { position: absolute; top: 0.75rem; right: 0.75rem; border: none; background: none; cursor: pointer; color: #475569; z-index: 30; }
-
-/* Wizard */
-.wizard-modal {
-  background: white; border-radius: 16px; width: 100%; max-width: 500px; max-height: 80vh;
-  display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-.wizard-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
-.wizard-header-left { display: flex; align-items: center; gap: 1rem; flex: 1; }
-.wizard-search-input { flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 8px; }
-.wizard-body { padding: 1.5rem; overflow-y: auto; }
-.division-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-.division-card {
-  padding: 1rem; border-radius: 12px; border: 2px solid var(--div-border);
-  background: var(--div-bg); color: var(--div-color); text-align: left; cursor: pointer;
-}
-.template-list { display: flex; flex-direction: column; gap: 0.5rem; }
-.template-item { padding: 0.75rem 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; text-align: left; cursor: pointer; }
 
 /* Pagination */
 .pagination-bar { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-top: 1px solid #e2e8f0; }
