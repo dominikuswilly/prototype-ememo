@@ -186,10 +186,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 0; /* Remove horizontal padding to align with gutter */
   cursor: pointer;
-  background: #f8fafc;
-  transition: background 0.2s;
+  background: transparent; /* Seamless integration */
+  transition: opacity 0.2s;
 }
 
 .filter-header:hover {
@@ -251,7 +251,7 @@ onUnmounted(() => {
   flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
-  padding: 1rem 0rem;
+  padding: 1rem 0; /* Remove horizontal padding */
 }
 
 .filter-group {
@@ -495,11 +495,32 @@ onUnmounted(() => {
   .filter-container {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
+    gap: 0.75rem; /* Tighter gap on mobile */
+    padding: 0.75rem 0;
   }
 
   .filter-group {
     width: 100%;
+  }
+
+  .date-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .date-separator {
+    display: none; /* Hide 'to' when stacked */
+  }
+
+  .date-picker-wrapper {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 0.85rem;
   }
 }
 </style>

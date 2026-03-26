@@ -483,7 +483,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     position: sticky;
     top: 115px;
     background-color: white;
-    padding: 1rem var(--gutter);
+    padding: 0.5rem var(--gutter);
     z-index: 100;
     border-bottom: 1px solid #f1f5f9;
   }
@@ -491,7 +491,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   .header-main-row {
     position: static;
     background-color: white;
-    padding: 1rem var(--gutter);
+    padding: 0.5rem var(--gutter);
     margin-bottom: 0;
     border-bottom: none;
   }
