@@ -53,7 +53,6 @@ onUnmounted(() => window.removeEventListener('resize', checkMobile));
 const loadMore = () => { if (currentPage.value < totalPages.value) currentPage.value++; };
 
 const handleRowClick = (memo) => {
-  if (isMobile.value) return;
   selectedRow.value = (selectedRow.value && selectedRow.value.id === memo.id) ? null : memo;
 };
 
