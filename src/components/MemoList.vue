@@ -1822,6 +1822,7 @@ const getHistoryDotColor = (action) => {
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
+  border-left: 4px solid #e2e8f0; /* Default neutral left border */
   padding: 1.25rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -1899,20 +1900,50 @@ const getHistoryDotColor = (action) => {
 }
 
 /* Status Variations */
+.status-approved { 
+  border-left-color: var(--status-approved-primary);
+  border-color: rgba(16, 185, 129, 0.2);
+  background-color: rgba(16, 185, 129, 0.02);
+}
 .status-approved .status-icon-ghost { background: var(--status-approved-ghost); color: var(--status-approved-primary); }
 .status-approved .progress-bar-fill-new { background: var(--status-approved-primary); }
+.status-approved .progress-label-new { color: var(--status-approved-primary); }
 
+.status-pending {
+  border-left-color: var(--status-pending-primary);
+  border-color: rgba(245, 158, 11, 0.2);
+  background-color: rgba(245, 158, 11, 0.02);
+}
 .status-pending .status-icon-ghost { background: var(--status-pending-ghost); color: var(--status-pending-primary); }
 .status-pending .progress-bar-fill-new { background: var(--status-pending-primary); }
+.status-pending .progress-label-new { color: var(--status-pending-primary); }
 
+.status-draft {
+  border-left-color: var(--status-draft-primary);
+  border-color: rgba(100, 116, 139, 0.2);
+  background-color: rgba(100, 116, 139, 0.02);
+}
 .status-draft .status-icon-ghost { background: var(--status-draft-ghost); color: var(--status-draft-primary); }
 .status-draft .progress-bar-fill-new { background: var(--status-draft-primary); }
+.status-draft .progress-label-new { color: var(--status-draft-primary); }
 
+.status-requested-changes {
+  border-left-color: var(--status-requested-changes-primary);
+  border-color: rgba(249, 115, 22, 0.2);
+  background-color: rgba(249, 115, 22, 0.02);
+}
 .status-requested-changes .status-icon-ghost { background: var(--status-requested-changes-ghost); color: var(--status-requested-changes-primary); }
 .status-requested-changes .progress-bar-fill-new { background: var(--status-requested-changes-primary); }
+.status-requested-changes .progress-label-new { color: var(--status-requested-changes-primary); }
 
+.status-rejected {
+  border-left-color: var(--status-rejected-primary);
+  border-color: rgba(220, 38, 38, 0.2);
+  background-color: rgba(220, 38, 38, 0.02);
+}
 .status-rejected .status-icon-ghost { background: var(--status-rejected-ghost); color: var(--status-rejected-primary); }
 .status-rejected .progress-bar-fill-new { background: var(--status-rejected-primary); }
+.status-rejected .progress-label-new { color: var(--status-rejected-primary); }
 
 /* Body Grid System */
 .memo-card-body-grid {
