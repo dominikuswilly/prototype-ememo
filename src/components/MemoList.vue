@@ -802,25 +802,22 @@ const getHistoryDotColor = (action) => {
                 </div>
               </div>
 
-              <!-- Separator (Always Visible for "Finished" Look) -->
-              <div class="card-footer-separator"></div>
-
-              <!-- External Info Area -->
-              <div class="footer-external-area">
-                <div v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem" class="footer-external-row-vertical">
-                  <div class="external-system-name-row">
-                    {{ memo.externalSystem || 'External System' }}
-                  </div>
-                  <div class="external-status-ref-row">
-                    <span class="ext-status">{{ memo.externalStatus || 'Unknown' }}</span>
-                    <span class="ext-sep">:</span>
-                    <span class="ext-ref">{{ memo.externalReceiptNumber || '-' }}</span>
+              <!-- Separator and External Info (Only if data exists) -->
+              <template v-if="memo.externalReceiptNumber || memo.externalStatus || memo.externalSystem">
+                <div class="card-footer-separator"></div>
+                <div class="footer-external-area">
+                  <div class="footer-external-row-vertical">
+                    <div class="external-system-name-row">
+                      {{ memo.externalSystem || 'External System' }}
+                    </div>
+                    <div class="external-status-ref-row">
+                      <span class="ext-status">{{ memo.externalStatus || 'Unknown' }}</span>
+                      <span class="ext-sep">:</span>
+                      <span class="ext-ref">{{ memo.externalReceiptNumber || '-' }}</span>
+                    </div>
                   </div>
                 </div>
-                <div v-else class="footer-external-empty">
-                  <!-- Empty placeholder to maintain consistent spacing and "finished" feel -->
-                </div>
-              </div>
+              </template>
             </div>
 
             <!-- Selection Overlay (Quick Actions on Click) -->
@@ -1844,18 +1841,13 @@ const getHistoryDotColor = (action) => {
 .card-footer-separator {
   height: 1px;
   background: #f1f5f9;
-  margin: 0.5rem 0; /* Consistent distance */
+  margin: 0.5rem 0;
 }
 
 .footer-external-area {
-  min-height: 2.25rem; /* Maintain scale even if empty */
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.footer-external-empty {
-  height: 0.5rem; /* Subtle space at bottom */
 }
 
 .footer-external-row-vertical {
