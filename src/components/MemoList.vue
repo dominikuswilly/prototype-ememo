@@ -149,6 +149,8 @@ const getActions = (memo) => {
         if (isRequester) actions.push('remind');
         return actions;
     }
+    if (memo.status === 'Rejected') return ['view'];
+    if (memo.status === 'Requested Changes') return ['view', 'update'];
     if (memo.status === 'Draft') return ['view', 'edit', 'delete'];
     return ['view'];
 };
@@ -296,9 +298,13 @@ defineExpose({ openCreateModal });
                     class="overlay-main-btn edit" @click="openViewModal(memo, true)">
                     <Edit class="icon-small" /> {{ getActions(memo).includes('edit') ? 'Edit Draft' : 'Update Content' }}
                   </button>
+                  <button v-if="getActions(memo).includes('remind')" class="overlay-main-btn remind"
+                    @click="handleRemind(memo)">
+                    <Bell class="icon-small" /> Remind Approvers
+                  </button>
                   <button v-if="getActions(memo).includes('delete')" class="overlay-main-btn delete"
                     @click="handleDelete(memo)">
-                    <Trash2 class="icon-small" /> Delete
+                    <Trash2 class="icon-small" /> Delete Draft
                   </button>
                 </div>
                 <button class="overlay-close" @click="selectedRow = null">
@@ -468,6 +474,7 @@ defineExpose({ openCreateModal });
 .card-overlay {
   position: absolute; inset: 0; background: rgba(255, 255, 255, 0.95);
   display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem;
+  z-index: 20;
 }
 .overlay-btns { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
 .overlay-main-btn {
@@ -476,8 +483,9 @@ defineExpose({ openCreateModal });
 }
 .overlay-main-btn.view { background: #3b82f6; color: white; }
 .overlay-main-btn.edit { background: #f59e0b; color: white; }
+.overlay-main-btn.remind { background: #10b981; color: white; }
 .overlay-main-btn.delete { background: #ef4444; color: white; }
-.overlay-close { position: absolute; top: 0.75rem; right: 0.75rem; border: none; background: none; cursor: pointer; }
+.overlay-close { position: absolute; top: 0.75rem; right: 0.75rem; border: none; background: none; cursor: pointer; color: #475569; z-index: 30; }
 
 /* Wizard */
 .wizard-modal {

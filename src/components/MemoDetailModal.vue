@@ -29,6 +29,17 @@ const isConfirming = ref(false);
 const isHistoryCollapsed = ref(true);
 const isAttachmentsCollapsed = ref(true);
 
+const isMobile = ref(false);
+const checkMobile = () => { isMobile.value = window.innerWidth <= 768; };
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
+
 // Rejection/Review Modal State
 const isReviewModalOpen = ref(false);
 const reviewModalType = ref('Reject');
@@ -426,29 +437,32 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-header-left">
-            <button v-if="isConfirming" class="btn-back" @click="cancelConfirmation">
+            <button v-if="isConfirming" class="btn-back mr-2" @click="cancelConfirmation">
               <ArrowLeft class="icon" />
             </button>
-            <button v-else-if="isCreateMode" class="btn-back" @click="goBackToWizard">
+            <button v-else-if="isCreateMode" class="btn-back mr-2" @click="goBackToWizard">
+              <ArrowLeft class="icon" />
+            </button>
+            <button v-else-if="isMobile" class="btn-back mr-2" @click="closeViewModal">
               <ArrowLeft class="icon" />
             </button>
             <h2 v-if="isConfirming">Review Submission</h2>
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
-            <span v-if="!isCreateMode && localMemo" class="header-memo-number">{{ localMemo.memoNumber }}</span>
+            <span v-if="!isCreateMode && localMemo && !isMobile" class="header-memo-number">{{ localMemo.memoNumber }}</span>
           </div>
           <div class="modal-header-right">
             <div v-if="localMemo && localMemo.isReminded" class="reminded-tag mr-2"
               title="Approvers have been reminded">
               <Bell class="icon-tiny" />
-              <span v-if="!isEditMode" class="tag-text">REMINDED</span>
+              <span v-if="!isEditMode && !isMobile" class="tag-text">REMINDED</span>
             </div>
             <div v-if="!isCreateMode" :class="['status-badge-premium', getStatusColor(localMemo.status)]"
               :title="localMemo.status">
               <component :is="getStatusIcon(localMemo.status)" class="status-icon" />
-              <span v-if="!isEditMode" class="badge-text">{{ localMemo.status }}</span>
+              <span v-if="!isEditMode && !isMobile" class="badge-text">{{ localMemo.status }}</span>
             </div>
-            <button class="btn-close ml-3" @click="closeViewModal">
+            <button v-if="!isMobile" class="btn-close ml-3" @click="closeViewModal">
               <X class="icon" />
             </button>
           </div>
@@ -1150,7 +1164,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
     </div>
 
     <!-- Review Action Modal (Reject / Request Changes) -->
-    <div v-if="isReviewModalOpen" class="modal-overlay" style="z-index: 1050;" @click.self="cancelReviewAction">
+    <div v-if="isReviewModalOpen" class="modal-overlay" style="z-index: 1100;" @click.self="cancelReviewAction">
       <div class="modal-content" style="max-width: 480px;">
         <div class="modal-header">
           <h2>{{ reviewModalType === 'Reject' ? 'Reject Memo' : 'Request Changes' }}</h2>
@@ -1218,7 +1232,7 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1050;
   padding: 1rem;
 }
 
