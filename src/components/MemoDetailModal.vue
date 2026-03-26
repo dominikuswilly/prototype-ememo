@@ -1563,9 +1563,11 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 .draft { background: #f8fafc; color: #64748b; }
 
 .modal-section-actions {
-  margin-top: 2rem;
+  margin-top: auto;
   padding-top: 1.5rem;
+  padding-bottom: 1rem;
   border-top: 1px solid #e2e8f0;
+  flex-shrink: 0;
 }
 
 .modal-actions-group {

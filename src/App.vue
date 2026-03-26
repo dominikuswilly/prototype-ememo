@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import Sidebar from './components/Sidebar.vue';
 import MemoFilter from './components/MemoFilter.vue';
 import MemoList from './components/MemoList.vue';
@@ -113,7 +113,11 @@ const filteredMemos = computed(() => {
   });
 });
 
-const triggerCreateModal = () => {
+const triggerCreateModal = async () => {
+  if (activeView.value === 'summary') {
+    activeView.value = 'list';
+    await nextTick();
+  }
   if (memoListRef.value) {
     memoListRef.value.openCreateModal();
   }
