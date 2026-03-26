@@ -2320,6 +2320,7 @@ const getHistoryDotColor = (action) => {
   .memo-card {
     padding: 1.25rem;
     gap: 1rem;
+    border-left-width: 1px;
   }
 
   .memo-card-title {
