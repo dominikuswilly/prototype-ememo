@@ -588,18 +588,19 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
             </div>
             <div class="detail-section">
               <h3 class="section-group-title">General Information</h3>
-              <div class="detail-row">
-                <div class="detail-group">
+              <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <div class="detail-group-stacked">
                   <label>Requester</label>
                   <div v-if="isCreateMode" class="detail-value font-medium text-slate-400 italic">Self ({{ currentUser }})</div>
-                  <div v-else class="detail-value requester-info-row">
+                  <div v-else class="detail-value requester-info-row" style="display: flex; align-items: center;">
                     <User class="icon-tiny mr-1 text-slate-400" />
-                    <span class="requester-name">{{ localMemo.requester }}</span>
+                    <span class="requester-name font-medium">{{ localMemo.requester }}</span>
                   </div>
                 </div>
-                <div class="detail-group">
+
+                <div class="detail-group-stacked">
                   <label>Departments</label>
-                  <div class="detail-value dept-flow-row">
+                  <div class="detail-value dept-flow-row" style="display: flex; align-items: center;">
                     <span class="department-marker" title="Requester Department">
                       {{ localMemo.requesterDepartment }}
                     </span>
@@ -609,38 +610,47 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
                     </span>
                   </div>
                 </div>
-              </div>
 
-              <div class="detail-row">
-                <div v-if="!isCreateMode" class="detail-group">
+                <div v-if="!isCreateMode" class="detail-group-stacked">
                   <label>Created At</label>
                   <div class="detail-value">{{ formatDate(localMemo.createdAt) }}</div>
                 </div>
-              </div>
 
-              <div class="detail-group">
-                <label>Purposing of Memo</label>
-                <div v-if="isCreateMode" class="autocomplete-wrapper">
-                  <input ref="templateInputRef" type="text" class="form-input"
-                    placeholder="Search template by name or division..." v-model="templateSearch"
-                    @focus="handleTemplateFocus" @blur="handleTemplateBlur" @input="handleTemplateInput"
-                    autocomplete="off" />
-                  <Teleport to="body">
-                    <div v-if="showSuggestions" class="suggestions-dropdown-teleport" :style="dropdownStyle">
-                      <template v-if="filteredTemplates.length > 0">
-                        <div v-for="(item, idx) in filteredTemplates" :key="idx" class="suggestion-item"
-                          @mousedown.prevent="selectTemplate(item)">
-                          <span class="suggestion-name">{{ item.name }}</span>
-                          <span class="suggestion-division">{{ item.division }}</span>
-                        </div>
-                      </template>
-                      <div v-else class="suggestion-empty">No templates found</div>
-                    </div>
-                  </Teleport>
+                <div class="detail-group-stacked">
+                  <label>Purposing of Memo</label>
+                  <div v-if="isCreateMode" class="autocomplete-wrapper">
+                    <input ref="templateInputRef" type="text" class="form-input"
+                      placeholder="Search template by name or division..." v-model="templateSearch"
+                      @focus="handleTemplateFocus" @blur="handleTemplateBlur" @input="handleTemplateInput"
+                      autocomplete="off" />
+                    <Teleport to="body">
+                      <div v-if="showSuggestions" class="suggestions-dropdown-teleport" :style="dropdownStyle">
+                        <template v-if="filteredTemplates.length > 0">
+                          <div v-for="(item, idx) in filteredTemplates" :key="idx" class="suggestion-item"
+                            @mousedown.prevent="selectTemplate(item)">
+                            <span class="suggestion-name">{{ item.name }}</span>
+                            <span class="suggestion-division">{{ item.division }}</span>
+                          </div>
+                        </template>
+                        <div v-else class="suggestion-empty">No templates found</div>
+                      </div>
+                    </Teleport>
+                  </div>
+                  <div v-else class="detail-value">
+                    <div class="font-semibold">{{ localMemo.categoryType || '-' }}</div>
+                    <div v-if="localMemo.category" class="template-division-badge mt-1 inline-block">{{ localMemo.category }}</div>
+                  </div>
                 </div>
-                <div v-else class="detail-value">
-                  <div class="font-semibold">{{ localMemo.categoryType || '-' }}</div>
-                  <div v-if="localMemo.category" class="template-division-badge">{{ localMemo.category }}</div>
+
+                <div v-if="!isCreateMode" class="detail-group-stacked">
+                  <label>Status</label>
+                  <div class="detail-value flex-align-center" style="display: flex; align-items: center;">
+                    <div :class="['status-badge-premium', getStatusColor(localMemo.status)]"
+                      :title="localMemo.status" style="width: max-content;">
+                      <component :is="getStatusIcon(localMemo.status)" class="status-icon" />
+                      <span class="badge-text" style="margin-left: 4px;">{{ localMemo.status }}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -650,59 +660,57 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
             <template v-if="!isCreateMode || (localMemo.category && localMemo.categoryType)">
               <div class="detail-section">
                 <h3 class="section-group-title">Memo Content</h3>
-                <div class="detail-group">
-                  <label>Title</label>
-                  <div class="field-with-marker-wrapper">
-                    <input v-if="isEditMode" type="text" v-model="localMemo.title" class="form-input" />
-                    <div v-if="isEditMode && localMemo.markerDescriptions?.['Title']" class="marker-description-alert">
-                      <AlertCircle class="icon-tiny" />
-                      <span class="marker-text">{{ localMemo.markerDescriptions['Title'] }}</span>
-                    </div>
-                  </div>
-                  <div v-if="!isEditMode" class="detail-value font-semibold text-lg">{{ localMemo.title }}</div>
-                </div>
-                <div class="detail-group">
-                  <label>Description</label>
-                  <div class="field-with-marker-wrapper">
-                    <textarea v-if="isEditMode" v-model="localMemo.description" class="form-textarea"
-                      rows="4"></textarea>
-                    <div v-if="isEditMode && localMemo.markerDescriptions?.['Description']"
-                      class="marker-description-alert">
-                      <AlertCircle class="icon-tiny" />
-                      <span class="marker-text">{{ localMemo.markerDescriptions['Description'] }}</span>
-                    </div>
-                  </div>
-                  <div v-if="!isEditMode" class="detail-value leading-relaxed">{{ localMemo.description }}</div>
-                </div>
-                <!-- Attachments Section -->
-                <div class="detail-group mt-4 attachments-collapsible">
-                  <button class="section-toggle-header" @click="isAttachmentsCollapsed = !isAttachmentsCollapsed">
-                    <label class="m-0 cursor-pointer">Attachment ({{ localMemo.attachmentsCount }})</label>
-                    <div class="history-toggle-icon" :class="{ 'is-open': !isAttachmentsCollapsed }">
-                      <ChevronRight class="icon-small" />
-                    </div>
-                  </button>
-
-                  <div v-if="!isAttachmentsCollapsed" class="history-content-wrap mt-3">
-                    <div v-if="localMemo.attachmentsCount > 0" class="attachments-grid">
-                      <div v-for="n in localMemo.attachmentsCount" :key="n" class="attachment-card"
-                        :class="{ 'is-edit': isEditMode }">
-                        <div class="attachment-icon-box">
-                          <FileText class="attachment-icon-large" />
-                        </div>
-                        <span class="attachment-name">Doc {{ n }}</span>
-                        <button v-if="isEditMode" class="btn-remove-attachment-abs" title="Remove"
-                          @click.prevent="localMemo.attachmentsCount--">
-                          <X class="icon-tiny" />
-                        </button>
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                  <div class="detail-group-stacked">
+                    <label>Title</label>
+                    <div class="field-with-marker-wrapper">
+                      <input v-if="isEditMode" type="text" v-model="localMemo.title" class="form-input" />
+                      <div v-if="isEditMode && localMemo.markerDescriptions?.['Title']" class="marker-description-alert">
+                        <AlertCircle class="icon-tiny" />
+                        <span class="marker-text">{{ localMemo.markerDescriptions['Title'] }}</span>
                       </div>
                     </div>
-                    <div v-else class="detail-value text-muted italic">No attachments included.</div>
+                    <div v-if="!isEditMode" class="detail-value font-semibold text-lg">{{ localMemo.title }}</div>
+                  </div>
+                  
+                  <div class="detail-group-stacked">
+                    <label>Description</label>
+                    <div class="field-with-marker-wrapper">
+                      <textarea v-if="isEditMode" v-model="localMemo.description" class="form-textarea"
+                        rows="4"></textarea>
+                      <div v-if="isEditMode && localMemo.markerDescriptions?.['Description']"
+                        class="marker-description-alert">
+                        <AlertCircle class="icon-tiny" />
+                        <span class="marker-text">{{ localMemo.markerDescriptions['Description'] }}</span>
+                      </div>
+                    </div>
+                    <div v-if="!isEditMode" class="detail-value leading-relaxed">{{ localMemo.description }}</div>
+                  </div>
+                  
+                  <!-- Attachments Section -->
+                  <div class="detail-group-stacked">
+                    <label>Attachment ({{ localMemo.attachmentsCount }})</label>
+                    <div class="mt-2">
+                      <div v-if="localMemo.attachmentsCount > 0" class="attachments-grid">
+                        <div v-for="n in localMemo.attachmentsCount" :key="n" class="attachment-card"
+                          :class="{ 'is-edit': isEditMode }">
+                          <div class="attachment-icon-box">
+                            <FileText class="attachment-icon-large" />
+                          </div>
+                          <span class="attachment-name">Doc {{ n }}</span>
+                          <button v-if="isEditMode" class="btn-remove-attachment-abs" title="Remove"
+                            @click.prevent="localMemo.attachmentsCount--">
+                            <X class="icon-tiny" />
+                          </button>
+                        </div>
+                      </div>
+                      <div v-else class="detail-value text-muted italic">No attachments included.</div>
 
-                    <div v-if="isEditMode" class="mt-3">
-                      <button class="btn-upload" @click.prevent="localMemo.attachmentsCount++">
-                        <Plus class="icon-small" /> Add Document
-                      </button>
+                      <div v-if="isEditMode" class="mt-3">
+                        <button class="btn-upload" @click.prevent="localMemo.attachmentsCount++">
+                          <Plus class="icon-small" /> Add Document
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1394,6 +1402,21 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.detail-group-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.detail-group-stacked label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
 }
 
 .detail-value {
