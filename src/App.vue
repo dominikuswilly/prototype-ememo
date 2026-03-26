@@ -70,10 +70,10 @@ const filteredMemos = computed(() => {
       );
     });
   } else if (activeTab.value === 'all') {
-    // Show self + subordinates (excluding drafts of subordinates usually, but here we show all non-drafts)
+    // Show self + subordinates (Drafts are only shown if they belong to the current user)
     const subordinateNames = subordinates.map(s => s.name);
     const hierarchy = [currentUser, ...subordinateNames];
-    result = result.filter(m => hierarchy.includes(m.requester) && m.status !== 'Draft');
+    result = result.filter(m => hierarchy.includes(m.requester) && (m.status !== 'Draft' || m.requester === currentUser));
   }
 
   return result.filter(memo => {
