@@ -224,7 +224,7 @@ const handlePressEnd = () => emit('press-end');
 .grid-icon { width: 14px; height: 14px; color: #94a3b8; }
 
 .card-footer-separator-new { height: 1px; background: #e2e8f0; margin-top: auto; }
-.memo-card-footer-new { display: flex; flex-direction: column; gap: 0.5rem; }
+.memo-card-footer-new { display: flex; flex-direction: column; gap: 0.5rem; min-height: 42px; }
 .progress-row-new { display: flex; justify-content: space-between; align-items: center; }
 .progress-label-new { font-size: 0.75rem; font-weight: 700; color: #64748b; }
 .card-actions-mini-new { display: flex; gap: 0.5rem; }
