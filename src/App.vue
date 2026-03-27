@@ -52,8 +52,8 @@ const pageDescription = computed(() => {
 
 const pendingCount = computed(() => {
   return memos.value.filter(m => {
-    return m.status !== 'Approved' && m.approvalChain.some(tier =>
-      tier.approvers.some(a => a.name === currentUser && a.status === 'In Review')
+    return (m.status === 'In Review' || m.status === 'Pending') && m.approvalChain.some(tier =>
+      tier.approvers.some(a => a.name === currentUser && (a.status === 'In Review' || a.status === 'Pending'))
     );
   }).length;
 });
@@ -65,8 +65,8 @@ const filteredMemos = computed(() => {
     result = result.filter(m => m.requester === currentUser);
   } else if (activeTab.value === 'pending_approval') {
     result = result.filter(m => {
-      return m.status !== 'Approved' && m.approvalChain.some(tier =>
-        tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
+      return (m.status === 'In Review' || m.status === 'Pending') && m.approvalChain.some(tier =>
+        tier.approvers.some(a => a.name === currentUser && (a.status === 'In Review' || a.status === 'Pending'))
       );
     });
   } else if (activeTab.value === 'all') {
