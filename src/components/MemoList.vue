@@ -432,6 +432,41 @@ defineExpose({ openCreateModal });
   .memo-card { border-left-width: 1px; }
 }
 
+.mobile-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0 3rem;
+  width: 100%;
+}
+
+.btn-load-more {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 99px;
+  color: #1e293b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-load-more:active {
+  transform: scale(0.96);
+  background-color: #f8fafc;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.btn-load-more .icon-small {
+  width: 18px;
+  height: 18px;
+  color: #3b82f6;
+}
+
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
