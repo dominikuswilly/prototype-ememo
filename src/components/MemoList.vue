@@ -227,6 +227,24 @@ defineExpose({ openCreateModal });
                 <Calendar class="grid-icon" />
                 <span class="grid-text">{{ formatDate(memo.createdAt) }}</span>
               </div>
+              
+              <!-- System Integration Badge -->
+              <div v-if="memo.externalSystem" class="grid-item full-width mt-1">
+                <div :class="['system-badge', memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting']">
+                  <Zap class="badge-icon" />
+                  <span class="badge-content">
+                    {{ memo.externalSystem }}
+                    <template v-if="memo.externalReceiptNumber">
+                      <span class="badge-sep">•</span>
+                      <span class="badge-ref">#{{ memo.externalReceiptNumber }}</span>
+                    </template>
+                    <template v-else>
+                      <span class="badge-sep">:</span>
+                      <span class="badge-status">Waiting</span>
+                    </template>
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div class="card-footer-separator-new"></div>
@@ -431,6 +449,47 @@ defineExpose({ openCreateModal });
 @media (max-width: 640px) {
   .memo-card { border-left-width: 1px; }
 }
+
+/* System Badge Styles */
+.system-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: all 0.2s;
+}
+
+.badge-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.badge-waiting {
+  background-color: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.badge-sent {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #d1fae5;
+}
+
+.badge-sep {
+  opacity: 0.5;
+  margin: 0 0.25rem;
+}
+
+.badge-ref {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.mt-1 { margin-top: 0.25rem; }
 
 .mobile-load-more {
   display: flex;
