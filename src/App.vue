@@ -39,7 +39,7 @@ const handleFilterChange = (newFilters) => {
 const pageTitle = computed(() => {
   if (activeView.value === 'summary') return 'Memo Summary';
   if (activeTab.value === 'my_memos') return 'My Memos';
-  if (activeTab.value === 'pending_approval') return 'Pending Approval';
+  if (activeTab.value === 'pending_approval') return 'Needs My Approval';
   return 'All Memos';
 });
 
@@ -53,7 +53,7 @@ const pageDescription = computed(() => {
 const pendingCount = computed(() => {
   return memos.value.filter(m => {
     return m.status !== 'Approved' && m.approvalChain.some(tier =>
-      tier.approvers.some(a => a.name === currentUser && a.status === 'Pending')
+      tier.approvers.some(a => a.name === currentUser && a.status === 'In Review')
     );
   }).length;
 });
@@ -169,7 +169,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
         <div v-if="activeView === 'list'" class="tabs-nav">
           <button v-for="tab in ['all', 'my_memos', 'pending_approval']" :key="tab"
             :class="['tab-btn', { active: activeTab === tab }]" @click="activeTab = tab">
-            {{ tab === 'pending_approval' ? 'Pending Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
+            {{ tab === 'pending_approval' ? 'Needs My Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
             <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
           </button>
         </div>
@@ -196,7 +196,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
           <MemoSummary :memos="memos" :members="subordinates" :currentUser="currentUser"
             @view-list="activeView = 'list'; activeTab = 'all'"
             @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
-            @view-my-pending="activeView = 'list'; activeTab = 'my_memos'; filterState.statuses = ['Pending']" />
+            @view-my-pending="activeView = 'list'; activeTab = 'my_memos'; filterState.statuses = ['In Review']" />
         </template>
         <template v-else-if="activeView === 'list'">
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />

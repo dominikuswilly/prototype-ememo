@@ -363,7 +363,7 @@ const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
     case 'approved': return 'approved';
     case 'rejected': return 'rejected';
-    case 'pending': return 'pending';
+    case 'in review': return 'in-review';
     case 'requested changes': return 'requested-changes';
     case 'draft': return 'draft';
     default: return 'default';
@@ -375,7 +375,7 @@ const getStatusIcon = (status) => {
   switch (status.toLowerCase()) {
     case 'approved': return CheckCircle;
     case 'rejected': return XCircle;
-    case 'pending': return Clock;
+    case 'in review': return Clock;
     case 'requested changes': return AlertCircle;
     case 'draft': return FileText;
     default: return FileText;

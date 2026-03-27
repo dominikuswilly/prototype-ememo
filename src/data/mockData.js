@@ -24,9 +24,9 @@ export const mockMemos = [
       {
         tier: 2,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "In Review" }]
       }
     ],
     attachmentsCount: 3,
@@ -84,12 +84,12 @@ export const mockMemos = [
       {
         tier: 1,
         type: "quorum",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 2,
         approvers: [
           { name: "Michael Scott", role: "Regional Manager", status: "Approved" },
-          { name: "Toby Flenderson", role: "HR Lead", status: "Pending" },
-          { name: "Willy", role: "CTO", status: "Pending" }
+          { name: "Toby Flenderson", role: "HR Lead", status: "In Review" },
+          { name: "Willy", role: "CTO", status: "In Review" }
         ]
       }
     ],
@@ -231,14 +231,14 @@ export const mockMemos = [
     targetDepartment: "GA",
     createdAt: "2026-03-09T09:00:00Z",
     requester: "Jim Halpert",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "quorum",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "In Review" }]
       }
     ],
     attachmentsCount: 1,
@@ -284,14 +284,14 @@ export const mockMemos = [
     targetDepartment: "Medical",
     createdAt: "2026-03-04T10:00:00Z",
     requester: "Willy",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Darlene Alderson", role: "Medical Admin", status: "Pending" }]
+        approvers: [{ name: "Darlene Alderson", role: "Medical Admin", status: "In Review" }]
       }
     ],
     attachmentsCount: 2,
@@ -344,12 +344,12 @@ export const mockMemos = [
       {
         tier: 1,
         type: "quorum",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 2,
         approvers: [
           { name: "John Smith", role: "Benefits Lead", status: "Approved" },
-          { name: "Sarah Connor", role: "HR Dir", status: "Pending" },
-          { name: "Willy", role: "CTO", status: "Pending" }
+          { name: "Sarah Connor", role: "HR Dir", status: "In Review" },
+          { name: "Willy", role: "CTO", status: "In Review" }
         ]
       }
     ],
@@ -424,11 +424,11 @@ export const mockMemos = [
       {
         tier: 2,
         type: "quorum",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
         approvers: [
-          { name: "Sarah Connor", role: "HR Dir", status: "Pending" },
-          { name: "Phillip Price", role: "CEO", status: "Pending" }
+          { name: "Sarah Connor", role: "HR Dir", status: "In Review" },
+          { name: "Phillip Price", role: "CEO", status: "In Review" }
         ]
       }
     ],
@@ -464,14 +464,14 @@ export const mockMemos = [
     targetDepartment: "IT",
     createdAt: "2026-03-13T10:00:00Z",
     requester: "Elliot Alderson",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "In Review" }]
       }
     ],
     attachmentsCount: 1,
@@ -490,16 +490,16 @@ export const mockMemos = [
     targetDepartment: "Legal",
     createdAt: "2026-03-14T11:00:00Z",
     requester: "Susan Jacobs",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "quorum",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
         approvers: [
-          { name: "Phillip Price", role: "CEO", status: "Pending" },
-          { name: "Willy", role: "CTO", status: "Pending" }
+          { name: "Phillip Price", role: "CEO", status: "In Review" },
+          { name: "Willy", role: "CTO", status: "In Review" }
         ]
       }
     ],
@@ -546,21 +546,21 @@ export const mockMemos = [
     targetDepartment: "Finance",
     createdAt: "2026-03-14T15:30:00Z",
     requester: "Willy",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Sarah Connor", role: "Marketing Dir", status: "Pending" }]
+        approvers: [{ name: "Sarah Connor", role: "Marketing Dir", status: "In Review" }]
       },
       {
         tier: 2,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "John Smith", role: "Finance Dir", status: "Pending" }]
+        approvers: [{ name: "John Smith", role: "Finance Dir", status: "In Review" }]
       }
     ],
     attachmentsCount: 5,
@@ -579,14 +579,14 @@ export const mockMemos = [
     targetDepartment: "Finance",
     createdAt: "2026-03-12T09:00:00Z",
     requester: "Jim Halpert",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Phillip Price", role: "CEO", status: "Pending" }]
+        approvers: [{ name: "Phillip Price", role: "CEO", status: "In Review" }]
       }
     ],
     attachmentsCount: 2,
@@ -659,7 +659,7 @@ export const mockMemos = [
     targetDepartment: "IT",
     createdAt: "2026-03-15T10:00:00Z",
     requester: "Willy",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
@@ -681,9 +681,9 @@ export const mockMemos = [
       {
         tier: 3,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Phillip Price", role: "CEO", status: "Pending" }]
+        approvers: [{ name: "Phillip Price", role: "CEO", status: "In Review" }]
       }
     ],
     attachmentsCount: 2,
@@ -738,21 +738,21 @@ export const mockMemos = [
     targetDepartment: "IT",
     createdAt: "2026-03-16T08:00:00Z",
     requester: "Willy",
-    status: "Pending",
+    status: "In Review",
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Elliot Alderson", role: "Lead", status: "Pending" }]
+        approvers: [{ name: "Elliot Alderson", role: "Lead", status: "In Review" }]
       },
       {
         tier: 2,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Phillip Price", role: "CEO", status: "Pending" }]
+        approvers: [{ name: "Phillip Price", role: "CEO", status: "In Review" }]
       }
     ],
     attachmentsCount: 2,
@@ -774,15 +774,15 @@ export const mockMemos = [
     targetDepartment: "IT",
     createdAt: "2026-03-20T09:00:00Z",
     requester: "Willy",
-    status: "Pending",
+    status: "In Review",
     isReminded: true,
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Sarah Connor", role: "IT Dir", status: "Pending" }]
+        approvers: [{ name: "Sarah Connor", role: "IT Dir", status: "In Review" }]
       }
     ],
     attachmentsCount: 1,
@@ -802,15 +802,15 @@ export const mockMemos = [
     targetDepartment: "Finance",
     createdAt: "2026-03-22T14:00:00Z",
     requester: "Elliot Alderson",
-    status: "Pending",
+    status: "In Review",
     isReminded: true,
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Angela Moss", role: "Manager", status: "Pending" }]
+        approvers: [{ name: "Angela Moss", role: "Manager", status: "In Review" }]
       }
     ],
     attachmentsCount: 1,
@@ -830,15 +830,15 @@ export const mockMemos = [
     targetDepartment: "GA",
     createdAt: "2026-03-24T11:00:00Z",
     requester: "Pam Beesly",
-    status: "Pending",
+    status: "In Review",
     isReminded: true,
     approvalChain: [
       {
         tier: 1,
         type: "single",
-        status: "Pending",
+        status: "In Review",
         requiredApprovals: 1,
-        approvers: [{ name: "Willy", role: "CTO", status: "Pending" }]
+        approvers: [{ name: "Willy", role: "CTO", status: "In Review" }]
       }
     ],
     attachmentsCount: 2,

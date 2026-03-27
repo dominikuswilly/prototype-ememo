@@ -105,7 +105,7 @@ const getStatusColor = (status) => {
   switch (status.toLowerCase()) {
     case 'approved': return 'approved';
     case 'rejected': return 'rejected';
-    case 'pending': return 'pending';
+    case 'in review': return 'in-review';
     case 'requested changes': return 'requested-changes';
     case 'draft': return 'draft';
     default: return 'default';
@@ -117,7 +117,7 @@ const getStatusIcon = (status) => {
   switch (status.toLowerCase()) {
     case 'approved': return CheckCircle;
     case 'rejected': return XCircle;
-    case 'pending': return Clock;
+    case 'in review': return Clock;
     case 'requested changes': return AlertCircle;
     case 'draft': return FileText;
     default: return FileText;
@@ -144,7 +144,7 @@ const getProgressLabel = (memo) => {
 const getActions = (memo) => {
     const isRequester = memo.requester === props.currentUser;
     if (memo.status === 'Approved') return ['view'];
-    if (memo.status === 'Pending') {
+    if (memo.status === 'In Review') {
         const actions = ['view'];
         if (isRequester) actions.push('remind');
         return actions;
@@ -371,7 +371,7 @@ defineExpose({ openCreateModal });
 .memo-card.active { border-color: #3b82f6; background-color: #f8fafc; }
 
 .status-approved { border-left-color: #10b981; }
-.status-pending { border-left-color: #f59e0b; }
+.status-in-review { border-left-color: #f59e0b; }
 .status-draft { border-left-color: #64748b; }
 .status-requested-changes { border-left-color: #f97316; }
 .status-rejected { border-left-color: #dc2626; }

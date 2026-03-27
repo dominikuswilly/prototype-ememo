@@ -25,13 +25,13 @@ const emit = defineEmits(['view-list', 'view-pending', 'view-my-pending']);
 const stats = computed(() => {
   const total = props.memos.length;
   const approved = props.memos.filter(m => m.status === 'Approved').length;
-  const pending = props.memos.filter(m => m.status === 'Pending').length;
+  const pending = props.memos.filter(m => m.status === 'In Review').length;
   const rejected = props.memos.filter(m => m.status === 'Rejected').length;
   const requestedChanges = props.memos.filter(m => m.status === 'Requested Changes').length;
 
   const pendingApproval = props.memos.filter(m => {
     return m.status !== 'Approved' && m.approvalChain.some(tier =>
-      tier.approvers.some(a => a.name === props.currentUser && a.status === 'Pending')
+      tier.approvers.some(a => a.name === props.currentUser && a.status === 'In Review')
     );
   }).length;
 
@@ -70,7 +70,7 @@ const memberStats = computed(() => {
   return props.members.map(member => {
     const memberMemos = props.memos.filter(m => m.requester === member.name);
     const approved = memberMemos.filter(m => m.status === 'Approved').length;
-    const pending = memberMemos.filter(m => m.status === 'Pending').length;
+    const pending = memberMemos.filter(m => m.status === 'In Review').length;
 
     return {
       ...member,
@@ -91,7 +91,7 @@ const getStatusColorClass = (status) => {
   switch (status.toLowerCase()) {
     case 'approved': return 'bg-green-100 text-green-700';
     case 'rejected': return 'bg-red-100 text-red-700';
-    case 'pending': return 'bg-amber-100 text-amber-700';
+    case 'in review': return 'bg-amber-100 text-amber-700';
     case 'requested changes': return 'bg-purple-100 text-purple-700';
     default: return 'bg-gray-100 text-gray-700';
   }
@@ -107,7 +107,7 @@ const getStatusColorClass = (status) => {
           <Users class="stat-icon" />
         </div>
         <div class="stat-info">
-          <span class="stat-label">Pending Approval</span>
+          <span class="stat-label">Needs My Approval</span>
           <h2 class="stat-value">{{ stats.pendingApproval }}</h2>
         </div>
         <div class="stat-sublabel">Your Action Needed</div>
@@ -128,7 +128,7 @@ const getStatusColorClass = (status) => {
           <Clock class="stat-icon" />
         </div>
         <div class="stat-info">
-          <span class="stat-label">Pending</span>
+          <span class="stat-label">In Review</span>
           <h2 class="stat-value">{{ stats.pending }}</h2>
         </div>
         <div class="stat-sublabel">Needs Action</div>
@@ -185,7 +185,7 @@ const getStatusColorClass = (status) => {
             </div>
             <div class="member-footer-stats">
               <span class="stat-mini"><span class="dot-green"></span> {{ member.approved }} Approved</span>
-              <span class="stat-mini"><span class="dot-amber"></span> {{ member.pending }} Pending</span>
+              <span class="stat-mini"><span class="dot-amber"></span> {{ member.pending }} In Review</span>
             </div>
           </div>
         </div>
