@@ -490,13 +490,50 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
   justify-content: center;
 }
 
-.system-modal-content { display: flex; align-items: center; gap: 0.75rem; }
-.system-modal-icon { width: 20px; height: 20px; color: #3b82f6; }
-.system-modal-text { display: flex; flex-direction: column; }
-.system-modal-name { font-size: 0.85rem; font-weight: 700; color: #1e293b; }
-.system-modal-ref { font-family: monospace; font-size: 0.75rem; color: #64748b; }
-.system-modal-status { font-size: 0.75rem; color: #94a3b8; font-style: italic; }
-.system-modal-close { position: absolute; top: 0.5rem; right: 0.5rem; border: none; background: none; cursor: pointer; color: #64748b; }
+.system-modal-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.system-modal-icon {
+  width: 20px;
+  height: 20px;
+  color: #3b82f6;
+}
+
+.system-modal-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.system-modal-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.system-modal-ref {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.system-modal-status {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.system-modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #64748b;
+}
 
 .mt-1 {
   margin-top: 0.25rem;
