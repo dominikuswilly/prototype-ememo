@@ -234,22 +234,23 @@ const selectTemplate = (item) => {
   }
 
   if (isHrTemplate(item.name)) {
-    if (localMemo.value.hrEmployeeType === undefined) {
-      localMemo.value.hrEmployeeType = 'Existing';
-      localMemo.value.hrName = '';
-      localMemo.value.hrID = '';
-      localMemo.value.hrDOB = '';
-      localMemo.value.hrStartWork = '';
-      localMemo.value.hrDivision = '';
-      localMemo.value.hrBranch = '';
-      localMemo.value.hrJobTitle = '';
-      localMemo.value.hrStatus = 'Single';
-      localMemo.value.hrChildren = 0;
-      localMemo.value.hrSalaryChange = 'no';
-      localMemo.value.oldSalary = { basic: 0, allowance: 0, position: 0 };
-      localMemo.value.newSalary = { basic: 0, allowance: 0, position: 0 };
-      localMemo.value.hrEffectiveDate = '';
-    }
+    // Basic Employee Info
+    if (localMemo.value.hrEmployeeType === undefined) localMemo.value.hrEmployeeType = 'Existing';
+    if (localMemo.value.hrName === undefined) localMemo.value.hrName = '';
+    if (localMemo.value.hrID === undefined) localMemo.value.hrID = '';
+    if (localMemo.value.hrDOB === undefined) localMemo.value.hrDOB = '';
+    if (localMemo.value.hrStartWork === undefined) localMemo.value.hrStartWork = '';
+    if (localMemo.value.hrDivision === undefined) localMemo.value.hrDivision = '';
+    if (localMemo.value.hrBranch === undefined) localMemo.value.hrBranch = '';
+    if (localMemo.value.hrJobTitle === undefined) localMemo.value.hrJobTitle = '';
+    if (localMemo.value.hrStatus === undefined) localMemo.value.hrStatus = 'Single';
+    if (localMemo.value.hrChildren === undefined) localMemo.value.hrChildren = 0;
+    
+    // Salary info
+    if (localMemo.value.hrSalaryChange === undefined) localMemo.value.hrSalaryChange = 'no';
+    if (!localMemo.value.oldSalary) localMemo.value.oldSalary = { basic: 0, allowance: 0, position: 0 };
+    if (!localMemo.value.newSalary) localMemo.value.newSalary = { basic: 0, allowance: 0, position: 0 };
+    if (localMemo.value.hrEffectiveDate === undefined) localMemo.value.hrEffectiveDate = '';
   }
 
   templateSearch.value = item.name;
@@ -767,6 +768,7 @@ const normalizeTravelDate = (dateStr) => {
                       </div>
                     </div>
                   </div>
+
                   <!-- Travel Period (conditional) -->
                   <div v-if="['Pengajuan Perjalanan Dinas', 'Perjalanan Dinas'].includes(localMemo.categoryType)"
                     class="detail-group-stacked">
@@ -895,12 +897,12 @@ const normalizeTravelDate = (dateStr) => {
                   <h3 class="section-group-title">Employee Information</h3>
                   <div class="detail-row">
                     <div class="detail-group">
-                      <label>Types of Employees</label>
+                      <label>Employee Type</label>
                       <select v-if="isEditMode" v-model="localMemo.hrEmployeeType" class="form-select">
                         <option value="Existing">Existing</option>
                         <option value="New">New</option>
                       </select>
-                      <div v-else class="detail-value font-medium">{{ localMemo.hrEmployeeType }}</div>
+                      <div v-else class="detail-value font-medium">{{ localMemo.hrEmployeeType || '-' }}</div>
                     </div>
                     <div class="detail-group">
                       <label>Name</label>
@@ -910,7 +912,7 @@ const normalizeTravelDate = (dateStr) => {
                   </div>
                   <div class="detail-row">
                     <div class="detail-group">
-                      <label>Employee ID Number</label>
+                      <label>Employee ID (NIK)</label>
                       <input v-if="isEditMode" type="text" v-model="localMemo.hrID" class="form-input" />
                       <div v-else class="detail-value">{{ localMemo.hrID || '-' }}</div>
                     </div>
@@ -920,7 +922,7 @@ const normalizeTravelDate = (dateStr) => {
                         <input type="text" v-model="localMemo.hrDOB" placeholder="YYYY-MM-DD" class="form-input" />
                         <div class="date-picker-trigger">
                           <Calendar class="icon-small" />
-                          <input type="date" v-model="localMemo.hrDOB" class="hidden-date-picker" />
+                          <input type="date" v-model="localMemo.hrDOB" class="hidden-date-picker" @input="localMemo.hrDOB = $event.target.value" />
                         </div>
                       </div>
                       <div v-else class="detail-value">{{ localMemo.hrDOB || '-' }}</div>
@@ -928,20 +930,27 @@ const normalizeTravelDate = (dateStr) => {
                   </div>
                   <div class="detail-row">
                     <div class="detail-group">
-                      <label>Start Work</label>
+                      <label>Date of Joining</label>
                       <div v-if="isEditMode" class="date-input-group">
                         <input type="text" v-model="localMemo.hrStartWork" placeholder="YYYY-MM-DD"
                           class="form-input" />
                         <div class="date-picker-trigger">
                           <Calendar class="icon-small" />
-                          <input type="date" v-model="localMemo.hrStartWork" class="hidden-date-picker" />
+                          <input type="date" v-model="localMemo.hrStartWork" class="hidden-date-picker" @input="localMemo.hrStartWork = $event.target.value" />
                         </div>
                       </div>
                       <div v-else class="detail-value">{{ localMemo.hrStartWork || '-' }}</div>
                     </div>
                     <div class="detail-group">
-                      <label>Division</label>
-                      <input v-if="isEditMode" type="text" v-model="localMemo.hrDivision" class="form-input" />
+                      <label>Work Unit / Division</label>
+                      <select v-if="isEditMode" v-model="localMemo.hrDivision" class="form-select">
+                        <option value="Accounting">Accounting</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Sales">Sales</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="IT">IT</option>
+                      </select>
                       <div v-else class="detail-value">{{ localMemo.hrDivision || '-' }}</div>
                     </div>
                   </div>
@@ -952,19 +961,19 @@ const normalizeTravelDate = (dateStr) => {
                       <div v-else class="detail-value">{{ localMemo.hrBranch || '-' }}</div>
                     </div>
                     <div class="detail-group">
-                      <label>Job Title</label>
+                      <label>Grade / Position</label>
                       <input v-if="isEditMode" type="text" v-model="localMemo.hrJobTitle" class="form-input" />
                       <div v-else class="detail-value">{{ localMemo.hrJobTitle || '-' }}</div>
                     </div>
                   </div>
                   <div class="detail-row">
                     <div class="detail-group">
-                      <label>Status</label>
+                      <label>Marital Status</label>
                       <select v-if="isEditMode" v-model="localMemo.hrStatus" class="form-select">
                         <option value="Single">Single</option>
                         <option value="Married">Married</option>
                       </select>
-                      <div v-else class="detail-value">{{ localMemo.hrStatus }}</div>
+                      <div v-else class="detail-value">{{ localMemo.hrStatus || '-' }}</div>
                     </div>
                     <div class="detail-group">
                       <label>Number of Children</label>
@@ -982,9 +991,9 @@ const normalizeTravelDate = (dateStr) => {
                   </div>
                 </div>
 
-                <!-- Old Salary Breakdown (Conditional) -->
+                <!-- Previous Salary Details (Read Only) -->
                 <div v-if="localMemo.hrSalaryChange === 'yes'" class="detail-section">
-                  <h3 class="section-group-title">Old Salary Breakdown</h3>
+                  <h3 class="section-group-title">Previous Salary Details (Read Only)</h3>
                   <div class="salary-grid">
                     <div class="detail-group">
                       <label>Basic Salary</label>
@@ -1014,18 +1023,18 @@ const normalizeTravelDate = (dateStr) => {
                         0).toLocaleString('id-ID') }}</div>
                     </div>
                     <div class="detail-group salary-total-group">
-                      <label>Total (Read-Only)</label>
+                      <label>Total (Meal/Transport + Position Allowance)</label>
                       <div class="detail-value font-bold text-blue-600">
-                        Rp {{ (Number(localMemo.oldSalary?.basic || 0) + Number(localMemo.oldSalary?.allowance ||
+                        Rp {{ (Number(localMemo.oldSalary?.allowance ||
                           0) + Number(localMemo.oldSalary?.position || 0)).toLocaleString('id-ID') }}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- New Salary Breakdown -->
-                <div class="detail-section">
-                  <h3 class="section-group-title">New Salary Breakdown</h3>
+                <!-- New Salary Details -->
+                <div v-if="localMemo.hrSalaryChange === 'yes'" class="detail-section">
+                  <h3 class="section-group-title">New Salary Details</h3>
                   <div class="salary-grid">
                     <div class="detail-group">
                       <label>Basic Salary</label>
@@ -1055,9 +1064,9 @@ const normalizeTravelDate = (dateStr) => {
                         0).toLocaleString('id-ID') }}</div>
                     </div>
                     <div class="detail-group salary-total-group">
-                      <label>Total (Read-Only)</label>
+                      <label>Total (Meal/Transport + Position Allowance)</label>
                       <div class="detail-value font-bold text-blue-600">
-                        Rp {{ (Number(localMemo.newSalary?.basic || 0) + Number(localMemo.newSalary?.allowance ||
+                        Rp {{ (Number(localMemo.newSalary?.allowance ||
                           0) + Number(localMemo.newSalary?.position || 0)).toLocaleString('id-ID') }}
                       </div>
                     </div>
@@ -1065,7 +1074,7 @@ const normalizeTravelDate = (dateStr) => {
                 </div>
 
                 <!-- Effective Date -->
-                <div class="detail-section">
+                <div v-if="localMemo.hrSalaryChange === 'yes'" class="detail-section">
                   <h3 class="section-group-title">Effective Date</h3>
                   <div class="detail-group">
                     <label>Effective starting from</label>
@@ -1074,7 +1083,7 @@ const normalizeTravelDate = (dateStr) => {
                         class="form-input" />
                       <div class="date-picker-trigger">
                         <Calendar class="icon-small" />
-                        <input type="date" v-model="localMemo.hrEffectiveDate" class="hidden-date-picker" />
+                        <input type="date" v-model="localMemo.hrEffectiveDate" class="hidden-date-picker" @input="localMemo.hrEffectiveDate = $event.target.value" />
                       </div>
                     </div>
                     <div v-else class="detail-value font-medium">{{ localMemo.hrEffectiveDate || '-' }}</div>
