@@ -209,7 +209,21 @@ const handlePressEnd = () => emit('press-end');
 .status-rejected { border-left-color: #dc2626; }
 
 .memo-card-header-new { display: flex; justify-content: space-between; align-items: flex-start; min-height: 48px; }
-.memo-card-title-new { font-size: 1rem; font-weight: 700; color: #0f172a; margin: 0; }
+.memo-card-title-new {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.7rem;
+  max-height: 2.7rem;
+  line-height: 1.35rem;
+}
 .memo-card-number-new { font-family: monospace; font-size: 0.75rem; color: #64748b; }
 
 .status-icon-ghost {
