@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, defineEmits, computed } from 'vue';
+import { defineProps, defineEmits, computed, ref } from 'vue';
 import {
   Eye, Edit, Trash2, X, Paperclip, Bell, Calendar,
   CheckCircle, Clock, AlertCircle, FileText, User, Layers, Check, XCircle, Zap, ArrowRight
@@ -82,6 +82,8 @@ const getActions = (memo) => {
 const handleCardClick = () => emit('select', props.memo);
 const handlePressStart = () => emit('press-start', props.memo);
 const handlePressEnd = () => emit('press-end');
+
+const showSystemOverlay = ref(!!props.memo.externalSystem);
 </script>
 
 <template>
@@ -116,25 +118,24 @@ const handlePressEnd = () => emit('press-end');
         <span class="grid-text">{{ memo.requesterDepartment }} → {{ memo.targetDepartment }}</span>
       </div>
 
-      <!-- System Integration Badge Container -->
-      <div class="grid-item full-width mt-1">
-        <div v-if="memo.externalSystem"
-          :class="['system-badge', memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting']">
-          <Zap class="badge-icon" />
-          <span class="badge-content">
-            {{ memo.externalSystem }}
-            <template v-if="memo.externalReceiptNumber">
-              <span class="badge-sep">•</span>
-              <span class="badge-ref">#{{ memo.externalReceiptNumber }}</span>
-            </template>
-            <template v-else>
-              <span class="badge-sep">:</span>
-              <span class="badge-status">Waiting</span>
-            </template>
-          </span>
-        </div>
-      </div>
     </div>
+
+    <!-- Transparent System Info Overlay -->
+    <Transition name="fade">
+      <div v-if="memo.externalSystem && showSystemOverlay" class="system-info-overlay" @click.stop>
+        <div class="system-modal-content">
+          <Zap class="system-modal-icon" />
+          <div class="system-modal-text">
+            <div class="system-modal-name">{{ memo.externalSystem }}</div>
+            <div class="system-modal-ref" v-if="memo.externalReceiptNumber">#{{ memo.externalReceiptNumber }}</div>
+            <div class="system-modal-status" v-else>Integration Pending</div>
+          </div>
+        </div>
+        <button class="system-modal-close" @click.stop="showSystemOverlay = false">
+          <X class="icon-tiny" />
+        </button>
+      </div>
+    </Transition>
 
     <div class="card-footer-separator-new"></div>
 
@@ -469,6 +470,33 @@ const handlePressEnd = () => emit('press-end');
 .badge-ref {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
+
+/* System Info Overlay */
+.system-info-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.system-modal-content { display: flex; align-items: center; gap: 0.75rem; }
+.system-modal-icon { width: 20px; height: 20px; color: #3b82f6; }
+.system-modal-text { display: flex; flex-direction: column; }
+.system-modal-name { font-size: 0.85rem; font-weight: 700; color: #1e293b; }
+.system-modal-ref { font-family: monospace; font-size: 0.75rem; color: #64748b; }
+.system-modal-status { font-size: 0.75rem; color: #94a3b8; font-style: italic; }
+.system-modal-close { position: absolute; top: 0.5rem; right: 0.5rem; border: none; background: none; cursor: pointer; color: #64748b; }
 
 .mt-1 {
   margin-top: 0.25rem;
