@@ -32,6 +32,19 @@ const isAttachmentsCollapsed = ref(true);
 const isMobile = ref(false);
 const checkMobile = () => { isMobile.value = window.innerWidth <= 1024; };
 
+const isCurrentApprover = computed(() => {
+  if (!localMemo.value) return false;
+  const isPendingMemo = ['Pending', 'In Review'].includes(localMemo.value.status);
+  if (!isPendingMemo) return false;
+  const activeTier = localMemo.value.approvalChain?.find(tier =>
+    tier.approvers.some(a => ['Pending', 'In Review', 'Waiting'].includes(a.status))
+  );
+  if (!activeTier) return false;
+  return activeTier.approvers.some(a =>
+    a.name === props.currentUser && ['Pending', 'In Review', 'Waiting'].includes(a.status)
+  );
+});
+
 onMounted(() => {
   checkMobile();
   window.addEventListener('resize', checkMobile);
@@ -441,10 +454,10 @@ const handleRemind = (memo) => { alert(`Reminder sent to approvers for Memo ${me
 // Normalize date string to YYYY-MM-DD regardless of input format
 const normalizeTravelDate = (dateStr) => {
   if (!dateStr) return '-';
-  
+
   // If already YYYY-MM-DD, return as is
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-  
+
   // Handle DD-MM-YYYY or DD/MM/YYYY
   const parts = dateStr.split(/[-/]/);
   if (parts.length === 3) {
@@ -505,7 +518,7 @@ const normalizeTravelDate = (dateStr) => {
             <h2 v-else-if="isCreateMode">New Memo Request</h2>
             <h2 v-else>{{ isEditMode ? 'Edit Memo' : 'Memo Details' }}</h2>
             <span v-if="!isCreateMode && localMemo" class="header-memo-number hide-on-mobile">{{ localMemo.memoNumber
-            }}</span>
+              }}</span>
           </div>
           <div class="modal-header-right">
             <div v-if="localMemo && localMemo.isReminded" class="reminded-tag mr-2"
@@ -647,7 +660,7 @@ const normalizeTravelDate = (dateStr) => {
                 <div class="detail-group-stacked">
                   <label>Requester</label>
                   <div v-if="isCreateMode" class="detail-value font-medium text-slate-400 italic">Self ({{ currentUser
-                  }})</div>
+                    }})</div>
                   <div v-else class="detail-value requester-info-row" style="display: flex; align-items: center;">
                     <User class="icon-tiny mr-1 text-slate-400" />
                     <span class="requester-name font-medium">{{ localMemo.requester }}</span>
@@ -759,7 +772,8 @@ const normalizeTravelDate = (dateStr) => {
                     class="detail-group-stacked">
                     <label>Travel Period</label>
                     <div class="travel-date-range">
-                      <div class="travel-date-card" :class="{ 'edit-mode': isEditMode }" @click="isEditMode && openDatePicker($event)">
+                      <div class="travel-date-card" :class="{ 'edit-mode': isEditMode }"
+                        @click="isEditMode && openDatePicker($event)">
                         <div class="travel-date-label">
                           <Calendar class="icon-tiny mr-1" />
                           Start Date
@@ -773,7 +787,8 @@ const normalizeTravelDate = (dateStr) => {
                         <div v-else class="travel-date-value">{{ normalizeTravelDate(localMemo.travStartDate) }}</div>
                       </div>
                       <div class="travel-date-arrow">→</div>
-                      <div class="travel-date-card" :class="{ 'edit-mode': isEditMode }" @click="isEditMode && openDatePicker($event)">
+                      <div class="travel-date-card" :class="{ 'edit-mode': isEditMode }"
+                        @click="isEditMode && openDatePicker($event)">
                         <div class="travel-date-label">
                           <Calendar class="icon-tiny mr-1" />
                           End Date
@@ -1127,7 +1142,7 @@ const normalizeTravelDate = (dateStr) => {
                           <div class="timeline-header"
                             style="justify-content: flex-start; gap: 8px; align-items: center;">
                             <span class="timeline-action font-bold" :class="getHistoryColor(item.action)">{{ item.action
-                            }}</span>
+                              }}</span>
                             <span class="timeline-date" style="color: #64748b; font-size: 0.75rem;">{{
                               formatDate(item.at, true) }}</span>
                           </div>
@@ -1172,43 +1187,46 @@ const normalizeTravelDate = (dateStr) => {
                 </div>
               </div>
             </template>
-          </div>
 
-          <!-- Action Area (Moved from footer) -->
-          <div class="modal-section-actions">
-            <div v-if="!isEditMode && activeTab === 'pending_approval' && localMemo.status === 'Pending'"
-              class="modal-actions-group is-centered">
-              <button class="btn-success" @click="handleApprove">
-                <CheckCircle class="icon-small mr-2" /> Approve
-              </button>
-              <button class="btn-warning" @click="handleRequestChanges">
-                <FileEdit class="icon-small mr-2" /> Request Changes
-              </button>
-              <button class="btn-danger" @click="handleReject">
-                <XCircle class="icon-small mr-2" /> Reject
-              </button>
-            </div>
-
-            <template v-if="isEditMode">
-              <div class="modal-actions-group is-centered">
-                <template v-if="isConfirming">
-                  <button class="btn-primary" @click="handleUpdate">Confirm & Submit Submission</button>
-                </template>
-                <template v-else>
-                  <button class="btn-draft" @click="handleSaveDraft">Save Draft</button>
-                  <button class="btn-primary" @click="handleUpdate">
-                    {{ isCreateMode ? 'Submit Request' : 'Update Memo' }}
-                  </button>
-                </template>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="getActions(localMemo).includes('remind')" class="modal-actions-group is-centered">
-                <button class="btn-remind" @click="handleRemind(localMemo)">
-                  <Bell class="icon-small mr-1" /> Remind Approvers
+            <!-- Action Area (Fixed Footer) -->
+            <div class="modal-footer-premium">
+              <div v-if="!isEditMode && isCurrentApprover" class="modal-actions-group">
+                <button class="btn-success action-large" @click="handleApprove">
+                  <CheckCircle class="icon-small mr-2" /> Approve Memo
+                </button>
+                <button class="btn-warning action-large" @click="handleRequestChanges">
+                  <FileEdit class="icon-small mr-2" /> Request Changes
+                </button>
+                <button class="btn-danger action-large" @click="handleReject">
+                  <XCircle class="icon-small mr-2" /> Reject
                 </button>
               </div>
-            </template>
+
+              <template v-else-if="isEditMode">
+                <div class="modal-actions-group">
+                  <template v-if="isConfirming">
+                    <button class="btn-primary action-large" @click="handleUpdate">Confirm & Submit Request</button>
+                    <button class="btn-secondary" @click="cancelConfirmation">Back to Edit</button>
+                  </template>
+                  <template v-else>
+                    <button class="btn-draft" @click="handleSaveDraft">Save Draft</button>
+                    <button class="btn-primary action-large" @click="handleUpdate">
+                      {{ isCreateMode ? 'Submit Request' : 'Update Memo' }}
+                    </button>
+                  </template>
+                </div>
+              </template>
+
+              <template v-else>
+                <div class="modal-actions-group justify-end">
+                  <button v-if="getActions(localMemo).includes('remind')" class="btn-remind"
+                    @click="handleRemind(localMemo)">
+                    <Bell class="icon-small mr-1" /> Remind Approvers
+                  </button>
+                  <button class="btn-secondary" @click="closeViewModal">Close</button>
+                </div>
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -1253,17 +1271,17 @@ const normalizeTravelDate = (dateStr) => {
             <textarea v-model="rejectionReason" class="form-textarea" rows="4"
               :placeholder="reviewModalType === 'Reject' ? 'Explain why this cannot be approved...' : 'Describe what needs to be changed...'"></textarea>
           </div>
-          <div class="modal-section-actions">
-            <div class="modal-actions-group is-centered">
-              <button class="btn-secondary" @click="cancelReviewAction">
-                <X class="icon-small mr-2" /> Cancel
-              </button>
-              <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary'" @click="confirmReviewAction">
-                <XCircle v-if="reviewModalType === 'Reject'" class="icon-small mr-2" />
-                <FileEdit v-else class="icon-small mr-2" />
-                {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
-              </button>
-            </div>
+        </div>
+        <div class="modal-footer-premium">
+          <div class="modal-actions-group justify-center">
+            <button class="btn-secondary" @click="cancelReviewAction">
+              <X class="icon-small mr-2" /> Cancel
+            </button>
+            <button :class="reviewModalType === 'Reject' ? 'btn-danger' : 'btn-primary'" @click="confirmReviewAction">
+              <XCircle v-if="reviewModalType === 'Reject'" class="icon-small mr-2" />
+              <FileEdit v-else class="icon-small mr-2" />
+              {{ reviewModalType === 'Reject' ? 'Confirm Rejection' : 'Confirm Request' }}
+            </button>
           </div>
         </div>
       </div>
@@ -1648,27 +1666,44 @@ const normalizeTravelDate = (dateStr) => {
   color: #64748b;
 }
 
-.modal-section-actions {
-  margin-top: auto;
-  padding-top: 1.5rem;
-  padding-bottom: 1rem;
+.modal-footer-premium {
+  padding: 1.25rem 1.5rem;
   border-top: 1px solid #e2e8f0;
-  flex-shrink: 0;
+  background: white;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.action-large {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
 }
 
 .modal-actions-group {
   display: flex;
   gap: 0.75rem;
+  width: 100%;
   justify-content: center;
 }
 
-.modal-footer {
-  padding: 1.25rem 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
+.modal-actions-group.justify-end {
   justify-content: flex-end;
-  background: #f8fafc;
-  gap: 1rem;
+}
+
+.modal-actions-group.justify-center {
+  justify-content: center;
+}
+
+.btn-remind {
+  background: #ecfdf5;
+  color: #10b981;
+  border: 1px solid #d1fae5;
+}
+
+.modal-footer {
+  display: none;
 }
 
 .btn-success {
