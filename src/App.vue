@@ -157,13 +157,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
     <!-- Sidebar -->
     <div :class="['sidebar-wrapper', { 'mobile-open': isMobileMenuOpen }]">
-      <Sidebar 
-        :is-mobile="isMobile" 
-        :active-view="activeView"
-        @collapse="handleSidebarCollapse" 
-        @close="isMobileMenuOpen = false" 
-        @change-view="activeView = $event"
-      />
+      <Sidebar :is-mobile="isMobile" :active-view="activeView" @collapse="handleSidebarCollapse"
+        @close="isMobileMenuOpen = false" @change-view="activeView = $event" />
     </div>
 
     <!-- Main Content -->
@@ -198,14 +193,10 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
       <div class="list-wrapper">
         <template v-if="activeView === 'summary'">
-          <MemoSummary 
-            :memos="memos" 
-            :members="subordinates" 
-            :currentUser="currentUser" 
-            @view-list="activeView = 'list'; activeTab = 'all'" 
+          <MemoSummary :memos="memos" :members="subordinates" :currentUser="currentUser"
+            @view-list="activeView = 'list'; activeTab = 'all'"
             @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
-            @view-my-pending="activeView = 'list'; activeTab = 'my_memos'; filterState.statuses = ['Pending']"
-          />
+            @view-my-pending="activeView = 'list'; activeTab = 'my_memos'; filterState.statuses = ['Pending']" />
         </template>
         <template v-else-if="activeView === 'list'">
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
@@ -218,7 +209,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       </div>
 
       <footer class="app-footer">
-        <p>Designed by Willy</p>
+        <p>Designed by Willy and Brosur</p>
       </footer>
     </main>
   </div>
@@ -239,7 +230,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   left: 0;
   top: 0;
   height: 100vh;
-  z-index: 1020; /* Higher than mobile header */
+  z-index: 1020;
+  /* Higher than mobile header */
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -308,7 +300,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 .sticky-page-header {
   background-color: var(--bg-app);
-  z-index: 110; /* Increased to stay above list items and cards */
+  z-index: 110;
+  /* Increased to stay above list items and cards */
   padding-bottom: 0px;
   margin-bottom: 1rem;
 }
@@ -324,7 +317,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding: 0.75rem calc(var(--gutter) - 1.25rem) 0; /* Offset by tab-btn padding to align text */
+  padding: 0.75rem calc(var(--gutter) - 1.25rem) 0;
+  /* Offset by tab-btn padding to align text */
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -438,7 +432,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     justify-content: space-between;
     padding: 0 var(--gutter);
     border-bottom: 1px solid #e2e8f0;
-    z-index: 1000; /* Ensure it stays above dashboard sections */
+    z-index: 1000;
+    /* Ensure it stays above dashboard sections */
   }
 
   .mobile-logo {
@@ -459,7 +454,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     inset: 0;
     background: rgba(15, 23, 42, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 1010; /* Above mobile header but below sidebar */
+    z-index: 1010;
+    /* Above mobile header but below sidebar */
   }
 
   .create-btn span {
@@ -480,7 +476,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     margin-bottom: 1rem;
     background-color: white;
     padding: 0;
-    overflow: visible; /* Crucial: allow dropdowns to show */
+    overflow: visible;
+    /* Crucial: allow dropdowns to show */
   }
 
   .header-filter-wrapper {
