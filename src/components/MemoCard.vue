@@ -114,9 +114,9 @@ const handlePressEnd = () => emit('press-end');
         <span class="grid-text">{{ formatDate(memo.createdAt) }}</span>
       </div>
       
-      <!-- System Integration Badge -->
-      <div v-if="memo.externalSystem" class="grid-item full-width mt-1">
-        <div :class="['system-badge', memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting']">
+      <!-- System Integration Badge Container -->
+      <div class="grid-item full-width mt-1">
+        <div v-if="memo.externalSystem" :class="['system-badge', memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting']">
           <Zap class="badge-icon" />
           <span class="badge-content">
             {{ memo.externalSystem }}
@@ -208,7 +208,7 @@ const handlePressEnd = () => emit('press-end');
 .status-requested-changes { border-left-color: #f97316; }
 .status-rejected { border-left-color: #dc2626; }
 
-.memo-card-header-new { display: flex; justify-content: space-between; align-items: flex-start; }
+.memo-card-header-new { display: flex; justify-content: space-between; align-items: flex-start; min-height: 48px; }
 .memo-card-title-new { font-size: 1rem; font-weight: 700; color: #0f172a; margin: 0; }
 .memo-card-number-new { font-family: monospace; font-size: 0.75rem; color: #64748b; }
 
@@ -219,7 +219,7 @@ const handlePressEnd = () => emit('press-end');
 .status-approved .status-icon-ghost { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 
 .memo-card-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.grid-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #475569; }
+.grid-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #475569; min-height: 24px; }
 .grid-item.full-width { grid-column: span 2; }
 .grid-icon { width: 14px; height: 14px; color: #94a3b8; }
 
