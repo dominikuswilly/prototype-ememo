@@ -649,52 +649,7 @@ export const mockMemos = [
       { at: "2026-03-14T10:00:00Z", action: "Approved", user: "Phillip Price", note: "Ready for signing." }
     ]
   },
-  {
-    id: 22,
-    title: "Scenario X: Tier 3 Final Approval",
-    description: "Testing a complex 3-tier approval process where the last tier is still pending.",
-    category: "IT",
-    categoryType: "Template Test STD 1.76.8",
-    requesterDepartment: "Engineering",
-    targetDepartment: "IT",
-    createdAt: "2026-03-15T10:00:00Z",
-    requester: "Willy",
-    status: "In Review",
-    approvalChain: [
-      {
-        tier: 1,
-        type: "single",
-        status: "Approved",
-        requiredApprovals: 1,
-        approvers: [{ name: "Elliot Alderson", role: "Lead", status: "Approved" }]
-      },
-      {
-        tier: 2,
-        type: "quorum",
-        status: "Approved",
-        requiredApprovals: 2,
-        approvers: [
-          { name: "Angela Moss", role: "Manager", status: "Approved" },
-          { name: "Darlene Alderson", role: "Admin", status: "Approved" }
-        ]
-      },
-      {
-        tier: 3,
-        type: "single",
-        status: "In Review",
-        requiredApprovals: 1,
-        approvers: [{ name: "Phillip Price", role: "CEO", status: "In Review" }]
-      }
-    ],
-    attachmentsCount: 2,
-    memoNumber: "TST-2026-999",
-    history: [
-      { at: "2026-03-15T10:00:00Z", action: "Created", user: "Willy" },
-      { at: "2026-03-15T11:00:00Z", action: "Approved Tier 1", user: "Elliot Alderson" },
-      { at: "2026-03-15T12:00:00Z", action: "Approved Tier 2", user: "Angela Moss" },
-      { at: "2026-03-15T12:05:00Z", action: "Approved Tier 2", user: "Darlene Alderson" }
-    ]
-  },
+
   {
     id: 23,
     title: "Project Alpha Budget Update",
@@ -726,42 +681,6 @@ export const mockMemos = [
     history: [
       { at: "2026-03-18T10:00:00Z", action: "Created", user: "Willy", note: "Initial budget request." },
       { at: "2026-03-18T14:00:00Z", action: "Requested Changes", user: "Phillip Price", note: "Please refine the description with more details." }
-    ]
-  },
-  {
-    id: 24,
-    title: "Scenario Y: Resubmitted After Changes Requested",
-    description: "Testing scenario where Tier 2 requested changes, the requester updated the memo, and now approval restarts from Tier 1.",
-    category: "IT",
-    categoryType: "Template Test STD 1.76.9",
-    requesterDepartment: "Engineering",
-    targetDepartment: "IT",
-    createdAt: "2026-03-16T08:00:00Z",
-    requester: "Willy",
-    status: "In Review",
-    approvalChain: [
-      {
-        tier: 1,
-        type: "single",
-        status: "In Review",
-        requiredApprovals: 1,
-        approvers: [{ name: "Elliot Alderson", role: "Lead", status: "In Review" }]
-      },
-      {
-        tier: 2,
-        type: "single",
-        status: "In Review",
-        requiredApprovals: 1,
-        approvers: [{ name: "Phillip Price", role: "CEO", status: "In Review" }]
-      }
-    ],
-    attachmentsCount: 2,
-    memoNumber: "TST-2026-1000",
-    history: [
-      { at: "2026-03-16T08:00:00Z", action: "Created", user: "Willy", note: "Initial submission." },
-      { at: "2026-03-16T09:30:00Z", action: "Approved Tier 1", user: "Elliot Alderson", note: "Approved, moving to Tier 2." },
-      { at: "2026-03-16T11:00:00Z", action: "Requested Changes", user: "Phillip Price", note: "Scope is unclear, please revise the document before approval." },
-      { at: "2026-03-17T10:00:00Z", action: "Changes Submitted", user: "Willy", note: "Document revised based on feedback. Resubmitting for approval from the beginning." }
     ]
   },
   {
