@@ -196,7 +196,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
           <MemoSummary :memos="memos" :members="subordinates" :currentUser="currentUser"
             @view-list="activeView = 'list'; activeTab = 'all'"
             @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
-            @view-my-pending="activeView = 'list'; activeTab = 'my_memos'; filterState.statuses = ['In Review']" />
+            @view-my-pending="activeView = 'list'; activeTab = 'all'; filterState.statuses = ['In Review']" />
         </template>
         <template v-else-if="activeView === 'list'">
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />

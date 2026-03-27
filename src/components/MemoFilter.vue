@@ -26,7 +26,7 @@ const filters = ref({
   member: ''
 });
 
-const availableStatuses = ['Pending', 'Approved', 'Rejected', 'Requested Changes', 'Draft'];
+const availableStatuses = ['In Review', 'Approved', 'Rejected', 'Requested Changes', 'Draft'];
 
 const toggleStatus = (status) => {
   const index = filters.value.statuses.indexOf(status);
@@ -141,9 +141,10 @@ onUnmounted(() => {
           <div class="custom-multi-select" ref="dropdownRef">
             <div class="select-trigger" @click="toggleStatusDropdown" :class="{ 'is-open': isStatusDropdownOpen }">
               <div class="trigger-content">
-                <span v-if="filters.statuses.length === 0" class="placeholder">Select Statuses</span>
+                <span v-if="filters.statuses.length === 0" class="placeholder">All Statuses</span>
                 <div v-else class="selected-tags">
-                  <span v-for="status in filters.statuses" :key="status" class="status-tag" :class="'tag-' + status.toLowerCase().replace(/\s+/g, '-')">
+                  <span v-for="status in filters.statuses" :key="status" class="status-tag"
+                    :class="'tag-' + status.toLowerCase().replace(/\s+/g, '-')">
                     {{ status }}
                   </span>
                 </div>
@@ -152,9 +153,7 @@ onUnmounted(() => {
             </div>
 
             <div v-if="isStatusDropdownOpen" class="dropdown-menu">
-              <div v-for="status in availableStatuses" :key="status" 
-                @click="toggleStatus(status)"
-                class="dropdown-item"
+              <div v-for="status in availableStatuses" :key="status" @click="toggleStatus(status)" class="dropdown-item"
                 :class="{ 'active': filters.statuses.includes(status) }">
                 <div class="checkbox-wrapper">
                   <div class="custom-checkbox" :class="{ 'checked': filters.statuses.includes(status) }">
@@ -185,9 +184,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 0; /* Remove horizontal padding to align with gutter */
+  padding: 0.75rem 0;
+  /* Remove horizontal padding to align with gutter */
   cursor: pointer;
-  background: transparent; /* Seamless integration */
+  background: transparent;
+  /* Seamless integration */
   transition: opacity 0.2s;
 }
 
@@ -242,7 +243,8 @@ onUnmounted(() => {
 }
 
 .filter-content:not(.is-collapsed) {
-  overflow: visible; /* Allow dropdowns to overflow */
+  overflow: visible;
+  /* Allow dropdowns to overflow */
 }
 
 .filter-container {
@@ -250,7 +252,8 @@ onUnmounted(() => {
   flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
-  padding: 1rem 0; /* Remove horizontal padding */
+  padding: 1rem 0;
+  /* Remove horizontal padding */
 }
 
 .filter-group {
@@ -362,7 +365,8 @@ onUnmounted(() => {
   border-radius: 8px;
   cursor: pointer;
   min-height: 38px;
-  height: auto; /* Allow height to grow */
+  height: auto;
+  /* Allow height to grow */
   transition: all 0.2s;
   overflow: visible;
 }
@@ -406,11 +410,30 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.tag-pending { background: #e0e7ff; color: #4f46e5; }
-.tag-approved { background: #dcfce7; color: #16a34a; }
-.tag-rejected { background: #fee2e2; color: #dc2626; }
-.tag-requested-changes { background: #fef9c3; color: #854d0e; }
-.tag-draft { background: #f1f5f9; color: #475569; }
+.tag-in-review {
+  background: #e0e7ff;
+  color: #444ed1;
+}
+
+.tag-approved {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.tag-rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.tag-requested-changes {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.tag-draft {
+  background: #f1f5f9;
+  color: #475569;
+}
 
 .dropdown-icon {
   width: 16px;
@@ -494,7 +517,8 @@ onUnmounted(() => {
   .filter-container {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem; /* Tighter gap on mobile */
+    gap: 0.75rem;
+    /* Tighter gap on mobile */
     padding: 0.75rem 0;
   }
 
@@ -509,7 +533,8 @@ onUnmounted(() => {
   }
 
   .date-separator {
-    display: none; /* Hide 'to' when stacked */
+    display: none;
+    /* Hide 'to' when stacked */
   }
 
   .date-picker-wrapper {
