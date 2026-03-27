@@ -2,7 +2,7 @@
 import { defineProps, defineEmits, computed } from 'vue';
 import {
   Eye, Edit, Trash2, X, Paperclip, Bell, Calendar,
-  CheckCircle, Clock, AlertCircle, FileText, User, Layers, Check, XCircle, Zap
+  CheckCircle, Clock, AlertCircle, FileText, User, Layers, Check, XCircle, Zap, ArrowRight
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -87,7 +87,7 @@ const handlePressEnd = () => emit('press-end');
 <template>
   <div class="memo-card" :class="['status-' + getStatusColor(memo.status), { active: isSelected }]"
     @click="handleCardClick" @touchstart="handlePressStart" @touchend="handlePressEnd">
-    
+
     <div class="memo-card-header-new">
       <div class="header-left">
         <h3 class="memo-card-title-new">{{ memo.title }}</h3>
@@ -105,18 +105,21 @@ const handlePressEnd = () => emit('press-end');
         <User class="grid-icon" />
         <span class="grid-text">{{ memo.requester }}</span>
       </div>
+
       <div class="grid-item">
-        <Layers class="grid-icon" />
-        <span class="grid-text">{{ memo.requesterDepartment }} → {{ memo.targetDepartment }}</span>
-      </div>
-      <div class="grid-item full-width">
         <Calendar class="grid-icon" />
         <span class="grid-text">{{ formatDate(memo.createdAt) }}</span>
       </div>
-      
+
+      <div class="grid-item full-width">
+        <Layers class="grid-icon" />
+        <span class="grid-text">{{ memo.requesterDepartment }} → {{ memo.targetDepartment }}</span>
+      </div>
+
       <!-- System Integration Badge Container -->
       <div class="grid-item full-width mt-1">
-        <div v-if="memo.externalSystem" :class="['system-badge', memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting']">
+        <div v-if="memo.externalSystem"
+          :class="['system-badge', memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting']">
           <Zap class="badge-icon" />
           <span class="badge-content">
             {{ memo.externalSystem }}
@@ -142,8 +145,8 @@ const handlePressEnd = () => emit('press-end');
           <button class="mini-action-btn view" @click.stop="emit('view', memo, false)" title="View Details">
             <Eye class="icon-tiny" />
           </button>
-          <button v-if="getActions(memo).includes('edit') || getActions(memo).includes('update')" class="mini-action-btn edit"
-            @click.stop="emit('view', memo, true)" title="Edit/Update">
+          <button v-if="getActions(memo).includes('edit') || getActions(memo).includes('update')"
+            class="mini-action-btn edit" @click.stop="emit('view', memo, true)" title="Edit/Update">
             <Edit class="icon-tiny" />
           </button>
         </div>
@@ -199,16 +202,44 @@ const handlePressEnd = () => emit('press-end');
   overflow: hidden;
   height: 100%;
 }
-.memo-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1); }
-.memo-card.active { border-color: #3b82f6; background-color: #f8fafc; }
 
-.status-approved { border-left-color: #10b981; }
-.status-in-review { border-left-color: #f59e0b; }
-.status-draft { border-left-color: #64748b; }
-.status-requested-changes { border-left-color: #f97316; }
-.status-rejected { border-left-color: #dc2626; }
+.memo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+}
 
-.memo-card-header-new { display: flex; justify-content: space-between; align-items: flex-start; min-height: 48px; }
+.memo-card.active {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.status-approved {
+  border-left-color: #10b981;
+}
+
+.status-in-review {
+  border-left-color: #f59e0b;
+}
+
+.status-draft {
+  border-left-color: #64748b;
+}
+
+.status-requested-changes {
+  border-left-color: #f97316;
+}
+
+.status-rejected {
+  border-left-color: #dc2626;
+}
+
+.memo-card-header-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 48px;
+}
+
 .memo-card-title-new {
   font-size: 1rem;
   font-weight: 700;
@@ -224,52 +255,180 @@ const handlePressEnd = () => emit('press-end');
   max-height: 2.7rem;
   line-height: 1.35rem;
 }
-.memo-card-number-new { font-family: monospace; font-size: 0.75rem; color: #64748b; }
+
+.memo-card-number-new {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #64748b;
+}
 
 .status-icon-ghost {
-  width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  background: #f1f5f9; color: #64748b;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #64748b;
 }
-.status-approved .status-icon-ghost { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 
-.memo-card-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.grid-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #475569; min-height: 24px; }
-.grid-item.full-width { grid-column: span 2; }
-.grid-icon { width: 14px; height: 14px; color: #94a3b8; }
+.status-approved .status-icon-ghost {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
 
-.card-footer-separator-new { height: 1px; background: #e2e8f0; margin-top: auto; }
-.memo-card-footer-new { display: flex; flex-direction: column; gap: 0.5rem; min-height: 42px; }
-.progress-row-new { display: flex; justify-content: space-between; align-items: center; }
-.progress-label-new { font-size: 0.75rem; font-weight: 700; color: #64748b; }
-.card-actions-mini-new { display: flex; gap: 0.5rem; }
+.memo-card-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.grid-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #475569;
+  min-height: 24px;
+}
+
+.grid-item.full-width {
+  grid-column: span 2;
+}
+
+.grid-icon {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+}
+
+.card-footer-separator-new {
+  height: 1px;
+  background: #e2e8f0;
+  margin-top: auto;
+}
+
+.memo-card-footer-new {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 42px;
+}
+
+.progress-row-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-label-new {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.card-actions-mini-new {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .mini-action-btn {
-  width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e2e8f0;
-  display: flex; align-items: center; justify-content: center; color: #64748b;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
 }
 
-.progress-bar-wrapper-new { height: 6px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
-.progress-bar-fill-new { height: 100%; background: #3b82f6; transition: width 0.3s; }
-.status-approved .progress-bar-fill-new { background: #10b981; }
+.progress-bar-wrapper-new {
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill-new {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.3s;
+}
+
+.status-approved .progress-bar-fill-new {
+  background: #10b981;
+}
 
 /* Overlay */
 .card-overlay {
-  position: absolute; inset: 0; background: rgba(255, 255, 255, 0.95);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem;
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
   z-index: 20;
 }
-.overlay-btns { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
-.overlay-main-btn {
-  width: 100%; padding: 0.6rem; border-radius: 8px; border: none; font-weight: 600;
-  display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;
+
+.overlay-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
 }
-.overlay-main-btn.view { background: #3b82f6; color: white; }
-.overlay-main-btn.edit { background: #f59e0b; color: white; }
-.overlay-main-btn.remind { background: #10b981; color: white; }
-.overlay-main-btn.delete { background: #ef4444; color: white; }
-.overlay-close { position: absolute; top: 0.75rem; right: 0.75rem; border: none; background: none; cursor: pointer; color: #475569; z-index: 30; }
+
+.overlay-main-btn {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.overlay-main-btn.view {
+  background: #3b82f6;
+  color: white;
+}
+
+.overlay-main-btn.edit {
+  background: #f59e0b;
+  color: white;
+}
+
+.overlay-main-btn.remind {
+  background: #10b981;
+  color: white;
+}
+
+.overlay-main-btn.delete {
+  background: #ef4444;
+  color: white;
+}
+
+.overlay-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #475569;
+  z-index: 30;
+}
 
 @media (max-width: 640px) {
-  .memo-card { border-left-width: 1px; }
+  .memo-card {
+    border-left-width: 1px;
+  }
 }
 
 /* System Badge Styles */
@@ -311,8 +470,17 @@ const handlePressEnd = () => emit('press-end');
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-.mt-1 { margin-top: 0.25rem; }
+.mt-1 {
+  margin-top: 0.25rem;
+}
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
