@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import {
   CheckCircle, Clock, XCircle, FileText,
-  Users, Calendar, ArrowRight
+  Users, Calendar, ArrowRight, RotateCcw
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -144,15 +144,15 @@ const getStatusColorClass = (status) => {
         </div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon-wrap rejected">
-          <XCircle class="stat-icon" />
+      <div class="stat-card" @click="emit('view-list')">
+        <div class="stat-icon-wrap requested-changes">
+          <RotateCcw class="stat-icon" />
         </div>
         <div class="stat-info">
-          <span class="stat-label">Rejected</span>
-          <h2 class="stat-value">{{ stats.rejected }}</h2>
+          <span class="stat-label">Requested Changes</span>
+          <h2 class="stat-value">{{ stats.requestedChanges }}</h2>
         </div>
-        <div class="stat-sublabel text-red-500">Requires Review</div>
+        <div class="stat-sublabel text-purple-600">Action Required</div>
       </div>
     </div>
 
@@ -343,6 +343,11 @@ const getStatusColorClass = (status) => {
 .stat-icon-wrap.rejected {
   background: #fef2f2;
   color: #dc2626;
+}
+
+.stat-icon-wrap.requested-changes {
+  background: #faf5ff;
+  color: #9333ea;
 }
 
 .stat-label {
