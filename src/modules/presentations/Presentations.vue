@@ -4,37 +4,60 @@ import {
   Search, Filter, Plus, FileText, Layout, 
   MoreVertical, Download, Eye, Clock, User,
   CheckCircle, AlertCircle, Trash2, X, UploadCloud,
-  Monitor, Briefcase, Globe, TrendingUp, Cpu
+  Monitor, Briefcase, Globe, TrendingUp, Cpu,
+  Settings, Users, Gift, ShieldCheck, CreditCard, Scale, ShieldAlert, BarChart3, Wrench, Heart
 } from 'lucide-vue-next';
 
 const categories = [
   { id: 'all', label: 'All Categories', icon: Layout },
+  { id: 'MARKETING', label: 'Marketing', icon: Globe },
+  { id: 'HRD_GA', label: 'HRD & GA', icon: Users },
+  { id: 'TEKNIK', label: 'Teknik', icon: Wrench },
+  { id: 'EMPLOYEE_BENEFIT', label: 'Employee Benefit', icon: Heart },
+  { id: 'CLAIM', label: 'Claim', icon: ShieldCheck },
   { id: 'IT', label: 'IT', icon: Cpu },
-  { id: 'Finance', label: 'Finance', icon: TrendingUp },
-  { id: 'Marketing', label: 'Marketing', icon: Globe },
-  { id: 'Sales', label: 'Sales', icon: Briefcase },
-  { id: 'HR', label: 'HR', icon: User },
-  { id: 'Product', label: 'Product', icon: Monitor }
+  { id: 'ACCOUNTING_FINANCE', label: 'Accounting & Finance', icon: CreditCard },
+  { id: 'MANAJEMEN', label: 'Manajemen', icon: BarChart3 },
+  { id: 'LEGAL', label: 'Legal', icon: Scale },
+  { id: 'RISK_MANAGEMENT', label: 'Risk Management', icon: ShieldAlert }
 ];
 
-const selectedCategory = ref('all');
+const selectedCategories = ref([]);
 const searchQuery = ref('');
 const isUploadModalOpen = ref(false);
 
+const toggleCategory = (id) => {
+  if (id === 'all') {
+    selectedCategories.value = [];
+    return;
+  }
+  const index = selectedCategories.value.indexOf(id);
+  if (index > -1) {
+    selectedCategories.value.splice(index, 1);
+  } else {
+    selectedCategories.value.push(id);
+  }
+};
+
+const isSelected = (id) => {
+  if (id === 'all') return selectedCategories.value.length === 0;
+  return selectedCategories.value.includes(id);
+};
+
 const mockPresentations = ref([
   { id: 1, title: 'Quarterly Security Audit', category: 'IT', author: 'Elliot Alderson', date: '2026-03-15', size: '4.2 MB' },
-  { id: 2, title: 'Financial Projection 2026', category: 'Finance', author: 'Angela Moss', date: '2026-03-20', size: '2.8 MB' },
-  { id: 3, title: 'Global Brand Strategy', category: 'Marketing', author: 'Phillip Price', date: '2026-03-22', size: '12.5 MB' },
-  { id: 4, title: 'Sales Performance Q1', category: 'Sales', author: 'Susan Jacobs', date: '2026-03-25', size: '5.1 MB' },
-  { id: 5, title: 'Employee Benefits Policy', category: 'HR', author: 'Gideon Goddard', date: '2026-03-28', size: '3.4 MB' },
-  { id: 6, title: 'Product Roadmap V2', category: 'Product', author: 'Willy', date: '2026-03-30', size: '8.9 MB' },
+  { id: 2, title: 'Financial Projection 2026', category: 'ACCOUNTING_FINANCE', author: 'Angela Moss', date: '2026-03-20', size: '2.8 MB' },
+  { id: 3, title: 'Global Brand Strategy', category: 'MARKETING', author: 'Phillip Price', date: '2026-03-22', size: '12.5 MB' },
+  { id: 4, title: 'Sales Performance Q1', category: 'MANAJEMEN', author: 'Susan Jacobs', date: '2026-03-25', size: '5.1 MB' },
+  { id: 5, title: 'Employee Benefits Policy', category: 'HRD_GA', author: 'Gideon Goddard', date: '2026-03-28', size: '3.4 MB' },
+  { id: 6, title: 'Product Roadmap V2', category: 'TEKNIK', author: 'Willy', date: '2026-03-30', size: '8.9 MB' },
   { id: 7, title: 'Network Infrastructure Upgrade', category: 'IT', author: 'Elliot Alderson', date: '2026-03-31', size: '6.7 MB' },
-  { id: 8, title: 'Market Expansion Plan', category: 'Marketing', author: 'Phillip Price', date: '2026-04-01', size: '15.2 MB' }
+  { id: 8, title: 'Market Expansion Plan', category: 'MARKETING', author: 'Phillip Price', date: '2026-04-01', size: '15.2 MB' }
 ]);
 
 const filteredPresentations = computed(() => {
   return mockPresentations.value.filter(p => {
-    const matchesCategory = selectedCategory.value === 'all' || p.category === selectedCategory.value;
+    const matchesCategory = selectedCategories.value.length === 0 || selectedCategories.value.includes(p.category);
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
                          p.author.toLowerCase().includes(searchQuery.value.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -46,7 +69,7 @@ const handleUpload = () => {
   mockPresentations.value.unshift({
     id: Date.now(),
     title: 'New Presentation ' + (mockPresentations.value.length + 1),
-    category: selectedCategory.value === 'all' ? 'Product' : selectedCategory.value,
+    category: selectedCategories.value.length === 0 ? 'IT' : selectedCategories.value[0],
     author: 'Willy',
     date: new Date().toISOString().split('T')[0],
     size: '1.5 MB'
@@ -57,28 +80,49 @@ const handleUpload = () => {
 
 <template>
   <div class="presentations-page">
-    <!-- Header Actions -->
-    <div class="page-actions">
-      <div class="search-box">
-        <Search class="search-icon" />
-        <input v-model="searchQuery" type="text" placeholder="Search presentations..." />
+    <!-- Search & Filters Container (Responsive Stack) -->
+    <div class="controls-container">
+      <!-- 1. Keyword search -->
+      <div class="search-wrap">
+        <div class="search-box">
+          <Search class="search-icon" />
+          <input v-model="searchQuery" type="text" placeholder="Search keyword..." />
+        </div>
       </div>
-      <button class="btn-primary" @click="isUploadModalOpen = true">
-        <Plus class="icon-small" />
-        <span>Upload Presentation</span>
-      </button>
+
+      <!-- 2. Filter by department (Mobile visible) -->
+      <div class="mobile-categories-wrap">
+        <div class="horizontal-categories">
+          <button 
+            v-for="cat in categories" 
+            :key="cat.id"
+            :class="['mobile-cat-pill', { active: isSelected(cat.id) }]"
+            @click="toggleCategory(cat.id)"
+          >
+            <span>{{ cat.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Button search (Upload) -->
+      <div class="action-wrap">
+        <button class="btn-primary full-width-mobile" @click="isUploadModalOpen = true">
+          <Plus class="icon-small" />
+          <span>Upload Presentation</span>
+        </button>
+      </div>
     </div>
 
     <div class="main-layout">
-      <!-- Categories Sidebar -->
-      <aside class="categories-sidebar">
+      <!-- Categories Sidebar (Desktop only) -->
+      <aside class="categories-sidebar desktop-only">
         <h3 class="sidebar-title">Categories</h3>
         <div class="category-list">
           <button 
             v-for="cat in categories" 
             :key="cat.id"
-            :class="['category-item', { active: selectedCategory === cat.id }]"
-            @click="selectedCategory = cat.id"
+            :class="['category-item', { active: isSelected(cat.id) }]"
+            @click="toggleCategory(cat.id)"
           >
             <component :is="cat.icon" class="category-icon" />
             <span>{{ cat.label }}</span>
@@ -136,7 +180,7 @@ const handleUpload = () => {
           </div>
           <h3>No presentations found</h3>
           <p>Try adjusting your search or category filter.</p>
-          <button class="btn-secondary" @click="selectedCategory = 'all'; searchQuery = ''">
+          <button class="btn-secondary" @click="selectedCategories = []; searchQuery = ''">
             Clear Filters
           </button>
         </div>
@@ -179,17 +223,44 @@ const handleUpload = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.page-actions {
+.controls-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: white;
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+@media (min-width: 1025px) {
+  .controls-container {
+    flex-direction: row;
+    align-items: center;
+    background: transparent;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .mobile-categories-wrap {
+    display: none;
+  }
+  
+  .search-wrap {
+    flex: 1;
+    max-width: 400px;
+  }
+}
+
+.search-wrap {
+  width: 100%;
 }
 
 .search-box {
   position: relative;
-  flex: 1;
-  max-width: 400px;
+  width: 100%;
 }
 
 .search-icon {
@@ -207,9 +278,15 @@ const handleUpload = () => {
   padding: 0.75rem 1rem 0.75rem 3rem;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  background: white;
+  background: #f8fafc;
   font-size: 0.95rem;
   transition: all 0.2s;
+}
+
+@media (min-width: 1025px) {
+  .search-box input {
+    background: white;
+  }
 }
 
 .search-box input:focus {
@@ -218,18 +295,71 @@ const handleUpload = () => {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.mobile-categories-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.horizontal-categories {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.horizontal-categories::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.mobile-cat-pill {
+  white-space: nowrap;
+  padding: 0.6rem 1.25rem;
+  border-radius: 99px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mobile-cat-pill:active {
+  transform: scale(0.95);
+}
+
+.mobile-cat-pill.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.action-wrap {
+  width: 100%;
+}
+
 .btn-primary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.85rem 1.5rem;
   background: #3b82f6;
   color: white;
   border: none;
   border-radius: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+@media (max-width: 640px) {
+  .full-width-mobile {
+    width: 100%;
+  }
 }
 
 .btn-primary:hover {
@@ -561,15 +691,8 @@ const handleUpload = () => {
 }
 
 @media (max-width: 1024px) {
-  .categories-sidebar {
-    display: none; /* In a real app, convert to a horizontal scroll or dropdown */
-  }
-}
-
-@media (max-width: 640px) {
-  .page-actions {
-    flex-direction: column;
-    align-items: stretch;
+  .desktop-only {
+    display: none;
   }
 }
 </style>
