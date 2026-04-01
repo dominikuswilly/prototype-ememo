@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar.vue';
 import MemoFilter from './modules/ememo/MemoFilter.vue';
 import MemoList from './modules/ememo/MemoList.vue';
 import MemoSummary from './modules/ememo/MemoSummary.vue';
+import Presentations from './modules/presentations/Presentations.vue';
 import { mockMemos } from './data/mockData';
 import { Menu, X, Plus } from 'lucide-vue-next';
 
@@ -43,6 +44,7 @@ const pageTitle = computed(() => {
     if (activeTab.value === 'pending_approval') return 'Needs My Approval';
     return 'All Memos';
   }
+  if (activeView.value === 'presentations') return 'Presentations';
   return activeView.value.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 });
 
@@ -53,6 +55,7 @@ const pageDescription = computed(() => {
     if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
     return 'A simple overview of all memorandums in the system.';
   }
+  if (activeView.value === 'presentations') return 'Manage and view company presentations and resources.';
   return `Management and overview for ${activeView.value.replace('-', ' ')}.`;
 });
 
@@ -206,6 +209,9 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
         </template>
         <template v-else-if="activeView === 'ememo-list'">
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
+        </template>
+        <template v-else-if="activeView === 'presentations'">
+          <Presentations />
         </template>
         <template v-else>
           <div class="placeholder-view">
