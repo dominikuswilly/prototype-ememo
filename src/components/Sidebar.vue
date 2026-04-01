@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { 
-  BarChart2, Settings, ChevronLeft, ChevronRight, 
+import {
+  BarChart2, Settings, ChevronLeft, ChevronRight,
   FileText, LayoutGrid, Bell, User, X,
-  LayoutDashboard, CalendarCheck, Presentation, 
-  GraduationCap, Shield, ClipboardList, Newspaper, 
+  LayoutDashboard, CalendarCheck, Presentation,
+  GraduationCap, Shield, ClipboardList, Newspaper,
   UserCheck, Globe, Users, Network, Building2,
   ChevronDown
 } from 'lucide-vue-next';
@@ -38,10 +38,10 @@ const menuData = [
     isGroup: true,
     children: [
       { id: 'attendance', label: 'Attendance', icon: CalendarCheck, view: 'attendance' },
-      { 
-        id: 'ememo', 
-        label: 'EMemo', 
-        icon: FileText, 
+      {
+        id: 'ememo',
+        label: 'EMemo',
+        icon: FileText,
         isSubGroup: true,
         children: [
           { id: 'ememo-summary', label: 'Summary', icon: BarChart2, view: 'ememo-summary' },
@@ -105,10 +105,9 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
     <div class="sidebar-header">
       <div v-if="!isCollapsed" class="branding" @click="handleNavClick('dashboard')">
         <h2 class="brand-name">SWERP</h2>
-        <span class="brand-subtitle">KBRU in your hand</span>
       </div>
       <div v-else class="logo-collapsed" @click="handleNavClick('dashboard')">SW</div>
-      
+
       <!-- Desktop Collapse Toggle -->
       <button v-if="!isMobile" class="collapse-toggle" @click="toggleCollapse">
         <ChevronLeft v-if="!isCollapsed" class="icon-small" />
@@ -123,13 +122,10 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 
     <nav class="sidebar-nav custom-scrollbar">
       <div v-for="item in menuData" :key="item.id" class="nav-item-container">
-        
+
         <!-- Group Header -->
         <template v-if="item.isGroup">
-          <div 
-            :class="['nav-group-header', { expanded: isGroupExpanded(item.id) }]" 
-            @click="toggleGroup(item.id)"
-          >
+          <div :class="['nav-group-header', { expanded: isGroupExpanded(item.id) }]" @click="toggleGroup(item.id)">
             <span v-if="!isCollapsed" class="group-label">{{ item.label }}</span>
             <div v-else class="group-divider"></div>
             <ChevronDown v-if="!isCollapsed" :class="['chevron-icon', { rotated: isGroupExpanded(item.id) }]" />
@@ -138,29 +134,23 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
           <!-- Group Children -->
           <div v-if="isGroupExpanded(item.id) || isCollapsed" class="nav-group-content">
             <template v-for="child in item.children" :key="child.id">
-              
+
               <!-- SubGroup (Nested) -->
-               <template v-if="child.isSubGroup">
-                <div 
-                  :class="['nav-link sub-group-toggle', { active: child.children.some(c => c.view === activeView) }]"
-                  @click="toggleGroup(child.id)"
-                  :title="child.label"
-                >
+              <template v-if="child.isSubGroup">
+                <div :class="['nav-link sub-group-toggle', { active: child.children.some(c => c.view === activeView) }]"
+                  @click="toggleGroup(child.id)" :title="child.label">
                   <div class="sub-group-info">
                     <component :is="child.icon" class="nav-icon" />
                     <span v-if="!isCollapsed">{{ child.label }}</span>
                   </div>
-                  <ChevronDown v-if="!isCollapsed" :class="['chevron-icon-sm', { rotated: isGroupExpanded(child.id) }]" />
+                  <ChevronDown v-if="!isCollapsed"
+                    :class="['chevron-icon-sm', { rotated: isGroupExpanded(child.id) }]" />
                 </div>
-                
+
                 <div v-if="isGroupExpanded(child.id) && !isCollapsed" class="sub-group-content">
-                  <a 
-                    v-for="subChild in child.children" 
-                    :key="subChild.id"
-                    href="#" 
-                    :class="['nav-link sub-link', { active: activeView === subChild.view }]" 
-                    @click.prevent="handleNavClick(subChild.view)"
-                  >
+                  <a v-for="subChild in child.children" :key="subChild.id" href="#"
+                    :class="['nav-link sub-link', { active: activeView === subChild.view }]"
+                    @click.prevent="handleNavClick(subChild.view)">
                     <component :is="subChild.icon" class="nav-icon-xs" />
                     <span>{{ subChild.label }}</span>
                   </a>
@@ -168,13 +158,8 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
               </template>
 
               <!-- Standard Link -->
-              <a 
-                v-else
-                href="#" 
-                :class="['nav-link', { active: activeView === child.view }]" 
-                :title="child.label"
-                @click.prevent="handleNavClick(child.view)"
-              >
+              <a v-else href="#" :class="['nav-link', { active: activeView === child.view }]" :title="child.label"
+                @click.prevent="handleNavClick(child.view)">
                 <component :is="child.icon" class="nav-icon" />
                 <span v-if="!isCollapsed">{{ child.label }}</span>
               </a>
@@ -183,26 +168,23 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
         </template>
 
         <!-- Direct Link (e.g. Dashboard) -->
-        <a 
-          v-else
-          href="#" 
-          :class="['nav-link root-link', { active: activeView === item.view }]" 
-          :title="item.label"
-          @click.prevent="handleNavClick(item.view)"
-        >
+        <a v-else href="#" :class="['nav-link root-link', { active: activeView === item.view }]" :title="item.label"
+          @click.prevent="handleNavClick(item.view)">
           <component :is="item.icon" class="nav-icon" />
           <span v-if="!isCollapsed">{{ item.label }}</span>
         </a>
       </div>
 
       <div class="nav-divider"></div>
-      
+
       <!-- Existing / Bottom items -->
-      <a href="#" :class="['nav-link', { active: activeView === 'notifications' }]" title="Notifications" @click.prevent="handleNavClick('notifications')">
+      <a href="#" :class="['nav-link', { active: activeView === 'notifications' }]" title="Notifications"
+        @click.prevent="handleNavClick('notifications')">
         <Bell class="nav-icon" />
         <span v-if="!isCollapsed">Notifications</span>
       </a>
-      <a href="#" :class="['nav-link', { active: activeView === 'settings' }]" title="Settings" @click.prevent="handleNavClick('settings')">
+      <a href="#" :class="['nav-link', { active: activeView === 'settings' }]" title="Settings"
+        @click.prevent="handleNavClick('settings')">
         <Settings class="nav-icon" />
         <span v-if="!isCollapsed">Settings</span>
       </a>
@@ -290,7 +272,7 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
   transition: transform 0.2s;
 }
@@ -307,6 +289,7 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
@@ -416,7 +399,8 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   opacity: 0.7;
 }
 
-.chevron-icon, .chevron-icon-sm {
+.chevron-icon,
+.chevron-icon-sm {
   width: 14px;
   height: 14px;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -502,4 +486,3 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   }
 }
 </style>
-
