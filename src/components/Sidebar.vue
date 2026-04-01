@@ -2,7 +2,11 @@
 import { ref } from 'vue';
 import { 
   BarChart2, Settings, ChevronLeft, ChevronRight, 
-  FileText, LayoutGrid, Bell, User
+  FileText, LayoutGrid, Bell, User, X,
+  LayoutDashboard, CalendarCheck, Presentation, 
+  GraduationCap, Shield, ClipboardList, Newspaper, 
+  UserCheck, Globe, Users, Network, Building2,
+  ChevronDown
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -12,12 +16,59 @@ const props = defineProps({
   },
   activeView: {
     type: String,
-    default: 'summary'
+    default: 'ememo-summary'
   }
 });
 
 const isCollapsed = ref(false);
+const expandedGroups = ref(['application']); // Default open Application
+
 const emit = defineEmits(['collapse', 'close', 'change-view']);
+
+const menuData = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    view: 'dashboard'
+  },
+  {
+    id: 'application',
+    label: 'Application',
+    isGroup: true,
+    children: [
+      { id: 'attendance', label: 'Attendance', icon: CalendarCheck, view: 'attendance' },
+      { 
+        id: 'ememo', 
+        label: 'EMemo', 
+        icon: FileText, 
+        isSubGroup: true,
+        children: [
+          { id: 'ememo-summary', label: 'Summary', icon: BarChart2, view: 'ememo-summary' },
+          { id: 'ememo-list', label: 'Memo List', icon: LayoutGrid, view: 'ememo-list' }
+        ]
+      },
+      { id: 'presentations', label: 'Presentations', icon: Presentation, view: 'presentations' },
+      { id: 'training', label: 'Training', icon: GraduationCap, view: 'training' },
+      { id: 'insurance-policy', label: 'Insurance Policy', icon: Shield, view: 'insurance-policy' },
+      { id: 'policy-claims', label: 'Policy Claims', icon: ClipboardList, view: 'policy-claims' },
+      { id: 'corporate-news', label: 'Corporate News', icon: Newspaper, view: 'corporate-news' },
+      { id: 'employee-requests', label: 'Employee Requests', icon: UserCheck, view: 'employee-requests' },
+      { id: 'brokerage', label: 'Brokerage', icon: Globe, view: 'brokerage' },
+      { id: 'guest-management', label: 'Guest Management', icon: Users, view: 'guest-management' }
+    ]
+  },
+  {
+    id: 'administration',
+    label: 'Administration',
+    isGroup: true,
+    children: [
+      { id: 'user-management', label: 'User Management', icon: Users, view: 'user-management' },
+      { id: 'division', label: 'Division', icon: Network, view: 'division' },
+      { id: 'department', label: 'Department', icon: Building2, view: 'department' }
+    ]
+  }
+];
 
 const toggleCollapse = () => {
   if (props.isMobile) return;
@@ -25,19 +76,38 @@ const toggleCollapse = () => {
   emit('collapse', isCollapsed.value);
 };
 
+const toggleGroup = (groupId) => {
+  if (isCollapsed.value && !props.isMobile) {
+    isCollapsed.value = false;
+    emit('collapse', false);
+  }
+  const index = expandedGroups.value.indexOf(groupId);
+  if (index > -1) {
+    expandedGroups.value.splice(index, 1);
+  } else {
+    expandedGroups.value.push(groupId);
+  }
+};
+
 const handleNavClick = (view) => {
+  if (!view) return;
   emit('change-view', view);
   if (props.isMobile) {
     emit('close');
   }
 };
+
+const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 </script>
 
 <template>
   <aside :class="['sidebar', { collapsed: isCollapsed }]">
     <div class="sidebar-header">
-      <h2 v-if="!isCollapsed" @click="handleNavClick('summary')" style="cursor: pointer;">eMemo</h2>
-      <div v-else class="logo-collapsed" @click="handleNavClick('summary')" style="cursor: pointer;">eM</div>
+      <div v-if="!isCollapsed" class="branding" @click="handleNavClick('dashboard')">
+        <h2 class="brand-name">SWERP</h2>
+        <span class="brand-subtitle">KBRU in your hand</span>
+      </div>
+      <div v-else class="logo-collapsed" @click="handleNavClick('dashboard')">SW</div>
       
       <!-- Desktop Collapse Toggle -->
       <button v-if="!isMobile" class="collapse-toggle" @click="toggleCollapse">
@@ -50,25 +120,94 @@ const handleNavClick = (view) => {
         <X class="icon-small" />
       </button>
     </div>
-    <nav class="sidebar-nav">
-      <a href="#" :class="['nav-link', { active: activeView === 'summary' }]" title="Summary" @click.prevent="handleNavClick('summary')">
-        <BarChart2 class="nav-icon" />
-        <span v-if="!isCollapsed">Summary</span>
-      </a>
-      <a href="#" :class="['nav-link', { active: activeView === 'list' }]" title="Memo List" @click.prevent="handleNavClick('list')">
-        <LayoutGrid class="nav-icon" />
-        <span v-if="!isCollapsed">Memo List</span>
-      </a>
+
+    <nav class="sidebar-nav custom-scrollbar">
+      <div v-for="item in menuData" :key="item.id" class="nav-item-container">
+        
+        <!-- Group Header -->
+        <template v-if="item.isGroup">
+          <div 
+            :class="['nav-group-header', { expanded: isGroupExpanded(item.id) }]" 
+            @click="toggleGroup(item.id)"
+          >
+            <span v-if="!isCollapsed" class="group-label">{{ item.label }}</span>
+            <div v-else class="group-divider"></div>
+            <ChevronDown v-if="!isCollapsed" :class="['chevron-icon', { rotated: isGroupExpanded(item.id) }]" />
+          </div>
+
+          <!-- Group Children -->
+          <div v-if="isGroupExpanded(item.id) || isCollapsed" class="nav-group-content">
+            <template v-for="child in item.children" :key="child.id">
+              
+              <!-- SubGroup (Nested) -->
+               <template v-if="child.isSubGroup">
+                <div 
+                  :class="['nav-link sub-group-toggle', { active: child.children.some(c => c.view === activeView) }]"
+                  @click="toggleGroup(child.id)"
+                  :title="child.label"
+                >
+                  <div class="sub-group-info">
+                    <component :is="child.icon" class="nav-icon" />
+                    <span v-if="!isCollapsed">{{ child.label }}</span>
+                  </div>
+                  <ChevronDown v-if="!isCollapsed" :class="['chevron-icon-sm', { rotated: isGroupExpanded(child.id) }]" />
+                </div>
+                
+                <div v-if="isGroupExpanded(child.id) && !isCollapsed" class="sub-group-content">
+                  <a 
+                    v-for="subChild in child.children" 
+                    :key="subChild.id"
+                    href="#" 
+                    :class="['nav-link sub-link', { active: activeView === subChild.view }]" 
+                    @click.prevent="handleNavClick(subChild.view)"
+                  >
+                    <component :is="subChild.icon" class="nav-icon-xs" />
+                    <span>{{ subChild.label }}</span>
+                  </a>
+                </div>
+              </template>
+
+              <!-- Standard Link -->
+              <a 
+                v-else
+                href="#" 
+                :class="['nav-link', { active: activeView === child.view }]" 
+                :title="child.label"
+                @click.prevent="handleNavClick(child.view)"
+              >
+                <component :is="child.icon" class="nav-icon" />
+                <span v-if="!isCollapsed">{{ child.label }}</span>
+              </a>
+            </template>
+          </div>
+        </template>
+
+        <!-- Direct Link (e.g. Dashboard) -->
+        <a 
+          v-else
+          href="#" 
+          :class="['nav-link root-link', { active: activeView === item.view }]" 
+          :title="item.label"
+          @click.prevent="handleNavClick(item.view)"
+        >
+          <component :is="item.icon" class="nav-icon" />
+          <span v-if="!isCollapsed">{{ item.label }}</span>
+        </a>
+      </div>
+
       <div class="nav-divider"></div>
-      <a href="#" class="nav-link" title="Notifications" @click.prevent="handleNavClick('notifications')">
+      
+      <!-- Existing / Bottom items -->
+      <a href="#" :class="['nav-link', { active: activeView === 'notifications' }]" title="Notifications" @click.prevent="handleNavClick('notifications')">
         <Bell class="nav-icon" />
         <span v-if="!isCollapsed">Notifications</span>
       </a>
-      <a href="#" class="nav-link" title="Settings" @click.prevent="handleNavClick('settings')">
+      <a href="#" :class="['nav-link', { active: activeView === 'settings' }]" title="Settings" @click.prevent="handleNavClick('settings')">
         <Settings class="nav-icon" />
         <span v-if="!isCollapsed">Settings</span>
       </a>
     </nav>
+
     <div class="sidebar-user" v-if="!isCollapsed">
       <div class="user-avatar">
         <User class="avatar-icon" />
@@ -99,19 +238,33 @@ const handleNavClick = (view) => {
 }
 
 .sidebar-header {
-  padding: 1.5rem;
-  height: 70px;
+  padding: 1rem 1.5rem;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.sidebar-header h2 {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
+.branding {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
   color: white;
+  line-height: 1;
+}
+
+.brand-subtitle {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 4px;
 }
 
 .logo-collapsed {
@@ -120,12 +273,13 @@ const handleNavClick = (view) => {
   color: #3b82f6;
   width: 100%;
   text-align: center;
+  cursor: pointer;
 }
 
 .collapse-toggle {
   position: absolute;
   right: -12px;
-  top: 75px;
+  top: 70px;
   width: 24px;
   height: 24px;
   background: #3b82f6;
@@ -141,20 +295,56 @@ const handleNavClick = (view) => {
   transition: transform 0.2s;
 }
 
-.collapse-toggle:hover {
-  transform: scale(1.1);
-}
-
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 0.75rem;
-  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  gap: 0.25rem;
   flex: 1;
+  overflow-y: auto;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.nav-item-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.nav-group-header:hover {
+  color: #94a3b8;
+}
+
+.group-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  width: 100%;
 }
 
 .nav-link {
-  padding: 0.8rem 1rem;
+  padding: 0.7rem 1rem;
   color: #94a3b8;
   text-decoration: none;
   font-weight: 500;
@@ -162,12 +352,13 @@ const handleNavClick = (view) => {
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.9rem;
+  font-size: 0.9rem;
 }
 
 .sidebar.collapsed .nav-link {
   justify-content: center;
-  padding: 1rem;
+  padding: 0.8rem;
 }
 
 .nav-link:hover {
@@ -176,15 +367,64 @@ const handleNavClick = (view) => {
 }
 
 .nav-link.active {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.root-link.active {
   background-color: #3b82f6;
   color: white;
   box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
 }
 
+.sub-group-toggle {
+  cursor: pointer;
+  justify-content: space-between !important;
+}
+
+.sub-group-info {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.sub-group-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 1.25rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0.5rem;
+}
+
+.sub-link {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}
+
 .nav-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
+}
+
+.nav-icon-xs {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.chevron-icon, .chevron-icon-sm {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.5;
+}
+
+.rotated {
+  transform: rotate(180deg);
 }
 
 .nav-divider {
@@ -195,7 +435,7 @@ const handleNavClick = (view) => {
 
 .sidebar-user {
   margin-top: auto;
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
@@ -204,8 +444,8 @@ const handleNavClick = (view) => {
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: #334155;
   display: flex;
@@ -215,8 +455,8 @@ const handleNavClick = (view) => {
 }
 
 .avatar-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .user-info {
@@ -224,7 +464,7 @@ const handleNavClick = (view) => {
 }
 
 .user-name {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -232,7 +472,7 @@ const handleNavClick = (view) => {
 }
 
 .user-role {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #94a3b8;
 }
 
@@ -250,14 +490,11 @@ const handleNavClick = (view) => {
   transition: background 0.2s;
 }
 
-.mobile-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .icon-small {
   width: 14px;
   height: 14px;
 }
+
 @media (max-width: 768px) {
   .sidebar {
     width: 280px;
@@ -265,3 +502,4 @@ const handleNavClick = (view) => {
   }
 }
 </style>
+

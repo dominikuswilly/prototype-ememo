@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import Sidebar from './components/Sidebar.vue';
-import MemoFilter from './components/MemoFilter.vue';
-import MemoList from './components/MemoList.vue';
-import MemoSummary from './components/MemoSummary.vue';
+import MemoFilter from './modules/ememo/MemoFilter.vue';
+import MemoList from './modules/ememo/MemoList.vue';
+import MemoSummary from './modules/ememo/MemoSummary.vue';
 import { mockMemos } from './data/mockData';
 import { Menu, X, Plus } from 'lucide-vue-next';
 
@@ -11,7 +11,7 @@ const memoListRef = ref(null);
 const memos = ref([...mockMemos]);
 const isMobileMenuOpen = ref(false);
 const activeTab = ref('all');
-const activeView = ref('summary'); // New view state
+const activeView = ref('ememo-summary'); // New view state
 
 // Mock user for "Pending Approval" logic
 // Mock user for hierarchy
@@ -37,17 +37,23 @@ const handleFilterChange = (newFilters) => {
 };
 
 const pageTitle = computed(() => {
-  if (activeView.value === 'summary') return 'Memo Summary';
-  if (activeTab.value === 'my_memos') return 'My Memos';
-  if (activeTab.value === 'pending_approval') return 'Needs My Approval';
-  return 'All Memos';
+  if (activeView.value === 'ememo-summary') return 'Memo Summary';
+  if (activeView.value === 'ememo-list') {
+    if (activeTab.value === 'my_memos') return 'My Memos';
+    if (activeTab.value === 'pending_approval') return 'Needs My Approval';
+    return 'All Memos';
+  }
+  return activeView.value.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 });
 
 const pageDescription = computed(() => {
-  if (activeView.value === 'summary') return 'High-level overview of memorandum activities and statistics.';
-  if (activeTab.value === 'my_memos') return 'Memos created by you, including drafts.';
-  if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
-  return 'A simple overview of all memorandums in the system.';
+  if (activeView.value === 'ememo-summary') return 'High-level overview of memorandum activities and statistics.';
+  if (activeView.value === 'ememo-list') {
+    if (activeTab.value === 'my_memos') return 'Memos created by you, including drafts.';
+    if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
+    return 'A simple overview of all memorandums in the system.';
+  }
+  return `Management and overview for ${activeView.value.replace('-', ' ')}.`;
 });
 
 const pendingCount = computed(() => {
@@ -114,8 +120,8 @@ const filteredMemos = computed(() => {
 });
 
 const triggerCreateModal = async () => {
-  if (activeView.value === 'summary') {
-    activeView.value = 'list';
+  if (activeView.value === 'ememo-summary') {
+    activeView.value = 'ememo-list';
     await nextTick();
   }
   if (memoListRef.value) {
@@ -148,7 +154,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   <div class="app-layout">
     <!-- Mobile Header -->
     <header class="mobile-header">
-      <div class="mobile-logo" @click="activeView = 'summary'" style="cursor: pointer;">eMemo</div>
+      <div class="mobile-logo" @click="activeView = 'ememo-summary'" style="cursor: pointer;">SWERP</div>
       <button @click="toggleMenu" class="menu-btn">
         <Menu v-if="!isMobileMenuOpen" class="icon-small" />
         <X v-else class="icon-small" />
@@ -166,7 +172,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
 
       <header class="sticky-page-header">
-        <div v-if="activeView === 'list'" class="tabs-nav">
+        <div v-if="activeView === 'ememo-list'" class="tabs-nav">
           <button v-for="tab in ['all', 'my_memos', 'pending_approval']" :key="tab"
             :class="['tab-btn', { active: activeTab === tab }]" @click="activeTab = tab">
             {{ tab === 'pending_approval' ? 'Needs My Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
@@ -179,26 +185,26 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             <h1>{{ pageTitle }}</h1>
             <p>{{ pageDescription }}</p>
           </div>
-          <button v-if="activeView === 'list'" class="create-btn" @click="triggerCreateModal">
+          <button v-if="activeView === 'ememo-list'" class="create-btn" @click="triggerCreateModal">
             <Plus class="icon-small" />
             <span>New Request</span>
           </button>
         </div>
 
-        <div v-if="activeView === 'list'" class="header-filter-wrapper">
+        <div v-if="activeView === 'ememo-list'" class="header-filter-wrapper">
           <MemoFilter :members="[{ name: currentUser, role: 'you' }, ...subordinates]" :activeTab="activeTab"
             @filter-change="handleFilterChange" />
         </div>
       </header>
 
       <div class="list-wrapper">
-        <template v-if="activeView === 'summary'">
+        <template v-if="activeView === 'ememo-summary'">
           <MemoSummary :memos="memos" :members="subordinates" :currentUser="currentUser"
-            @view-list="activeView = 'list'; activeTab = 'all'"
-            @view-pending="activeView = 'list'; activeTab = 'pending_approval'"
-            @view-my-pending="activeView = 'list'; activeTab = 'all'; filterState.statuses = ['In Review']" />
+            @view-list="activeView = 'ememo-list'; activeTab = 'all'"
+            @view-pending="activeView = 'ememo-list'; activeTab = 'pending_approval'"
+            @view-my-pending="activeView = 'ememo-list'; activeTab = 'all'; filterState.statuses = ['In Review']" />
         </template>
-        <template v-else-if="activeView === 'list'">
+        <template v-else-if="activeView === 'ememo-list'">
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
         </template>
         <template v-else>
