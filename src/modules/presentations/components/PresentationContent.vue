@@ -109,15 +109,27 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 
 .presentation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-top: 1rem;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1280px) {
+  .presentation-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
   .presentation-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .presentation-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
     margin-top: 1rem;
   }
 }

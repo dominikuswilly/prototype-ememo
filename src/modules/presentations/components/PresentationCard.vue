@@ -146,12 +146,13 @@ const getStatusIcon = (status) => {
 <style scoped>
 .presentation-card {
   background: white;
-  border: 1px solid #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-left: 4px solid #e2e8f0;
   border-radius: 12px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   height: 100%;
@@ -209,7 +210,6 @@ const getStatusIcon = (status) => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
   min-height: 48px;
 }
 
@@ -277,7 +277,6 @@ const getStatusIcon = (status) => {
   font-size: 1.05rem;
   font-weight: 800;
   color: #0f172a;
-  margin-bottom: 0.75rem;
   line-height: 1.4rem;
   letter-spacing: -0.01em;
   display: -webkit-box;
@@ -307,7 +306,6 @@ const getStatusIcon = (status) => {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.4rem;
-  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 640px) {
@@ -340,7 +338,7 @@ const getStatusIcon = (status) => {
 .card-footer {
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid #e2e8f0;
   min-height: 42px;
   display: flex;
   align-items: center;
