@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { 
   Filter, Search, BarChart3, LayoutGrid, List, ChevronDown, ChevronUp,
   Layers, SlidersHorizontal
@@ -31,6 +31,20 @@ const toggleFilter = () => {
 const focusSearch = () => {
   searchInput.value?.focus();
 };
+
+const isMobile = ref(false);
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 640;
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
 
 defineExpose({ focusSearch });
 </script>
@@ -79,7 +93,7 @@ defineExpose({ focusSearch });
         <div class="filter-spacer-alignment"></div>
 
         <!-- 4. More Filters (Trigger) -->
-        <div class="filter-group options-group">
+        <div v-if="!isMobile" class="filter-group options-group">
           <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
             @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
             <SlidersHorizontal class="icon-tiny" />
@@ -88,7 +102,7 @@ defineExpose({ focusSearch });
         </div>
 
         <!-- 4. View Mode Toggle -->
-        <div class="filter-group view-group">
+        <div v-if="!isMobile" class="filter-group view-group">
           <div class="view-toggles">
             <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" @click="emit('update:viewMode', 'grid')"
               title="Grid View">
@@ -106,8 +120,8 @@ defineExpose({ focusSearch });
       </div>
 
       <!-- Expandable More Filters Section -->
-      <transition name="expand">
-        <div v-if="isMoreFiltersOpen" class="more-filters-section">
+      <transition :name="isMobile ? '' : 'expand'">
+        <div v-if="isMoreFiltersOpen || isMobile" class="more-filters-section">
           <div class="filter-group sort-group">
             <label class="filter-label">Sort Order</label>
             <div class="input-icon-wrapper">

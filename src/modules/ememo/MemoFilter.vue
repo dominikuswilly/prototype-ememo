@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { Search, CalendarDays, ChevronDown, ChevronUp, Filter, LayoutGrid, List, User, Check, Clock, SlidersHorizontal, Layers } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -69,8 +69,13 @@ const openDatePicker = (event) => {
   }
 };
 
+// Responsive behavior
+const isMobile = ref(false);
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 640;
+};
+
 // Custom click outside logic
-import { onMounted, onUnmounted } from 'vue';
 const dropdownRef = ref(null);
 
 const handleOutsideClick = (event) => {
@@ -80,10 +85,13 @@ const handleOutsideClick = (event) => {
 };
 
 onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
   document.addEventListener('click', handleOutsideClick);
 });
 
 onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
   document.removeEventListener('click', handleOutsideClick);
 });
 </script>
@@ -157,7 +165,7 @@ onUnmounted(() => {
         </div>
 
         <!-- 4. More Filters -->
-        <div class="filter-group more-group">
+        <div v-if="!isMobile" class="filter-group more-group">
           <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
             @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
             <SlidersHorizontal class="icon-tiny" />
@@ -166,7 +174,7 @@ onUnmounted(() => {
         </div>
 
         <!-- 5. View Mode Toggle -->
-        <div class="filter-group view-group">
+        <div v-if="!isMobile" class="filter-group view-group">
           <div class="view-toggles">
             <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" 
               @click="emit('view-mode-change', 'grid')" title="Grid View">
@@ -179,9 +187,9 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Row 2: Date Range (Only if More Filters is Open) -->
-        <transition name="expand">
-          <div v-if="isMoreFiltersOpen" class="filter-group date-full-group">
+        <!-- Row 2: Date Range (Only if More Filters is Open or on Mobile) -->
+        <transition :name="isMobile ? '' : 'expand'">
+          <div v-if="isMoreFiltersOpen || isMobile" class="filter-group date-full-group">
              <div class="date-range-combined">
                <div class="date-input-box" @click="openDatePicker">
                  <CalendarDays class="input-icon-mini" />
