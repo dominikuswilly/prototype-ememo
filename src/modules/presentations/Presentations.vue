@@ -307,33 +307,30 @@ defineExpose({
 
 <template>
   <div class="presentations-page">
-    <!-- Main Content Area -->
-    <div class="main-content-full">
-      <PresentationContent :items="paginatedPresentations" :view-mode="props.viewMode" :selected-ids="selectedFiles"
-        :active-menu-id="activeMenuId" :is-mobile="isMobileScreen" :is-select-mode="isSelectMode"
-        :is-loading="isPageLoading" @toggle-selection="toggleFileSelection" @open-menu="openMenu"
-        @execute-action="executeAction" @select-all="selectAll" @clear-selection="clearSelection" />
+    <PresentationContent :items="paginatedPresentations" :view-mode="props.viewMode" :selected-ids="selectedFiles"
+      :active-menu-id="activeMenuId" :is-mobile="isMobileScreen" :is-select-mode="isSelectMode"
+      :is-loading="isPageLoading" @toggle-selection="toggleFileSelection" @open-menu="openMenu"
+      @execute-action="executeAction" @select-all="selectAll" @clear-selection="clearSelection" />
 
-      <!-- Pagination Controls -->
-      <div v-if="totalPages > 1" class="pagination-wrap">
-        <div class="pagination-info">
-          Showing <span>{{ currentRange.start }}</span> to <span>{{ currentRange.end }}</span> of <span>{{ currentRange.total }}</span> items
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--" title="Previous Page">
-            <ChevronLeft class="icon-small" />
-          </button>
-          <div class="page-numbers">
-            <button v-for="page in totalPages" :key="page" 
-              :class="['page-number', { active: currentPage === page }]"
-              @click="currentPage = page">
-              {{ page }}
-            </button>
-          </div>
-          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++" title="Next Page">
-            <ChevronRight class="icon-small" />
+    <!-- Pagination Controls -->
+    <div v-if="totalPages > 1" class="pagination-wrap">
+      <div class="pagination-info">
+        Showing <span>{{ currentRange.start }}</span> to <span>{{ currentRange.end }}</span> of <span>{{ currentRange.total }}</span> items
+      </div>
+      <div class="pagination-controls">
+        <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--" title="Previous Page">
+          <ChevronLeft class="icon-small" />
+        </button>
+        <div class="page-numbers">
+          <button v-for="page in totalPages" :key="page" 
+            :class="['page-number', { active: currentPage === page }]"
+            @click="currentPage = page">
+            {{ page }}
           </button>
         </div>
+        <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++" title="Next Page">
+          <ChevronRight class="icon-small" />
+        </button>
       </div>
     </div>
 
@@ -593,11 +590,7 @@ defineExpose({
 .presentations-page {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  animation: fadeIn 0.4s ease-out;
-  padding: 0;
-  min-height: 100vh;
-  background: #f8fafc;
+  width: 100%;
 }
 
 @keyframes fadeIn {
@@ -820,13 +813,7 @@ defineExpose({
   }
 }
 
-/* Main Content Layout */
-.main-content-full {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  flex: 1;
-}
+/* Main Content Layout - Simplified */
 
 /* Category Filter Bar (Universal) */
 .categories-filter-wrap {

@@ -229,19 +229,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
         <div v-if="activeView === 'ememo-list'" class="header-filter-wrapper">
           <MemoFilter :members="[{ name: currentUser, role: 'you' }, ...subordinates]" :activeTab="activeTab"
-            :viewMode="memoViewMode"
-            @filter-change="handleFilterChange" 
+            :viewMode="memoViewMode" @filter-change="handleFilterChange"
             @view-mode-change="(mode) => memoViewMode = mode" />
         </div>
         <div v-else-if="activeView === 'presentations'" class="header-filter-wrapper">
-          <PresentationFilter
-            v-model:search-query="presSearchQuery"
-            v-model:sort-by="presSortBy"
-            v-model:view-mode="presViewMode"
-            :categories="presentationCategories"
-            :selected-categories="presSelectedCategories"
-            @toggle-category="handlePresCategoryToggle"
-          />
+          <PresentationFilter v-model:search-query="presSearchQuery" v-model:sort-by="presSortBy"
+            v-model:view-mode="presViewMode" :categories="presentationCategories"
+            :selected-categories="presSelectedCategories" @toggle-category="handlePresCategoryToggle" />
         </div>
       </header>
 
@@ -253,18 +247,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             @view-my-pending="activeView = 'ememo-list'; activeTab = 'all'; filterState.statuses = ['In Review']" />
         </template>
         <template v-else-if="activeView === 'ememo-list'">
-          <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" 
-            :currentUser="currentUser" :viewMode="memoViewMode" />
+          <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser"
+            :viewMode="memoViewMode" />
         </template>
         <template v-else-if="activeView === 'presentations'">
-          <Presentations 
-            ref="presentationsRef" 
-            :searchQuery="presSearchQuery"
-            :sortBy="presSortBy"
-            :viewMode="presViewMode"
-            :selectedCategories="presSelectedCategories"
-            @update:view-mode="presViewMode = $event"
-          />
+          <Presentations ref="presentationsRef" :searchQuery="presSearchQuery" :sortBy="presSortBy"
+            :viewMode="presViewMode" :selectedCategories="presSelectedCategories"
+            @update:view-mode="presViewMode = $event" />
         </template>
         <template v-else>
           <div class="placeholder-view">
@@ -405,7 +394,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 }
 
 .header-filter-wrapper {
-  padding: 0 var(--gutter) 2rem;
+  padding: 0 var(--gutter);
   position: sticky;
   top: 0;
   background-color: var(--bg-app);
@@ -575,8 +564,15 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 }
 
 @keyframes modalScaleUp {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .welcome-header {
@@ -639,10 +635,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 }
 
 /* Transitions */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s ease;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
