@@ -5,7 +5,7 @@ import {
   MoreVertical, Download, Eye, Clock, User,
   CheckCircle, AlertCircle, Trash2, X, UploadCloud,
   Monitor, Briefcase, Globe, TrendingUp, Cpu,
-  Settings, Users, Gift, ShieldCheck, CreditCard, Scale, ShieldAlert, Wrench, Heart,
+  Settings, Users, Gift, ShieldCheck, CreditCard, Scale, ShieldAlert, BarChart3, Wrench, Heart,
   LayoutGrid, List, ChevronLeft, ChevronRight, FileDigit, FileVideo, FileImage, MoreHorizontal,
   Edit2, FolderInput, Copy, Share2, Lock, Link, Info, History, Archive
 } from 'lucide-vue-next';
@@ -29,7 +29,7 @@ const categories = [
 const selectedCategories = ref([]);
 const searchQuery = ref('');
 const isUploadModalOpen = ref(false);
-const searchInput = ref(null);
+const filterRef = ref(null);
 const categoryScrollRef = ref(null);
 const isPageLoading = ref(true);
 const isCategoryDropdownOpen = ref(false);
@@ -80,7 +80,7 @@ const showToast = (message, type = 'success') => {
 
 const clearSearch = () => {
   searchQuery.value = '';
-  searchInput.value?.focus();
+  filterRef.value?.focusSearch();
 };
 
 const handleResize = () => {
@@ -90,7 +90,7 @@ const handleResize = () => {
 const handleKeydown = (e) => {
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
     e.preventDefault();
-    searchInput.value?.focus();
+    filterRef.value?.focusSearch();
   }
 };
 
@@ -332,6 +332,7 @@ defineExpose({
     <!-- EMemo-style Filter & Search Wrapper -->
     <!-- Presentations Filter Component (Extracted) -->
     <PresentationFilter
+      ref="filterRef"
       v-model:search-query="searchQuery"
       v-model:sort-by="sortBy"
       v-model:view-mode="viewMode"

@@ -20,10 +20,17 @@ const emit = defineEmits([
 ]);
 
 const isFilterCollapsed = ref(false);
+const searchInput = ref(null);
 
 const toggleFilter = () => {
   isFilterCollapsed.value = !isFilterCollapsed.value;
 };
+
+const focusSearch = () => {
+  searchInput.value?.focus();
+};
+
+defineExpose({ focusSearch });
 </script>
 
 <template>
@@ -56,7 +63,7 @@ const toggleFilter = () => {
         <div class="filter-group keyword-group">
           <div class="input-icon-wrapper">
             <Search class="input-icon" />
-            <input type="text" :value="searchQuery" 
+            <input type="text" ref="searchInput" :value="searchQuery" 
               @input="emit('update:searchQuery', $event.target.value)"
               placeholder="Search by Title, Author, or Keyword"
               class="filter-input" />
