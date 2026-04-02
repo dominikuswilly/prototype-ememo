@@ -157,7 +157,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   <div class="app-layout">
     <!-- Mobile Header -->
     <header class="mobile-header">
-      <div class="mobile-logo" @click="activeView = 'ememo-summary'" style="cursor: pointer;">SWERP</div>
+      <div class="mobile-logo" @click="activeView = 'ememo-summary'" style="cursor: pointer;">KBRU</div>
       <button @click="toggleMenu" class="menu-btn">
         <Menu v-if="!isMobileMenuOpen" class="icon-small" />
         <X v-else class="icon-small" />
@@ -280,7 +280,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   align-items: center;
   gap: 0.75rem;
   padding: 0.8rem 1.5rem;
-  background-color: #3b82f6;
+  background-color: var(--brand-primary);
   border: none;
   color: white;
   border-radius: var(--radius-md);
@@ -288,13 +288,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 6px -1px var(--brand-primary-light);
 }
 
 .create-btn:hover {
-  background-color: #2563eb;
+  background-color: var(--brand-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 10px 15px -3px var(--brand-primary-light);
 }
 
 .create-btn:active {
@@ -379,8 +379,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 }
 
 .tab-btn.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: var(--brand-primary);
+  border-bottom-color: var(--brand-primary);
 }
 
 .tab-badge {
@@ -451,7 +451,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   .mobile-logo {
     font-weight: 800;
     font-size: 1.25rem;
-    color: #3b82f6;
+    color: var(--brand-primary);
   }
 
   .menu-btn {

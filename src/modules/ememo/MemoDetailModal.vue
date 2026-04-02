@@ -1465,7 +1465,7 @@ const normalizeTravelDate = (dateStr) => {
 .section-group-title {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--brand-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 1rem 0;
@@ -1533,7 +1533,7 @@ const normalizeTravelDate = (dateStr) => {
 .form-textarea:focus,
 .form-select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
@@ -1586,7 +1586,7 @@ const normalizeTravelDate = (dateStr) => {
   align-items: center;
   justify-content: center;
   margin-bottom: 0.5rem;
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 /* Approval Chain */
@@ -1734,7 +1734,7 @@ const normalizeTravelDate = (dateStr) => {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
   border: none;
 }
@@ -1962,7 +1962,7 @@ button {
 
 .travel-date-card.edit-mode {
   cursor: pointer;
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   background: #f0f7ff;
 }
 

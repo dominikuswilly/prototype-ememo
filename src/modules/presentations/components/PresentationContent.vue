@@ -279,13 +279,13 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 .presentation-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.12), 0 5px 15px -5px rgba(59, 130, 246, 0.1);
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
 }
 
 .presentation-card.selected {
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   background: #f8fbff;
-  box-shadow: 0 0 0 1px #3b82f6;
+  box-shadow: 0 0 0 1px var(--brand-primary);
 }
 
 .card-selection {
@@ -390,7 +390,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 
 /* Ghost Tag Style */
 .category-tag {
-  color: #3b82f6;
+  color: var(--brand-primary);
   background: rgba(59, 130, 246, 0.08);
   border: none;
 }
@@ -492,7 +492,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 }
 
 .col-name { display: flex; align-items: center; gap: 1rem; font-weight: 700; color: #1e293b; }
-.row-file-icon { width: 18px; height: 18px; color: #3b82f6; }
+.row-file-icon { width: 18px; height: 18px; color: var(--brand-primary); }
 @media (max-width: 1024px) { .row-file-icon { width: 24px; height: 24px; } }
 
 @media (max-width: 1024px) {
@@ -590,7 +590,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 }
 
 .icon-action-btn.secondary:hover {
-  color: #3b82f6;
+  color: var(--brand-primary);
   background: #eff6ff;
 }
 
@@ -667,7 +667,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   position: absolute;
   width: 100%;
   height: 100%;
-  background: #3b82f6;
+  background: var(--brand-primary);
   border-radius: 50%;
   opacity: 0.1;
   animation: pulse 2s infinite ease-out;
@@ -681,7 +681,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 .empty-icon {
   width: 44px;
   height: 44px;
-  color: #3b82f6;
+  color: var(--brand-primary);
   position: relative;
   z-index: 2;
 }
@@ -707,7 +707,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   align-items: center;
   gap: 0.6rem;
   padding: 0.8rem 1.75rem;
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
   border: none;
   border-radius: 12px;

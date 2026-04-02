@@ -330,7 +330,7 @@ onUnmounted(() => {
 }
 
 .filter-input:focus {
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
@@ -376,7 +376,7 @@ onUnmounted(() => {
 }
 
 .select-trigger.is-open {
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
@@ -495,8 +495,8 @@ onUnmounted(() => {
 }
 
 .custom-checkbox.checked {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
 }
 
 .check-mark {

@@ -239,7 +239,7 @@ defineExpose({ openCreateModal });
 .page-buttons { display: flex; gap: 0.5rem; }
 .page-btn { padding: 0.5rem 1rem; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
 .page-btn:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }
-.page-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+.page-btn.active { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
 .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .mobile-load-more {
@@ -274,7 +274,7 @@ defineExpose({ openCreateModal });
 .btn-load-more .icon-small {
   width: 18px;
   height: 18px;
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }

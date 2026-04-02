@@ -801,7 +801,7 @@ const handleUpload = () => {
 .search-box input:focus {
   outline: none;
   background: white;
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -942,7 +942,7 @@ const handleUpload = () => {
 
 .toolbar-btn.active {
   background: #eff6ff;
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 .divider {
@@ -961,11 +961,11 @@ const handleUpload = () => {
   font-size: 0.85rem;
   font-weight: 700;
   width: auto;
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 .text-btn.active {
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
 }
 
@@ -1060,8 +1060,8 @@ const handleUpload = () => {
 
 .category-select-btn.active {
   background: #eff6ff;
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
 }
 
 .category-select-btn .btn-text {
@@ -1147,7 +1147,7 @@ const handleUpload = () => {
 .btn-reset {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--brand-primary);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -1200,13 +1200,13 @@ const handleUpload = () => {
 }
 
 .custom-checkbox.checked {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: white;
 }
 
 .dropdown-item:hover .custom-checkbox {
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
 }
 
 .item-icon {
@@ -1216,7 +1216,7 @@ const handleUpload = () => {
 }
 
 .dropdown-item:hover .item-icon {
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 @media (max-width: 1024px) {
@@ -1319,14 +1319,14 @@ const handleUpload = () => {
 
 .cat-pill:hover {
   background: #f8fafc;
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
   transform: translateY(-1px);
 }
 
 .cat-pill.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: white;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
@@ -1358,7 +1358,7 @@ const handleUpload = () => {
 
 .cat-pill:hover .pill-count:not(.cat-pill.active *) {
   background: #eff6ff;
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 /* Administrative Global Icons */
@@ -1377,7 +1377,7 @@ const handleUpload = () => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1.25rem;
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
   border: none;
   border-radius: 10px;
@@ -1423,7 +1423,7 @@ const handleUpload = () => {
 
 .custom-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
@@ -1459,7 +1459,7 @@ const handleUpload = () => {
   height: 40px;
   border-radius: 50%;
   background: #eff6ff;
-  color: #3b82f6;
+  color: var(--brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1494,7 +1494,7 @@ const handleUpload = () => {
 .btn-text {
   background: transparent;
   border: none;
-  color: #3b82f6;
+  color: var(--brand-primary);
   font-weight: 700;
   font-size: 0.875rem;
   display: flex;
@@ -1533,8 +1533,8 @@ const handleUpload = () => {
 
 .move-option:hover {
   background: #eff6ff;
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
 }
 
 /* Properties Modal Styles */
@@ -1560,8 +1560,8 @@ const handleUpload = () => {
 }
 
 .properties-tabs button.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
+  color: var(--brand-primary);
+  border-bottom-color: var(--brand-primary);
 }
 
 .properties-content {
@@ -1777,8 +1777,8 @@ const handleUpload = () => {
 
 .action-group-grid button:active {
   background: #eff6ff;
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
   transform: scale(0.95);
 }
 
@@ -1847,7 +1847,7 @@ const handleUpload = () => {
 }
 
 .count-pill {
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
   padding: 2px 10px;
   border-radius: 99px;
@@ -1977,7 +1977,7 @@ const handleUpload = () => {
   position: fixed;
   bottom: 2rem;
   right: 1.5rem;
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
   border: none;
   border-radius: 99px;
@@ -2120,8 +2120,8 @@ const handleUpload = () => {
 }
 
 .page-number.active {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: white;
   box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
 }

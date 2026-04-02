@@ -210,7 +210,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 }
 
 .memo-card.active {
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   background-color: #f8fafc;
 }
 
@@ -354,7 +354,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 
 .progress-bar-fill-new {
   height: 100%;
-  background: #3b82f6;
+  background: var(--brand-primary);
   transition: width 0.3s;
 }
 
@@ -396,7 +396,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 }
 
 .overlay-main-btn.view {
-  background: #3b82f6;
+  background: var(--brand-primary);
   color: white;
 }
 
@@ -499,7 +499,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 .system-modal-icon {
   width: 20px;
   height: 20px;
-  color: #3b82f6;
+  color: var(--brand-primary);
 }
 
 .system-modal-text {

@@ -237,7 +237,7 @@ const selectWizardTemplate = (item) => {
 }
 
 .wizard-search-input:focus {
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 

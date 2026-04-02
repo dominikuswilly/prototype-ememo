@@ -507,7 +507,7 @@ const getStatusColorClass = (status) => {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  background: linear-gradient(90deg, var(--brand-primary), #60a5fa);
   border-radius: 4px;
 }
 
@@ -530,7 +530,7 @@ const getStatusColorClass = (status) => {
 
 .recent-memo-item:hover {
   background: white;
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
   transform: translateX(4px);
 }
@@ -604,7 +604,7 @@ const getStatusColorClass = (status) => {
 .btn-text-link {
   background: none;
   border: none;
-  color: #3b82f6;
+  color: var(--brand-primary);
   font-size: 0.875rem;
   font-weight: 600;
   display: flex;
@@ -652,7 +652,7 @@ const getStatusColorClass = (status) => {
 
 .member-stat-item:hover {
   background: white;
-  border-color: #3b82f6;
+  border-color: var(--brand-primary);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.05);
   transform: translateX(4px);
 }
@@ -703,7 +703,7 @@ const getStatusColorClass = (status) => {
 .member-total-badge {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--brand-primary);
   background: #eff6ff;
   padding: 0.2rem 0.5rem;
   border-radius: 99px;

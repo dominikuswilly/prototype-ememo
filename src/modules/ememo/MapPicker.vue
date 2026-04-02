@@ -240,7 +240,7 @@ watch(() => props.locationQuery, (newVal) => {
   width: 22px;
   height: 22px;
   border: 3px solid #e2e8f0;
-  border-top-color: #3b82f6;
+  border-top-color: var(--brand-primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

@@ -104,9 +104,10 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   <aside :class="['sidebar', { collapsed: isCollapsed }]">
     <div class="sidebar-header">
       <div v-if="!isCollapsed" class="branding" @click="handleNavClick('dashboard')">
-        <h2 class="brand-name">SWERP</h2>
+        <h2 class="brand-name">KBRU</h2>
+        <span class="brand-subtitle">Insurance Brokers</span>
       </div>
-      <div v-else class="logo-collapsed" @click="handleNavClick('dashboard')">SW</div>
+      <div v-else class="logo-collapsed" @click="handleNavClick('dashboard')">KB</div>
 
       <!-- Desktop Collapse Toggle -->
       <button v-if="!isMobile" class="collapse-toggle" @click="toggleCollapse">
@@ -205,7 +206,7 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 <style scoped>
 .sidebar {
   width: 260px;
-  background-color: #1e293b;
+  background-color: var(--brand-dark);
   color: white;
   display: flex;
   flex-direction: column;
@@ -235,24 +236,27 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 }
 
 .brand-name {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 900;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   color: white;
   line-height: 1;
+  text-shadow: 2px 2px 0 var(--brand-primary);
 }
 
 .brand-subtitle {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: #94a3b8;
-  font-weight: 500;
+  font-weight: 700;
   margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .logo-collapsed {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #3b82f6;
+  color: var(--brand-primary);
   width: 100%;
   text-align: center;
   cursor: pointer;
@@ -264,7 +268,7 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   top: 70px;
   width: 24px;
   height: 24px;
-  background: #3b82f6;
+  background: var(--brand-primary);
   border: none;
   border-radius: 50%;
   color: white;
@@ -330,7 +334,7 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   padding: 0.7rem 1rem;
   color: #94a3b8;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 8px;
   transition: all 0.2s;
   display: flex;
@@ -350,15 +354,15 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 }
 
 .nav-link.active {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
   font-weight: 600;
 }
 
 .root-link.active {
-  background-color: #3b82f6;
+  background-color: var(--brand-primary);
   color: white;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(225, 29, 46, 0.2);
 }
 
 .sub-group-toggle {
@@ -458,6 +462,7 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
 .user-role {
   font-size: 0.7rem;
   color: #94a3b8;
+  font-weight: 600;
 }
 
 .mobile-close-btn {
