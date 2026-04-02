@@ -138,6 +138,7 @@ const toggleMenu = () => {
 };
 
 const isSidebarCollapsed = ref(false);
+const showWelcomeModal = ref(true);
 
 const isMobile = ref(window.innerWidth <= 768);
 
@@ -220,9 +221,26 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
         </template>
       </div>
 
-      <footer class="app-footer">
-        <p>Designed by Willy and Brosur</p>
-      </footer>
+      <!-- Welcome Modal -->
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showWelcomeModal" class="welcome-overlay" @click.self="showWelcomeModal = false">
+            <div class="welcome-modal">
+              <div class="welcome-header">
+                <div class="welcome-logo">KBRU</div>
+                <div class="welcome-subtitle">Insurance Brokers</div>
+              </div>
+              <div class="welcome-body">
+                <h3>Welcome to the SWERP Prototype</h3>
+                <p>This application was designed and developed by <strong>Willy and Brosur</strong>.</p>
+              </div>
+              <div class="welcome-footer">
+                <button class="welcome-btn" @click="showWelcomeModal = false">Enter Application</button>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
     </main>
   </div>
 </template>
@@ -529,26 +547,100 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   }
 }
 
-.app-footer {
-  margin-top: 3rem;
-  padding: 2rem var(--gutter);
-  border-top: 1px solid #e2e8f0;
+/* Welcome Modal Styles */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1.5rem;
+}
+
+.welcome-modal {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  padding: 2.5rem;
   text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalScaleUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(225, 29, 46, 0.1);
 }
 
-.app-footer p {
-  color: var(--text-muted);
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.welcome-header {
+  margin-bottom: 2rem;
+}
+
+.welcome-header .welcome-logo {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--brand-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.welcome-header .welcome-subtitle {
   font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: 0.025em;
+  color: var(--text-muted);
+  font-weight: 700;
   text-transform: uppercase;
-  opacity: 0.6;
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
 }
 
-@media (max-width: 768px) {
-  .app-footer {
-    padding-bottom: 6rem;
-    /* Space for fab button */
-  }
+.welcome-body h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+.welcome-body p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.welcome-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--brand-primary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 10px 15px -3px var(--brand-primary-light);
+}
+
+.welcome-btn:hover {
+  background: var(--brand-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 20px -5px var(--brand-primary-light);
+}
+
+.welcome-btn:active {
+  transform: translateY(0);
+}
+
+/* Transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

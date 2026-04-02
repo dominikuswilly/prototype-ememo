@@ -1392,6 +1392,46 @@ const handleUpload = () => {
 }
 
 /* Administrative Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 2100;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* Modal Animations via Transition */
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-active .modal-content {
+  animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fade-leave-active .modal-content {
+  animation: modalPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) reverse;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 .modal-content.sm {
   max-width: 400px;
 }
@@ -1400,16 +1440,46 @@ const handleUpload = () => {
   max-width: 550px;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.form-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #475569;
-  margin-bottom: 0.5rem;
+.modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.btn-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f8fafc;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-body.no-padding {
+  padding: 0;
 }
 
 .custom-input {
@@ -1800,23 +1870,6 @@ const handleUpload = () => {
   font-weight: 800;
   color: #64748b;
   cursor: pointer;
-}
-
-/* Transitions for Sheet */
-.sheet-enter-active,
-.sheet-leave-active {
-  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.sheet-enter-from,
-.sheet-leave-to {
-  opacity: 0;
-  transform: translateY(100%);
-}
-
-.sheet-enter-active .bottom-sheet-content,
-.sheet-leave-active .bottom-sheet-content {
-  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Desktop Bulk Actions Toolbar */
