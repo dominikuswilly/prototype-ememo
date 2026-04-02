@@ -93,11 +93,17 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
     <div class="memo-card-header-new">
       <div class="header-left">
         <h3 class="memo-card-title-new">{{ memo.title }}</h3>
-        <span class="memo-card-number-new">#{{ memo.memoNumber }}</span>
+        <div class="header-meta-row">
+          <span class="memo-card-number-new">#{{ memo.memoNumber }}</span>
+          <div v-if="memo.externalSystem" class="system-integration-badge" :title="`${memo.externalSystem}: ${memo.externalReceiptNumber || 'Pending'}`">
+            <Zap class="icon-tiny-pulse" />
+            <span>{{ memo.externalSystem }}</span>
+          </div>
+        </div>
       </div>
       <div class="header-right">
-        <div class="status-icon-ghost">
-          <component :is="getStatusIcon(memo.status)" class="status-icon-large" />
+        <div :class="['status-indicator-box', getStatusColor(memo.status)]">
+          <component :is="getStatusIcon(memo.status)" class="status-icon-mid" />
         </div>
       </div>
     </div>
@@ -120,28 +126,14 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 
     </div>
 
-    <!-- Transparent System Info Overlay -->
-    <Transition name="fade">
-      <div v-if="memo.externalSystem && showSystemOverlay" class="system-info-overlay" @click.stop>
-        <div class="system-modal-content">
-          <Zap class="system-modal-icon" />
-          <div class="system-modal-text">
-            <div class="system-modal-name">{{ memo.externalSystem }}</div>
-            <div class="system-modal-ref" v-if="memo.externalReceiptNumber">#{{ memo.externalReceiptNumber }}</div>
-            <div class="system-modal-status" v-else>Integration Pending</div>
-          </div>
-        </div>
-        <button class="system-modal-close" @click.stop="showSystemOverlay = false">
-          <X class="icon-tiny" />
-        </button>
-      </div>
-    </Transition>
 
     <div class="card-footer-separator-new"></div>
 
     <div class="memo-card-footer-new">
       <div class="progress-row-new">
-        <span class="progress-label-new">{{ getProgressLabel(memo) }}</span>
+        <span class="progress-label-new" :class="{ 'draft-label': memo.status === 'Draft' }">
+          {{ getProgressLabel(memo) }}
+        </span>
         <div class="card-actions-mini-new">
           <button class="mini-action-btn view" @click.stop="emit('view', memo, false)" title="View Details">
             <Eye class="icon-tiny" />
@@ -153,9 +145,9 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
         </div>
       </div>
 
-      <div class="progress-bar-container-new" v-if="memo.status !== 'Draft'">
+      <div class="progress-bar-container-new">
         <div class="progress-bar-wrapper-new">
-          <div class="progress-bar-fill-new" :style="{ width: getApprovalProgress(memo) + '%' }"></div>
+          <div class="progress-bar-fill-new" :style="{ width: getApprovalProgress(memo) + '%' }" :class="getStatusColor(memo.status)"></div>
         </div>
       </div>
     </div>
@@ -167,17 +159,20 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
             <Eye class="icon-small" /> Open Memo
           </button>
           <button v-if="getActions(memo).includes('update') || getActions(memo).includes('edit')"
-            class="overlay-main-btn edit" @click="emit('view', memo, true)">
+            class="overlay-ghost-btn edit" @click="emit('view', memo, true)">
             <Edit class="icon-small" /> {{ getActions(memo).includes('edit') ? 'Edit Draft' : 'Update Content' }}
           </button>
-          <button v-if="getActions(memo).includes('remind')" class="overlay-main-btn remind"
+          <button v-if="getActions(memo).includes('remind')" class="overlay-ghost-btn remind"
             @click="emit('remind', memo)">
             <Bell class="icon-small" /> Remind Approvers
           </button>
-          <button v-if="getActions(memo).includes('delete')" class="overlay-main-btn delete"
-            @click="emit('delete', memo)">
-            <Trash2 class="icon-small" /> Delete Draft
-          </button>
+          
+          <div class="overlay-footer-actions">
+            <button v-if="getActions(memo).includes('delete')" class="subtle-danger-btn"
+              @click="emit('delete', memo)">
+              <Trash2 class="icon-tiny" /> Delete Draft
+            </button>
+          </div>
         </div>
         <button class="overlay-close" @click="emit('deselect')">
           <X class="icon-small" />
@@ -242,8 +237,8 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 }
 
 .memo-card-title-new {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: #0f172a;
   margin: 0;
   display: -webkit-box;
@@ -252,31 +247,73 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 2.7rem;
-  max-height: 2.7rem;
-  line-height: 1.35rem;
+  min-height: 2.8rem;
+  max-height: 2.8rem;
+  line-height: 1.4rem;
+}
+
+.header-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 .memo-card-number-new {
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.75rem;
+  font-weight: 700;
   color: #64748b;
+  background: #f1f5f9;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
 }
 
-.status-icon-ghost {
-  width: 40px;
-  height: 40px;
+.system-integration-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+  background: #fef2f2;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.icon-tiny-pulse {
+  width: 12px;
+  height: 12px;
+  animation: pulse-red 2s infinite ease-out;
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.status-indicator-box {
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
-  color: #64748b;
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #f1f5f9;
 }
 
-.status-approved .status-icon-ghost {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+.status-indicator-box.approved { background: #ecfdf5; color: #10b981; border-color: #d1fae5; }
+.status-indicator-box.rejected { background: #fef2f2; color: #ef4444; border-color: #fee2e2; }
+.status-indicator-box.in-review { background: #fffbeb; color: #f59e0b; border-color: #fef3c7; }
+.status-indicator-box.requested-changes { background: #fff7ed; color: #f97316; border-color: #ffedd5; }
+.status-indicator-box.draft { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+.status-icon-mid {
+  width: 18px;
+  height: 18px;
 }
 
 .memo-card-body-grid {
@@ -358,8 +395,15 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
   transition: width 0.3s;
 }
 
-.status-approved .progress-bar-fill-new {
-  background: #10b981;
+.status-approved .progress-bar-fill-new { background: #10b981; }
+.status-rejected .progress-bar-fill-new { background: #ef4444; }
+.status-in-review .progress-bar-fill-new { background: #f59e0b; }
+.status-requested-changes .progress-bar-fill-new { background: #f97316; }
+.status-draft .progress-bar-fill-new { background: #e2e8f0; }
+
+.draft-label {
+  color: #94a3b8;
+  font-weight: 600;
 }
 
 /* Overlay */
@@ -378,7 +422,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 .overlay-btns {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
   width: 100%;
 }
 
@@ -398,21 +442,58 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 .overlay-main-btn.view {
   background: var(--brand-primary);
   color: white;
+  box-shadow: 0 4px 12px rgba(225, 29, 46, 0.3);
 }
 
-.overlay-main-btn.edit {
-  background: #f59e0b;
-  color: white;
+.overlay-ghost-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  color: #475569;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.overlay-main-btn.remind {
-  background: #10b981;
-  color: white;
+.overlay-ghost-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
 }
 
-.overlay-main-btn.delete {
-  background: #ef4444;
-  color: white;
+.overlay-footer-actions {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.subtle-danger-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+}
+
+.subtle-danger-btn:hover {
+  color: #ef4444;
+  background: #fef2f2;
 }
 
 .overlay-close {

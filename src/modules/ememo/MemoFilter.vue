@@ -126,7 +126,7 @@ onUnmounted(() => {
         </div>
 
         <!-- 3. Status/Sort Column -->
-        <div class="filter-group status-group">
+        <div :class="['filter-group status-group', { 'is-open': isStatusDropdownOpen }]">
           <div v-if="activeTab !== 'pending_approval'" class="custom-multi-select" ref="dropdownRef">
             <div class="select-trigger" @click="toggleStatusDropdown" :class="{ 'is-open': isStatusDropdownOpen }">
               <div class="trigger-content">
@@ -211,7 +211,8 @@ onUnmounted(() => {
   margin-bottom: 2rem;
   border: 1px solid #e2e8f0;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden removed to allow dropdowns to break out */
+  overflow: visible; 
 }
 
 .filter-header {
@@ -303,6 +304,12 @@ onUnmounted(() => {
 
 .status-group {
   grid-column: span 1;
+  position: relative;
+  z-index: 10;
+}
+
+.status-group.is-open {
+  z-index: 600; /* Forward onto container and higher stacking */
 }
 
 .options-group {

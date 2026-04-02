@@ -2,7 +2,7 @@
 import { 
   FileText, FileVideo, FileImage, MoreVertical, MoreHorizontal,
   Eye, Download, User, Edit2, FolderInput, Copy, Share2, Link, Info, Archive, Trash2,
-  Search
+  Search, Clock, CheckCircle2, AlertCircle
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -80,36 +80,43 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
                 <component :is="getFileIcon(p.fileType)" class="file-icon" />
               </div>
               
-              <div class="card-action-cluster action-wrap-trigger">
-                <!-- Grouped Actions in Top Right -->
-                <button class="icon-action-btn secondary" title="View" v-if="!isMobile">
-                  <Eye class="icon-small" />
-                </button>
-                <button class="icon-action-btn secondary" title="Download" v-if="!isMobile">
-                  <Download class="icon-small" />
-                </button>
-                <div class="relative-inline">
-                  <button class="icon-action-btn" @click.stop="emit('open-menu', p.id)">
-                    <MoreVertical class="icon-small" />
+              <div class="header-right-actions">
+                <div class="status-badge-mini" :title="p.date">
+                  <Clock class="icon-tiny" />
+                  <span>NEW</span>
+                </div>
+                
+                <div class="card-action-cluster action-wrap-trigger">
+                  <!-- Grouped Actions in Top Right -->
+                  <button class="icon-action-btn secondary" title="View" v-if="!isMobile">
+                    <Eye class="icon-small" />
                   </button>
-                  
-                  <!-- Dropdown Menu (Desktop) -->
-                  <div v-if="!isMobile && activeMenuId === p.id" class="dropdown-menu">
-                    <div class="menu-group">
-                      <button @click.stop="emit('execute-action', 'rename', p)"><Edit2 class="icon-tiny" /> Rename</button>
-                      <button @click.stop="emit('execute-action', 'move', p)"><FolderInput class="icon-tiny" /> Move to...</button>
-                      <button @click.stop="emit('execute-action', 'duplicate', p)"><Copy class="icon-tiny" /> Duplicate</button>
-                    </div>
-                    <div class="menu-divider"></div>
-                    <div class="menu-group">
-                      <button @click.stop="emit('execute-action', 'share', p)"><Share2 class="icon-tiny" /> Share</button>
-                      <button @click.stop="emit('execute-action', 'copy-link', p)"><Link class="icon-tiny" /> Copy Link</button>
-                    </div>
-                    <div class="menu-divider"></div>
-                    <div class="menu-group">
-                      <button @click.stop="emit('execute-action', 'properties', p)"><Info class="icon-tiny" /> Properties</button>
-                      <button @click.stop="emit('execute-action', 'archive', p)"><Archive class="icon-tiny" /> Archive</button>
-                      <button class="danger" @click.stop="emit('execute-action', 'delete', p)"><Trash2 class="icon-tiny" /> Delete</button>
+                  <button class="icon-action-btn secondary" title="Download" v-if="!isMobile">
+                    <Download class="icon-small" />
+                  </button>
+                  <div class="relative-inline">
+                    <button class="icon-action-btn" @click.stop="emit('open-menu', p.id)">
+                      <MoreVertical class="icon-small" />
+                    </button>
+                    
+                    <!-- Dropdown Menu (Desktop) -->
+                    <div v-if="!isMobile && activeMenuId === p.id" class="dropdown-menu">
+                      <div class="menu-group">
+                        <button @click.stop="emit('execute-action', 'rename', p)"><Edit2 class="icon-tiny" /> Rename</button>
+                        <button @click.stop="emit('execute-action', 'move', p)"><FolderInput class="icon-tiny" /> Move to...</button>
+                        <button @click.stop="emit('execute-action', 'duplicate', p)"><Copy class="icon-tiny" /> Duplicate</button>
+                      </div>
+                      <div class="menu-divider"></div>
+                      <div class="menu-group">
+                        <button @click.stop="emit('execute-action', 'share', p)"><Share2 class="icon-tiny" /> Share</button>
+                        <button @click.stop="emit('execute-action', 'copy-link', p)"><Link class="icon-tiny" /> Copy Link</button>
+                      </div>
+                      <div class="menu-divider"></div>
+                      <div class="menu-group">
+                        <button @click.stop="emit('execute-action', 'properties', p)"><Info class="icon-tiny" /> Properties</button>
+                        <button @click.stop="emit('execute-action', 'archive', p)"><Archive class="icon-tiny" /> Archive</button>
+                        <button class="danger" @click.stop="emit('execute-action', 'delete', p)"><Trash2 class="icon-tiny" /> Delete</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -125,10 +132,17 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
             </div>
 
             <div class="card-footer">
-              <div class="footer-info">
-                <div class="info-row">
-                  <User class="icon-tiny" />
-                  <span>{{ p.author }} <span class="meta-dot">&bull;</span> {{ p.date }}</span>
+              <div class="footer-layout">
+                <div class="footer-info">
+                  <div class="info-row">
+                    <User class="icon-tiny" />
+                    <span>{{ p.author }} <span class="meta-dot">&bull;</span> {{ p.size }}</span>
+                  </div>
+                </div>
+                <div class="storage-indicator">
+                  <div class="storage-bar">
+                    <div class="storage-fill" :style="{ width: (p.id % 2 === 0 ? '85%' : '40%') }"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -311,8 +325,29 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 .card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
+}
+
+.header-right-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.status-badge-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f0f9ff;
+  color: #0369a1;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border: 1px solid #e0f2fe;
 }
 
 .card-action-cluster {
@@ -347,11 +382,12 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 @media (max-width: 640px) { .file-icon { width: 20px; height: 20px; } }
 
 .presentation-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
   margin-bottom: 0.75rem;
   line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 @media (max-width: 640px) {
@@ -431,9 +467,30 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   margin-top: auto;
   padding-top: 1.25rem;
   border-top: 1px solid #f1f5f9;
+}
+
+.footer-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.storage-indicator {
+  width: 100%;
+}
+
+.storage-bar {
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.storage-fill {
+  height: 100%;
+  background: var(--brand-primary);
+  border-radius: 99px;
+  opacity: 0.6;
 }
 
 @media (max-width: 640px) { .card-footer { display: none; } }
