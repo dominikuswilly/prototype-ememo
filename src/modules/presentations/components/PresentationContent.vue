@@ -105,13 +105,15 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 .content-section {
   flex: 1;
   min-width: 0;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .presentation-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 @media (max-width: 1280px) {
@@ -130,7 +132,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   .presentation-grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
-    margin-top: 1rem;
+    margin-top: 0;
   }
 }
 
@@ -140,7 +142,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   border-radius: 20px;
   border: 1px solid #f1f5f9;
   overflow: hidden;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .list-header {

@@ -591,6 +591,8 @@ defineExpose({
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 @keyframes fadeIn {
