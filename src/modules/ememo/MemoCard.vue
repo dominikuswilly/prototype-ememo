@@ -262,9 +262,9 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 .memo-card-number-new {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.75rem;
-  font-weight: 700;
-  color: #64748b;
-  background: #f1f5f9;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f8fafc;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
 }
@@ -273,12 +273,13 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--brand-primary);
-  background: #fef2f2;
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
+  color: #c41e3a; /* Darker red for contrast */
+  background: #fff1f2;
+  padding: 0.2rem 0.75rem;
+  border-radius: 99px;
+  border: none;
 }
 
 .icon-tiny-pulse {
@@ -327,7 +328,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: #475569;
+  color: #64748b;
   min-height: 24px;
 }
 
@@ -383,7 +384,7 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 }
 
 .progress-bar-wrapper-new {
-  height: 6px;
+  height: 3px;
   background: #f1f5f9;
   border-radius: 99px;
   overflow: hidden;

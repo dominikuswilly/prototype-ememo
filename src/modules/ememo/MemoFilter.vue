@@ -156,26 +156,25 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- 4. View Mode & More Filters -->
-        <div class="filter-group options-group">
-          <div class="options-container">
-            <div class="view-toggles">
-              <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" 
-                @click="emit('view-mode-change', 'grid')" title="Grid View">
-                <LayoutGrid class="icon-tiny" />
-                <span>Grid</span>
-              </button>
-              <button :class="['view-toggle-btn', { active: viewMode === 'list' }]" 
-                @click="emit('view-mode-change', 'list')" title="List View">
-                <List class="icon-tiny" />
-                <span>List</span>
-              </button>
-            </div>
-            
-            <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
-              @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
-              <SlidersHorizontal class="icon-tiny" />
-              <span>More</span>
+        <!-- 4. More Filters -->
+        <div class="filter-group more-group">
+          <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
+            @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
+            <SlidersHorizontal class="icon-tiny" />
+            <span>More</span>
+          </button>
+        </div>
+
+        <!-- 5. View Mode Toggle -->
+        <div class="filter-group view-group">
+          <div class="view-toggles">
+            <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" 
+              @click="emit('view-mode-change', 'grid')" title="Grid View">
+              <LayoutGrid class="icon-tiny" />
+            </button>
+            <button :class="['view-toggle-btn', { active: viewMode === 'list' }]" 
+              @click="emit('view-mode-change', 'list')" title="List View">
+              <List class="icon-tiny" />
             </button>
           </div>
         </div>
@@ -283,9 +282,10 @@ onUnmounted(() => {
 
 .filter-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  padding: 1.5rem;
+  grid-template-columns: minmax(150px, 180px) 1fr minmax(150px, 180px) 100px 90px;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  align-items: end;
 }
 
 .filter-group {
@@ -312,7 +312,11 @@ onUnmounted(() => {
   z-index: 600; /* Forward onto container and higher stacking */
 }
 
-.options-group {
+.more-group {
+  grid-column: span 1;
+}
+
+.view-group {
   grid-column: span 1;
 }
 
@@ -332,7 +336,7 @@ onUnmounted(() => {
 }
 
 .date-full-group {
-  grid-column: span 4;
+  grid-column: span 5;
   margin-top: 0.5rem;
   border-top: 1px dashed #e2e8f0;
   padding-top: 1.5rem;
@@ -479,12 +483,11 @@ onUnmounted(() => {
 }
 
 .member-group {
-  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .status-group {
-  flex: 1;
-  min-width: 200px;
+  min-width: 0;
 }
 
 .custom-multi-select {

@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 import { 
-  Filter, Search, BarChart3, LayoutGrid, List, ChevronDown, ChevronUp 
+  Filter, Search, BarChart3, LayoutGrid, List, ChevronDown, ChevronUp,
+  Layers, SlidersHorizontal
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -20,6 +21,7 @@ const emit = defineEmits([
 ]);
 
 const isFilterCollapsed = ref(false);
+const isMoreFiltersOpen = ref(false);
 const searchInput = ref(null);
 
 const toggleFilter = () => {
@@ -48,18 +50,21 @@ defineExpose({ focusSearch });
 
     <div :class="['filter-content', { 'is-collapsed': isFilterCollapsed }]">
       <div class="filter-container">
-        <!-- Category Filter -->
+        <!-- 1. Category Scope -->
         <div class="filter-group category-group">
-          <select :value="selectedCategories[0] || ''" @change="emit('toggle-category', $event.target.value)"
-            class="filter-input select-input">
-            <option value="">All Categories</option>
-            <option v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id" :value="cat.id">
-              {{ cat.label }}
-            </option>
-          </select>
+          <div class="input-icon-wrapper">
+            <Layers class="input-icon" />
+            <select :value="selectedCategories[0] || ''" @change="emit('toggle-category', $event.target.value)"
+              class="filter-input select-input">
+              <option value="">All Categories</option>
+              <option v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id" :value="cat.id">
+                {{ cat.label }}
+              </option>
+            </select>
+          </div>
         </div>
 
-        <!-- Keyword Search -->
+        <!-- 2. Keyword Search -->
         <div class="filter-group keyword-group">
           <div class="input-icon-wrapper">
             <Search class="input-icon" />
@@ -70,34 +75,52 @@ defineExpose({ focusSearch });
           </div>
         </div>
 
-        <!-- Sort Filter -->
-        <div class="filter-group sort-group">
-          <div class="input-icon-wrapper">
-            <BarChart3 class="input-icon" />
-            <select :value="sortBy" @change="emit('update:sortBy', $event.target.value)" class="filter-input select-input">
-              <option value="date_desc">Latest First</option>
-              <option value="date_asc">Oldest First</option>
-              <option value="title_asc">Title A-Z</option>
-            </select>
-          </div>
+        <!-- 3. Spacer for Ruler Grid Alignment (Matches Status column in Memos) -->
+        <div class="filter-spacer-alignment"></div>
+
+        <!-- 4. More Filters (Trigger) -->
+        <div class="filter-group options-group">
+          <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
+            @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
+            <SlidersHorizontal class="icon-tiny" />
+            <span>More</span>
+          </button>
         </div>
 
-        <!-- View Mode Toggle -->
+        <!-- 4. View Mode Toggle -->
         <div class="filter-group view-group">
           <div class="view-toggles">
             <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" @click="emit('update:viewMode', 'grid')"
-              title="Grid Representation">
+              title="Grid View">
               <LayoutGrid class="icon-tiny" />
-              <span>Grid</span>
             </button>
             <button :class="['view-toggle-btn', { active: viewMode === 'list' }]" @click="emit('update:viewMode', 'list')"
-              title="List Representation">
+              title="List View">
               <List class="icon-tiny" />
-              <span>List</span>
             </button>
           </div>
         </div>
+
+        <!-- 5. Sort Filter (Now in More menu or just moved to fit grid) -->
+        <!-- Moved to expandable section below for 5-element pattern consistency -->
       </div>
+
+      <!-- Expandable More Filters Section -->
+      <transition name="expand">
+        <div v-if="isMoreFiltersOpen" class="more-filters-section">
+          <div class="filter-group sort-group">
+            <label class="filter-label">Sort Order</label>
+            <div class="input-icon-wrapper">
+              <BarChart3 class="input-icon" />
+              <select :value="sortBy" @change="emit('update:sortBy', $event.target.value)" class="filter-input select-input">
+                <option value="date_desc">Latest First</option>
+                <option value="date_asc">Oldest First</option>
+                <option value="title_asc">Title A-Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -175,9 +198,10 @@ defineExpose({ focusSearch });
 
 .filter-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  padding: 1.5rem;
+  grid-template-columns: minmax(150px, 180px) 1fr minmax(150px, 180px) 100px 90px;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  align-items: end;
 }
 
 @media (max-width: 1200px) {
@@ -277,6 +301,57 @@ defineExpose({ focusSearch });
   background: white;
   color: var(--brand-primary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.more-filters-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  height: 42px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.more-filters-btn.active {
+  background: var(--brand-primary);
+  color: white;
+}
+
+.more-filters-section {
+  padding: 1.5rem;
+  border-top: 1px dashed #e2e8f0;
+  background: white;
+}
+
+.filter-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05rem;
+}
+
+.expand-enter-active, .expand-leave-active {
+  transition: all 0.3s ease;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.expand-enter-from, .expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .icon-tiny {

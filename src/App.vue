@@ -311,15 +311,15 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.8rem 1.5rem;
+  padding: 0.75rem 1.75rem;
   background-color: var(--brand-primary);
   border: none;
   color: white;
   border-radius: var(--radius-md);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   box-shadow: 0 4px 6px -1px var(--brand-primary-light);
 }
 
@@ -347,7 +347,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   z-index: 110;
   /* Increased to stay above list items and cards */
   padding-bottom: 0px;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .header-main-row {
@@ -382,7 +382,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 }
 
 .list-wrapper {
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   padding: 0 var(--gutter);
 }
 
