@@ -114,17 +114,10 @@ const formatTagName = (id) => {
     </div>
 
     <div class="card-footer">
-      <div class="footer-layout">
-        <div class="footer-info">
-          <div class="info-row">
-            <User class="icon-tiny" />
-            <span>{{ p.author }} <span class="meta-dot">&bull;</span> {{ p.size }}</span>
-          </div>
-        </div>
-        <div class="storage-indicator">
-          <div class="storage-bar">
-            <div class="storage-fill" :style="{ width: (p.id % 2 === 0 ? '85%' : '40%') }"></div>
-          </div>
+      <div class="footer-info">
+        <div class="info-row">
+          <User class="icon-tiny" />
+          <span>{{ p.author }} <span class="meta-dot">&bull;</span> {{ p.size }}</span>
         </div>
       </div>
     </div>
@@ -135,8 +128,8 @@ const formatTagName = (id) => {
 .presentation-card {
   background: white;
   border: 1px solid #f1f5f9;
-  border-radius: 20px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -191,7 +184,8 @@ const formatTagName = (id) => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  min-height: 48px;
 }
 
 .header-right-actions {
@@ -247,12 +241,20 @@ const formatTagName = (id) => {
 @media (max-width: 640px) { .file-icon { width: 20px; height: 20px; } }
 
 .presentation-title {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #0f172a;
   margin-bottom: 0.75rem;
-  line-height: 1.4;
+  line-height: 1.4rem;
   letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.8rem;
+  max-height: 2.8rem;
 }
 
 @media (max-width: 640px) {
@@ -304,34 +306,11 @@ const formatTagName = (id) => {
 
 .card-footer {
   margin-top: auto;
-  padding-top: 1.25rem;
+  padding-top: 1rem;
   border-top: 1px solid #f1f5f9;
-}
-
-@media (max-width: 640px) { .card-footer { display: none; } }
-
-.footer-layout {
+  min-height: 42px;
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.storage-indicator {
-  width: 100%;
-}
-
-.storage-bar {
-  height: 4px;
-  background: #f1f5f9;
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.storage-fill {
-  height: 100%;
-  background: var(--brand-primary);
-  border-radius: 99px;
-  opacity: 0.6;
+  align-items: center;
 }
 
 .info-row {

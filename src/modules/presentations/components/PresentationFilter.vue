@@ -1,0 +1,279 @@
+<script setup>
+import { ref } from 'vue';
+import { 
+  Filter, Search, BarChart3, LayoutGrid, List, ChevronDown, ChevronUp 
+} from 'lucide-vue-next';
+
+const props = defineProps({
+  categories: { type: Array, required: true },
+  selectedCategories: { type: Array, default: () => [] },
+  searchQuery: { type: String, default: '' },
+  sortBy: { type: String, default: 'date_desc' },
+  viewMode: { type: String, default: 'grid' }
+});
+
+const emit = defineEmits([
+  'update:searchQuery', 
+  'update:sortBy', 
+  'update:viewMode', 
+  'toggle-category'
+]);
+
+const isFilterCollapsed = ref(false);
+
+const toggleFilter = () => {
+  isFilterCollapsed.value = !isFilterCollapsed.value;
+};
+</script>
+
+<template>
+  <div class="filter-wrapper">
+    <div class="filter-header" @click="toggleFilter">
+      <div class="header-left">
+        <Filter class="header-icon" />
+        <span class="header-title">Filter & Search</span>
+      </div>
+      <button class="toggle-btn">
+        <ChevronUp v-if="!isFilterCollapsed" class="toggle-icon" />
+        <ChevronDown v-else class="toggle-icon" />
+      </button>
+    </div>
+
+    <div :class="['filter-content', { 'is-collapsed': isFilterCollapsed }]">
+      <div class="filter-container">
+        <!-- Category Filter -->
+        <div class="filter-group category-group">
+          <select :value="selectedCategories[0] || ''" @change="emit('toggle-category', $event.target.value)"
+            class="filter-input select-input">
+            <option value="">All Categories</option>
+            <option v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id" :value="cat.id">
+              {{ cat.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Keyword Search -->
+        <div class="filter-group keyword-group">
+          <div class="input-icon-wrapper">
+            <Search class="input-icon" />
+            <input type="text" :value="searchQuery" 
+              @input="emit('update:searchQuery', $event.target.value)"
+              placeholder="Search by Title, Author, or Keyword"
+              class="filter-input" />
+          </div>
+        </div>
+
+        <!-- Sort Filter -->
+        <div class="filter-group sort-group">
+          <div class="input-icon-wrapper">
+            <BarChart3 class="input-icon" />
+            <select :value="sortBy" @change="emit('update:sortBy', $event.target.value)" class="filter-input select-input">
+              <option value="date_desc">Latest First</option>
+              <option value="date_asc">Oldest First</option>
+              <option value="title_asc">Title A-Z</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- View Mode Toggle -->
+        <div class="filter-group view-group">
+          <div class="view-toggles">
+            <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" @click="emit('update:viewMode', 'grid')"
+              title="Grid Representation">
+              <LayoutGrid class="icon-tiny" />
+              <span>Grid</span>
+            </button>
+            <button :class="['view-toggle-btn', { active: viewMode === 'list' }]" @click="emit('update:viewMode', 'list')"
+              title="List Representation">
+              <List class="icon-tiny" />
+              <span>List</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.filter-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  background: white;
+  transition: background 0.2s;
+}
+
+.filter-header:hover {
+  background: #f8fafc;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-icon {
+  width: 18px;
+  height: 18px;
+  color: #64748b;
+}
+
+.header-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s;
+}
+
+.filter-content {
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+  max-height: 500px;
+  opacity: 1;
+  border-top: 1px solid #f1f5f9;
+}
+
+.filter-content.is-collapsed {
+  max-height: 0;
+  opacity: 0;
+  border-top-color: transparent;
+}
+
+.filter-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .filter-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.85rem;
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  z-index: 1;
+}
+
+.filter-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 0.75rem 0 2.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.filter-input:focus {
+  background: white;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(225, 29, 46, 0.1);
+}
+
+.select-input {
+  padding-left: 0.85rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+.sort-group .filter-input {
+  padding-left: 2.5rem;
+}
+
+.view-toggles {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  height: 42px;
+}
+
+.view-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-toggle-btn.active {
+  background: white;
+  color: var(--brand-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.icon-tiny {
+  width: 14px;
+  height: 14px;
+}
+</style>
