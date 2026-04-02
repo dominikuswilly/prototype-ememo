@@ -94,7 +94,10 @@ const handleGlobalClick = (e) => {
   if (!e.target.closest('.action-wrap-trigger') && !e.target.closest('.bottom-sheet-content')) {
     activeMenuId.value = null;
   }
-  if (!e.target.closest('.category-select-wrap')) {
+  // Ignore clicks inside the wrap OR inside the teleported modal OR on the backdrop
+  if (!e.target.closest('.category-select-wrap') && 
+      !e.target.closest('.category-multi-dropdown') && 
+      !e.target.closest('.dropdown-backdrop')) {
     isCategoryDropdownOpen.value = false;
   }
 };
@@ -340,13 +343,13 @@ const handleUpload = () => {
             <ChevronDown class="icon-tiny arrow" :class="{ open: isCategoryDropdownOpen }" />
           </button>
 
-          <Teleport to="body">
+          <Teleport to="body" :disabled="!isMobileScreen">
             <Transition name="dropdown">
               <div v-if="isCategoryDropdownOpen">
-                <!-- Backdrop for All Screens -->
-                <div class="dropdown-backdrop" @click="isCategoryDropdownOpen = false"></div>
+                <!-- Backdrop for Mobile ONLY -->
+                <div v-if="isMobileScreen" class="dropdown-backdrop" @click="isCategoryDropdownOpen = false"></div>
                 
-                <div class="category-multi-dropdown">
+                <div class="category-multi-dropdown" @click.stop>
                   <div class="dropdown-header">
                     <span>Filter by Category</span>
                     <button class="btn-reset" v-if="selectedCategories.length > 0" @click="selectedCategories = []">Clear All</button>
@@ -366,9 +369,9 @@ const handleUpload = () => {
                     </button>
                   </div>
 
-                  <!-- Footer for Mobile -->
-                  <div v-if="isMobileScreen" class="dropdown-footer">
-                    <button class="btn-primary full-width" @click="isCategoryDropdownOpen = false">Done</button>
+                  <!-- Footer for Confirmation -->
+                  <div class="dropdown-footer">
+                    <button class="btn-primary full-width" @click.stop="isCategoryDropdownOpen = false">OK</button>
                   </div>
                 </div>
               </div>
@@ -794,9 +797,14 @@ const handleUpload = () => {
 
 @media (min-width: 1025px) {
   .page-header {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  
+  .main-toolbar {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
@@ -1050,7 +1058,8 @@ const handleUpload = () => {
 }
 
 .category-select-btn {
-  width: auto !important;
+  width: 190px !important;
+  justify-content: space-between;
   padding: 0 1rem !important;
   gap: 0.6rem;
   background: #f8fafc;
@@ -1093,24 +1102,37 @@ const handleUpload = () => {
 }
 
 .category-multi-dropdown {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  transform-origin: center center;
-  width: calc(100% - 2.5rem);
-  max-width: 440px;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(12px);
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 0;
+  width: 320px;
+  background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.1);
   z-index: 2000;
   padding: 0.5rem;
   display: flex;
   flex-direction: column;
-  max-height: 85vh;
+  max-height: 480px;
   overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .category-multi-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 2.5rem);
+    max-width: 440px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-height: 85vh;
+    padding: 1.5rem;
+  }
 }
 
 .dropdown-backdrop {
@@ -1242,26 +1264,32 @@ const handleUpload = () => {
   }
 }
 
-/* Dropdown Transition - Focused Center 'Light-up' */
+/* Dropdown Transition - Multi-Format */
 .dropdown-enter-active, .dropdown-leave-active {
-  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Ensure backdrop only fades while modal pop-ins */
-.dropdown-enter-from, .dropdown-leave-to {
-  opacity: 0;
+/* Desktop Transition (Slide Down) */
+@media (min-width: 1025px) {
+  .dropdown-enter-from, .dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
-.dropdown-enter-from .category-multi-dropdown,
-.dropdown-leave-to .category-multi-dropdown {
-  transform: translate(-50%, -50%) scale(0.6) !important;
-  opacity: 0;
-}
-
-.dropdown-enter-to .category-multi-dropdown,
-.dropdown-leave-from .category-multi-dropdown {
-  transform: translate(-50%, -50%) scale(1) !important;
-  opacity: 1;
+/* Mobile Transition (Pop Center) */
+@media (max-width: 1024px) {
+  .dropdown-enter-from .category-multi-dropdown,
+  .dropdown-leave-to .category-multi-dropdown {
+    transform: translate(-50%, -50%) scale(0.6) !important;
+    opacity: 0;
+  }
+  
+  .dropdown-enter-to .category-multi-dropdown,
+  .dropdown-leave-from .category-multi-dropdown {
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1;
+  }
 }
 
 /* Main Content Layout */

@@ -33,9 +33,7 @@ const getFileIcon = (type) => {
 
 const formatTagName = (id) => {
   if (!id) return '';
-  return id.split('_').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-  ).join(' ');
+  return id.replace(/_/g, ' ').toUpperCase();
 };
 
 const isFileSelected = (id) => props.selectedIds.includes(id);
@@ -122,7 +120,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
               <h4 class="presentation-title" :title="p.title">{{ p.title }}</h4>
               <div class="presentation-meta">
                 <span class="category-tag">{{ formatTagName(p.category) }}</span>
-                <span class="file-type-tag">{{ p.fileType }}</span>
+                <span class="file-type-tag">{{ p.fileType.toUpperCase() }}</span>
               </div>
             </div>
 
@@ -180,7 +178,10 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
               <span class="row-title" :title="p.title">{{ p.title }}</span>
             </div>
             <div class="col-category">
-              <span class="category-tag ghost">{{ formatTagName(p.category) }}</span>
+              <div class="flex-center gap-xs">
+                <span class="category-tag ghost">{{ formatTagName(p.category) }}</span>
+                <span class="file-type-badge">{{ p.fileType.toUpperCase() }}</span>
+              </div>
             </div>
             <div class="col-author">
               <div class="row-info">
@@ -219,12 +220,14 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
     <!-- Empty State -->
     <div v-else class="empty-state">
       <div class="empty-icon-wrap">
+        <div class="icon-pulse"></div>
         <Search class="empty-icon" />
       </div>
-      <h3>No presentations found</h3>
-      <p>Try adjusting your search or category filter.</p>
-      <button class="btn-secondary" @click="emit('clear-filters')">
-        Clear Filters
+      <h3 class="em-title">No presentations found</h3>
+      <p class="em-text">Try adjusting your search or category filter to find what you're looking for.</p>
+      <button class="btn-clear-filters" @click="emit('clear-filters')">
+        <X class="icon-tiny" />
+        <span>Clear Filters</span>
       </button>
     </div>
   </section>
@@ -360,8 +363,9 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 
 .presentation-meta {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
   margin-bottom: 1.5rem;
 }
 
@@ -377,7 +381,6 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   border: 1px solid #dbeafe;
   padding: 0.25rem 0.75rem;
   border-radius: 8px;
-  text-transform: capitalize;
 }
 
 /* Ghost Tag Style */
@@ -397,7 +400,26 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   font-size: 0.7rem;
   color: #94a3b8;
   font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.file-type-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
   letter-spacing: 0.05em;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.gap-xs {
+  gap: 0.35rem;
 }
 
 .card-footer {
@@ -611,25 +633,94 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
 }
 
 .empty-state {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 5rem 2rem; text-align: center; background: white; border-radius: 20px; border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .empty-icon-wrap {
-  width: 80px; height: 80px; background: #f8fafc; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+  width: 96px;
+  height: 96px;
+  background: #eff6ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  position: relative;
 }
 
-.empty-icon { width: 40px; height: 40px; color: #cbd5e1; }
-.empty-state h3 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem; }
-.empty-state p { color: #64748b; margin-bottom: 2rem; }
-
-.btn-secondary {
-  padding: 0.6rem 1.25rem; background: #f1f5f9; color: #475569; border: none;
-  border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+.icon-pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: pulse 2s infinite ease-out;
 }
 
-.btn-secondary:hover { background: #e2e8f0; }
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.empty-icon {
+  width: 44px;
+  height: 44px;
+  color: #3b82f6;
+  position: relative;
+  z-index: 2;
+}
+
+.em-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.em-text {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 2.5rem;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.btn-clear-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.75rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.btn-clear-filters:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.35);
+}
+
+.btn-clear-filters:active {
+  transform: translateY(0);
+}
 
 @media (max-width: 1024px) {
   .desktop-only { display: none; }
