@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { 
-  Search, Filter, Plus, FileText, Layout, 
+import {
+  Search, Filter, Plus, FileText, Layout,
   MoreVertical, Download, Eye, Clock, User,
   CheckCircle, AlertCircle, Trash2, X, UploadCloud,
   Monitor, Briefcase, Globe, TrendingUp, Cpu,
@@ -31,10 +31,7 @@ const isUploadModalOpen = ref(false);
 const searchInput = ref(null);
 const categoryScrollRef = ref(null);
 const isPageLoading = ref(true);
-const canScrollLeft = ref(false);
-const canScrollRight = ref(false);
-
-// Platform & Responsive State
+const isCategoryDropdownOpen = ref(false);
 const isMobileScreen = ref(false);
 const isScrolled = ref(false);
 const checkMobile = () => {
@@ -82,6 +79,10 @@ const clearSearch = () => {
   searchInput.value?.focus();
 };
 
+const handleResize = () => {
+  checkMobile();
+};
+
 const handleKeydown = (e) => {
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
     e.preventDefault();
@@ -89,21 +90,13 @@ const handleKeydown = (e) => {
   }
 };
 
-const checkScroll = () => {
-  const el = categoryScrollRef.value;
-  if (!el) return;
-  canScrollLeft.value = el.scrollLeft > 0;
-  canScrollRight.value = el.scrollLeft < (el.scrollWidth - el.clientWidth - 5);
-};
-
-const scrollCategories = (direction) => {
-  const el = categoryScrollRef.value;
-  if (!el) return;
-  const scrollAmount = 300;
-  el.scrollBy({
-    left: direction === 'left' ? -scrollAmount : scrollAmount,
-    behavior: 'smooth'
-  });
+const handleGlobalClick = (e) => {
+  if (!e.target.closest('.action-wrap-trigger') && !e.target.closest('.bottom-sheet-content')) {
+    activeMenuId.value = null;
+  }
+  if (!e.target.closest('.category-select-wrap')) {
+    isCategoryDropdownOpen.value = false;
+  }
 };
 
 onMounted(() => {
@@ -111,27 +104,19 @@ onMounted(() => {
   // Simulate data fetching
   setTimeout(() => {
     isPageLoading.value = false;
-    setTimeout(checkScroll, 100);
   }, 1500);
 
-  window.addEventListener('resize', () => {
-    checkMobile();
-    checkScroll();
-  });
+  window.addEventListener('resize', handleResize);
   window.addEventListener('scroll', handleScroll);
   window.addEventListener('keydown', handleKeydown);
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.action-wrap-trigger') && !e.target.closest('.bottom-sheet-content')) {
-      activeMenuId.value = null;
-    }
-  });
+  document.addEventListener('click', handleGlobalClick);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', checkMobile);
+  window.removeEventListener('resize', handleResize);
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('keydown', handleKeydown);
-  document.removeEventListener('click', null);
+  document.removeEventListener('click', handleGlobalClick);
 });
 
 const toggleCategory = (id) => {
@@ -188,10 +173,10 @@ const executeAction = (action, file) => {
     case 'share': isShareModalOpen.value = true; break;
     case 'properties': isPropertiesModalOpen.value = true; break;
     case 'move': isMoveModalOpen.value = true; break;
-    case 'copy-link': 
-      showToast('Share link copied to clipboard!'); 
+    case 'copy-link':
+      showToast('Share link copied to clipboard!');
       break;
-    case 'duplicate': 
+    case 'duplicate':
       const copy = { ...file, id: Date.now(), title: file.title + ' (Copy)' };
       mockPresentations.value.unshift(copy);
       showToast('File duplicated successfully');
@@ -256,11 +241,11 @@ const categoryCounts = computed(() => {
 const sortedFilteredPresentations = computed(() => {
   let filtered = mockPresentations.value.filter(p => {
     // Hide archived from main view unless explicitly in archive (future)
-    if (p.status === 'Archived') return false; 
-    
+    if (p.status === 'Archived') return false;
+
     const matchesCategory = selectedCategories.value.length === 0 || selectedCategories.value.includes(p.category);
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
-                         p.author.toLowerCase().includes(searchQuery.value.toLowerCase());
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      p.author.toLowerCase().includes(searchQuery.value.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -287,7 +272,7 @@ const toggleFileSelection = (id) => {
 const isFileSelected = (id) => selectedFiles.value.includes(id);
 
 const formatTagName = (id) => {
-  return id.split('_').map(word => 
+  return id.split('_').map(word =>
     word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
   ).join(' ');
 };
@@ -333,13 +318,60 @@ const handleUpload = () => {
         <div v-if="!isMobileScreen" class="search-wrap desktop-search">
           <div class="search-box">
             <Search class="search-icon" />
-            <input ref="searchInput" v-model="searchQuery" type="text" placeholder="Search presentations... ( / )" />
+            <input ref="searchInput" v-model="searchQuery" type="text" placeholder="Search presentations..." />
             <div class="search-actions">
               <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
                 <X class="icon-tiny" />
               </button>
             </div>
           </div>
+        </div>
+
+        <div class="divider" v-if="!isMobileScreen"></div>
+
+        <!-- Category Multi-Select Component -->
+        <div class="category-select-wrap">
+          <button @click="isCategoryDropdownOpen = !isCategoryDropdownOpen" 
+            :class="['toolbar-btn category-select-btn', { active: selectedCategories.length > 0 }]">
+            <Filter class="icon-small" />
+            <span class="btn-text">
+              {{ selectedCategories.length === 0 ? 'All Categories' : `${selectedCategories.length} Selected` }}
+            </span>
+            <ChevronDown class="icon-tiny arrow" :class="{ open: isCategoryDropdownOpen }" />
+          </button>
+
+          <Transition name="dropdown">
+            <div v-if="isCategoryDropdownOpen">
+              <!-- Backdrop for Mobile -->
+              <div v-if="isMobileScreen" class="dropdown-backdrop" @click="isCategoryDropdownOpen = false"></div>
+              
+              <div class="category-multi-dropdown">
+                <div class="dropdown-header">
+                  <span>Filter by Category</span>
+                  <button class="btn-reset" v-if="selectedCategories.length > 0" @click="selectedCategories = []">Clear All</button>
+                </div>
+                <div class="dropdown-list custom-scrollbar">
+                  <button v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id"
+                    class="dropdown-item" @click="toggleCategory(cat.id)">
+                    <div class="item-main">
+                      <div :class="['custom-checkbox', { checked: isSelected(cat.id) }]">
+                        <Plus v-if="!isSelected(cat.id)" class="icon-tiny" />
+                        <CheckCircle v-else class="icon-tiny" />
+                      </div>
+                      <component :is="cat.icon" class="item-icon" />
+                      <span class="item-label">{{ cat.label }}</span>
+                    </div>
+                    <span class="item-count">{{ categoryCounts[cat.id] || 0 }}</span>
+                  </button>
+                </div>
+
+                <!-- Footer for Mobile -->
+                <div v-if="isMobileScreen" class="dropdown-footer">
+                  <button class="btn-primary full-width" @click="isCategoryDropdownOpen = false">Done</button>
+                </div>
+              </div>
+            </div>
+          </Transition>
         </div>
 
         <div class="divider" v-if="!isMobileScreen"></div>
@@ -377,54 +409,25 @@ const handleUpload = () => {
       </div>
     </header>
 
-    <!-- Search (Mobile Only - Persistent in header) -->
+    <!-- Mobile Search (Persistent in header) -->
     <div v-if="isMobileScreen" class="mobile-search-bar" :class="{ scrolled: isScrolled }">
       <div class="search-box">
         <Search class="search-icon" />
         <input v-model="searchQuery" type="text" placeholder="Search..." />
-        <button v-if="searchQuery" class="clear-btn" @click="clearSearch"><X class="icon-tiny" /></button>
-      </div>
-    </div>
-
-    <!-- Category Filter Bar (Universal) -->
-    <div class="filter-navigation-bar" :class="{ 'with-arrows': !isMobileScreen }">
-      <button v-if="!isMobileScreen && canScrollLeft" class="scroll-arrow left" @click="scrollCategories('left')">
-        <ChevronLeft class="icon-small" />
-      </button>
-      
-      <div class="horizontal-categories-wrap" ref="categoryScrollRef" @scroll="checkScroll">
-        <button v-for="cat in categories" :key="cat.id" 
-          :class="['cat-pill', { active: isSelected(cat.id) }]"
-          @click="toggleCategory(cat.id)">
-          <component :is="cat.icon" class="pill-icon" />
-          <span class="pill-label">{{ cat.label }}</span>
-          <span v-if="categoryCounts[cat.id]" class="pill-count">{{ categoryCounts[cat.id] }}</span>
+        <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
+          <X class="icon-tiny" />
         </button>
       </div>
-
-      <button v-if="!isMobileScreen && canScrollRight" class="scroll-arrow right" @click="scrollCategories('right')">
-        <ChevronRight class="icon-small" />
-      </button>
     </div>
 
     <!-- Main Content Area -->
     <div class="main-content-full">
       <!-- Presentations Content (Extracted to Sub-component) -->
-      <PresentationContent 
-        :items="sortedFilteredPresentations"
-        :view-mode="viewMode"
-        :selected-ids="selectedFiles"
-        :active-menu-id="activeMenuId"
-        :is-mobile="isMobileScreen"
-        :is-select-mode="isSelectMode"
-        :is-loading="isPageLoading"
-        @toggle-selection="toggleFileSelection"
-        @open-menu="openMenu"
-        @execute-action="executeAction"
-        @select-all="selectAll"
-        @clear-selection="clearSelection"
-        @clear-filters="selectedCategories = []; searchQuery = ''"
-      />
+      <PresentationContent :items="sortedFilteredPresentations" :view-mode="viewMode" :selected-ids="selectedFiles"
+        :active-menu-id="activeMenuId" :is-mobile="isMobileScreen" :is-select-mode="isSelectMode"
+        :is-loading="isPageLoading" @toggle-selection="toggleFileSelection" @open-menu="openMenu"
+        @execute-action="executeAction" @select-all="selectAll" @clear-selection="clearSelection"
+        @clear-filters="selectedCategories = []; searchQuery = ''" />
     </div>
 
     <!-- Administrative Modals -->
@@ -433,7 +436,9 @@ const handleUpload = () => {
       <div class="modal-content sm">
         <div class="modal-header">
           <h3>Rename File</h3>
-          <button class="btn-close" @click="isRenameModalOpen = false"><X class="icon" /></button>
+          <button class="btn-close" @click="isRenameModalOpen = false">
+            <X class="icon" />
+          </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
@@ -453,7 +458,9 @@ const handleUpload = () => {
       <div class="modal-content md">
         <div class="modal-header">
           <h3>Share "{{ activeFile.title }}"</h3>
-          <button class="btn-close" @click="isShareModalOpen = false"><X class="icon" /></button>
+          <button class="btn-close" @click="isShareModalOpen = false">
+            <X class="icon" />
+          </button>
         </div>
         <div class="modal-body">
           <div class="share-input-wrap">
@@ -492,17 +499,15 @@ const handleUpload = () => {
       <div class="modal-content sm">
         <div class="modal-header">
           <h3>Move to Category</h3>
-          <button class="btn-close" @click="isMoveModalOpen = false"><X class="icon" /></button>
+          <button class="btn-close" @click="isMoveModalOpen = false">
+            <X class="icon" />
+          </button>
         </div>
         <div class="modal-body">
           <p class="modal-desc">Select a new department for this file.</p>
           <div class="move-options custom-scrollbar">
-            <button 
-              v-for="cat in categories.filter(c => c.id !== 'all')" 
-              :key="cat.id" 
-              class="move-option"
-              @click="saveMove(cat.id)"
-            >
+            <button v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id" class="move-option"
+              @click="saveMove(cat.id)">
               <component :is="cat.icon" class="icon-small" />
               <span>{{ cat.label }}</span>
             </button>
@@ -516,7 +521,9 @@ const handleUpload = () => {
       <div class="modal-content md">
         <div class="modal-header">
           <h3>File Properties</h3>
-          <button class="btn-close" @click="isPropertiesModalOpen = false"><X class="icon" /></button>
+          <button class="btn-close" @click="isPropertiesModalOpen = false">
+            <X class="icon" />
+          </button>
         </div>
         <div class="modal-body no-padding">
           <div class="properties-tabs">
@@ -595,7 +602,7 @@ const handleUpload = () => {
               <p>{{ activeFile.size }} • {{ formatTagName(activeFile.category) }}</p>
             </div>
           </div>
-          
+
           <div class="sheet-actions" v-if="activeFile">
             <div class="action-group-grid">
               <button @click="executeAction('rename', activeFile)">
@@ -666,7 +673,8 @@ const handleUpload = () => {
 
     <!-- Mobile Floating Action Button (FAB) -->
     <Transition name="fab">
-      <button v-if="isMobileScreen" class="mobile-fab" @click="isUploadModalOpen = true" :class="{ 'fab-minified': isScrolled }">
+      <button v-if="isMobileScreen" class="mobile-fab" @click="isUploadModalOpen = true"
+        :class="{ 'fab-minified': isScrolled }">
         <Plus class="fab-icon" />
         <span class="fab-label" v-show="!isScrolled">Upload</span>
       </button>
@@ -765,11 +773,12 @@ const handleUpload = () => {
     z-index: 1000;
     background: rgba(248, 250, 252, 0.8);
     backdrop-filter: blur(8px);
-    margin: -0.75rem -0.75rem 0.5rem; /* Match page padding */
+    margin: -0.75rem -0.75rem 0.5rem;
+    /* Match page padding */
     padding: 1.25rem 1rem 0.75rem;
     border-bottom: 1px solid transparent;
   }
-  
+
   .page-header.scrolled {
     background: rgba(255, 255, 255, 0.9);
     border-bottom: 1px solid #e2e8f0;
@@ -777,9 +786,9 @@ const handleUpload = () => {
   }
 
   .page-header.scrolled .page-subtitle {
-     display: none;
+    display: none;
   }
-  
+
   .page-header.scrolled .page-title {
     font-size: 1.25rem;
   }
@@ -838,6 +847,18 @@ const handleUpload = () => {
   border-radius: 14px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 1024px) {
+  .toolbar-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
 }
 
 .view-toggles {
@@ -899,14 +920,14 @@ const handleUpload = () => {
   align-items: center;
 }
 
+@media (max-width: 1024px) {
+  .sort-dropdown-wrap {
+    width: 100%;
+  }
+}
+
 .toolbar-select {
   appearance: none;
-  background: transparent;
-  border: none;
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #475569;
   cursor: pointer;
   outline: none;
 }
@@ -930,7 +951,8 @@ const handleUpload = () => {
 @media (max-width: 1024px) {
   .controls-container {
     position: sticky;
-    top: 60px; /* Below sticky header */
+    top: 60px;
+    /* Below sticky header */
     z-index: 990;
     background: rgba(248, 250, 252, 0.95);
     backdrop-filter: blur(8px);
@@ -996,118 +1018,259 @@ const handleUpload = () => {
   margin: 0 0.5rem;
 }
 
-/* Optimized Filter Bar */
-.filter-navigation-bar {
+/* Category Multi-Select Dropdown */
+.category-select-wrap {
   position: relative;
   display: flex;
   align-items: center;
-  background: #f8fafc;
-  padding: 0.5rem 0;
-  margin: 0 -1rem;
-  border-bottom: 1px solid #f1f5f9;
 }
 
-.filter-navigation-bar.scrolled {
-  position: sticky;
-  top: 106px; /* Adjust based on mobile header height */
-  z-index: 980;
-}
-
-@media (min-width: 1025px) {
-  .filter-navigation-bar {
-    margin: 0;
-    background: transparent;
-    border: none;
-    padding: 0;
+@media (max-width: 1024px) {
+  .category-select-wrap {
+    grid-column: span 2;
+    width: 100%;
   }
 }
 
-.horizontal-categories-wrap {
-  display: flex;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding: 0.5rem 1rem;
-  scrollbar-width: none;
-  scroll-behavior: smooth;
-  flex: 1;
-  mask-image: linear-gradient(to right, black 90%, transparent 100%);
-}
-
-.horizontal-categories-wrap::-webkit-scrollbar {
-  display: none;
-}
-
-.scroll-arrow {
-  width: 32px;
-  height: 32px;
-  background: white;
+.category-select-btn {
+  width: auto !important;
+  padding: 0 1rem !important;
+  gap: 0.6rem;
+  background: #f8fafc;
   border: 1px solid #e2e8f0;
-  border-radius: 50%;
+  color: #475569;
+}
+
+@media (max-width: 1024px) {
+  .category-select-btn {
+    width: 100% !important;
+    height: 48px;
+    justify-content: space-between;
+    background: white;
+    border-radius: 12px;
+  }
+}
+
+.category-select-btn.active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.category-select-btn .btn-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-select-btn .arrow {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #94a3b8;
+}
+
+.category-select-btn .arrow.open {
+  transform: rotate(180deg);
+}
+
+.category-multi-dropdown {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 0;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  padding: 0.5rem;
+}
+
+.dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
+}
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 0.5rem;
+}
+
+.dropdown-header span {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.btn-reset {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #3b82f6;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.btn-reset:hover { background: #eff6ff; }
+
+.dropdown-list {
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-item:hover {
+  background: #f8fafc;
+}
+
+.item-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
-  cursor: pointer;
-  z-index: 10;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: transparent;
   transition: all 0.2s;
-  position: absolute;
-}
-
-.scroll-arrow:hover {
-  background: #f8fafc;
-  color: #3b82f6;
-  border-color: #3b82f6;
-}
-
-.scroll-arrow.left { left: -0.5rem; }
-.scroll-arrow.right { right: -0.5rem; }
-
-.cat-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 1rem;
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  color: #64748b;
-  white-space: nowrap;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
 }
 
-.cat-pill:hover {
-  border-color: #3b82f6;
-  color: #3b82f6;
-  background: #f0f7ff;
-}
-
-.cat-pill.active {
+.custom-checkbox.checked {
   background: #3b82f6;
-  color: white;
   border-color: #3b82f6;
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
+  color: white;
 }
 
-.pill-icon {
+.dropdown-item:hover .custom-checkbox {
+  border-color: #3b82f6;
+}
+
+.item-icon {
   width: 16px;
   height: 16px;
+  color: #64748b;
 }
 
-.pill-count {
+.dropdown-item:hover .item-icon {
+  color: #3b82f6;
+}
+
+.item-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.item-count {
   font-size: 0.75rem;
-  background: rgba(0, 0, 0, 0.05);
-  padding: 2px 6px;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 2px 8px;
   border-radius: 6px;
   font-weight: 800;
 }
 
-.cat-pill.active .pill-count {
-  background: rgba(255, 255, 255, 0.2);
+@media (max-width: 1024px) {
+  .category-multi-dropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    bottom: auto;
+    width: calc(100% - 2.5rem);
+    max-width: 400px;
+    margin: 0;
+    border-radius: 20px;
+    padding: 1.5rem;
+    z-index: 2000;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .dropdown-list {
+    max-height: none;
+    flex: 1;
+    margin-bottom: 1rem;
+    padding-right: 0.25rem;
+  }
+
+  .dropdown-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .btn-primary.full-width {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 14px;
+    justify-content: center;
+  }
+}
+
+/* Dropdown Transition */
+.dropdown-enter-active, .dropdown-leave-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dropdown-enter-from, .dropdown-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 1024px) {
+  .dropdown-enter-from .category-multi-dropdown,
+  .dropdown-leave-to .category-multi-dropdown {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.9);
+  }
+}
+
+@media (min-width: 1025px) {
+  .dropdown-enter-from .category-multi-dropdown,
+  .dropdown-leave-to .category-multi-dropdown {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
 }
 
 /* Main Content Layout */
@@ -1229,8 +1392,13 @@ const handleUpload = () => {
 }
 
 /* Administrative Modals */
-.modal-content.sm { max-width: 400px; }
-.modal-content.md { max-width: 550px; }
+.modal-content.sm {
+  max-width: 400px;
+}
+
+.modal-content.md {
+  max-width: 550px;
+}
 
 .form-group {
   margin-bottom: 1.5rem;
@@ -1370,7 +1538,9 @@ const handleUpload = () => {
 }
 
 /* Properties Modal Styles */
-.no-padding { padding: 0 !important; }
+.no-padding {
+  padding: 0 !important;
+}
 
 .properties-tabs {
   display: flex;
@@ -1456,9 +1626,20 @@ const handleUpload = () => {
   text-transform: capitalize;
 }
 
-.status-badge.published { background: #f0fdf4; color: #22c55e; }
-.status-badge.private { background: #fff7ed; color: #f97316; }
-.status-badge.draft { background: #f1f5f9; color: #64748b; }
+.status-badge.published {
+  background: #f0fdf4;
+  color: #22c55e;
+}
+
+.status-badge.private {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.status-badge.draft {
+  background: #f1f5f9;
+  color: #64748b;
+}
 
 .prop-description label {
   display: block;
@@ -1488,7 +1669,7 @@ const handleUpload = () => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   font-weight: 600;
   font-size: 0.875rem;
@@ -1546,8 +1727,16 @@ const handleUpload = () => {
   border-bottom: 1px solid #f1f5f9;
 }
 
-.file-icon-box.sm { width: 44px; height: 44px; border-radius: 10px; }
-.file-icon.sm { width: 22px; height: 22px; }
+.file-icon-box.sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.file-icon.sm {
+  width: 22px;
+  height: 22px;
+}
 
 .sheet-file-info h4 {
   font-size: 1rem;
@@ -1593,8 +1782,14 @@ const handleUpload = () => {
   transform: scale(0.95);
 }
 
-.action-group-grid button.danger { color: #ef4444; }
-.action-group-grid button.danger:active { background: #fef2f2; border-color: #ef4444; }
+.action-group-grid button.danger {
+  color: #ef4444;
+}
+
+.action-group-grid button.danger:active {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
 
 .btn-cancel-sheet {
   width: 100%;
@@ -1608,13 +1803,17 @@ const handleUpload = () => {
 }
 
 /* Transitions for Sheet */
-.sheet-enter-active, .sheet-leave-active {
+.sheet-enter-active,
+.sheet-leave-active {
   transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
-.sheet-enter-from, .sheet-leave-to {
+
+.sheet-enter-from,
+.sheet-leave-to {
   opacity: 0;
   transform: translateY(100%);
 }
+
 .sheet-enter-active .bottom-sheet-content,
 .sheet-leave-active .bottom-sheet-content {
   transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
@@ -1680,8 +1879,13 @@ const handleUpload = () => {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.toolbar-action-btn.danger { color: #fca5a5; }
-.toolbar-action-btn.danger:hover { background: rgba(239, 68, 68, 0.2); }
+.toolbar-action-btn.danger {
+  color: #fca5a5;
+}
+
+.toolbar-action-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
 
 .btn-text-only {
   background: transparent;
@@ -1693,13 +1897,18 @@ const handleUpload = () => {
   padding: 0.5rem;
 }
 
-.btn-text-only:hover { color: white; }
+.btn-text-only:hover {
+  color: white;
+}
 
 /* Transitions for Toolbar */
-.toolbar-enter-active, .toolbar-leave-active {
+.toolbar-enter-active,
+.toolbar-leave-active {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.toolbar-enter-from, .toolbar-leave-to {
+
+.toolbar-enter-from,
+.toolbar-leave-to {
   opacity: 0;
   transform: translate(-50%, 50px) scale(0.9);
 }
@@ -1731,14 +1940,19 @@ const handleUpload = () => {
 
 /* Final CSS Adjustments */
 @media (max-width: 1024px) {
-  .page-title { font-size: 1.5rem; }
-  .presentations-page { padding: 0.75rem; }
-  
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .presentations-page {
+    padding: 0.75rem;
+  }
+
   /* Modal optimization for mobile */
   .modal-overlay {
     align-items: flex-end;
   }
-  
+
   .modal-content {
     width: 100% !important;
     max-width: none !important;
@@ -1749,9 +1963,16 @@ const handleUpload = () => {
 }
 
 @keyframes modalSlideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}/* Mobile FAB Styling */
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Mobile FAB Styling */
 .mobile-fab {
   position: fixed;
   bottom: 2rem;
@@ -1795,10 +2016,13 @@ const handleUpload = () => {
 }
 
 /* Transitions for FAB */
-.fab-enter-active, .fab-leave-active {
+.fab-enter-active,
+.fab-leave-active {
   transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
-.fab-enter-from, .fab-leave-to {
+
+.fab-enter-from,
+.fab-leave-to {
   opacity: 0;
   transform: scale(0.5) translateY(50px);
 }
@@ -1811,12 +2035,12 @@ const handleUpload = () => {
     gap: 1rem;
     border-bottom: 1px solid #f1f5f9;
   }
-  
+
   .row-file-icon {
     width: 24px;
     height: 24px;
   }
-  
+
   .row-title {
     font-size: 1rem;
     font-weight: 600;
@@ -1824,7 +2048,7 @@ const handleUpload = () => {
     display: block;
     margin-bottom: 0.25rem;
   }
-  
+
   .presentation-row::after {
     /* Add subtler info below the title in list view */
     content: attr(data-meta);

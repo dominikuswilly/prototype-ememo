@@ -12,7 +12,7 @@ const memoListRef = ref(null);
 const memos = ref([...mockMemos]);
 const isMobileMenuOpen = ref(false);
 const activeTab = ref('all');
-const activeView = ref('ememo-summary'); // New view state
+const activeView = ref('dashboard'); // New view state
 
 // Mock user for "Pending Approval" logic
 // Mock user for hierarchy
