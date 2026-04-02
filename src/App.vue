@@ -5,6 +5,8 @@ import MemoFilter from './modules/ememo/MemoFilter.vue';
 import MemoList from './modules/ememo/MemoList.vue';
 import MemoSummary from './modules/ememo/MemoSummary.vue';
 import Presentations from './modules/presentations/Presentations.vue';
+import PresentationFilter from './modules/presentations/components/PresentationFilter.vue';
+import { presentationCategories } from './modules/presentations/data/categories';
 import { mockMemos } from './data/mockData';
 import { Menu, X, Plus } from 'lucide-vue-next';
 
@@ -34,6 +36,25 @@ const filterState = ref({
   statuses: [],
   member: '' // New filter field
 });
+
+// Presentation Filter State
+const presSearchQuery = ref('');
+const presSortBy = ref('date_desc');
+const presViewMode = ref('grid');
+const presSelectedCategories = ref([]);
+
+const handlePresCategoryToggle = (id) => {
+  if (id === 'all') {
+    presSelectedCategories.value = [];
+    return;
+  }
+  const index = presSelectedCategories.value.indexOf(id);
+  if (index > -1) {
+    presSelectedCategories.value.splice(index, 1);
+  } else {
+    presSelectedCategories.value.push(id);
+  }
+};
 
 const handleFilterChange = (newFilters) => {
   filterState.value = newFilters;
@@ -212,6 +233,16 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             @filter-change="handleFilterChange" 
             @view-mode-change="(mode) => memoViewMode = mode" />
         </div>
+        <div v-else-if="activeView === 'presentations'" class="header-filter-wrapper">
+          <PresentationFilter
+            v-model:search-query="presSearchQuery"
+            v-model:sort-by="presSortBy"
+            v-model:view-mode="presViewMode"
+            :categories="presentationCategories"
+            :selected-categories="presSelectedCategories"
+            @toggle-category="handlePresCategoryToggle"
+          />
+        </div>
       </header>
 
       <div class="list-wrapper">
@@ -226,7 +257,14 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             :currentUser="currentUser" :viewMode="memoViewMode" />
         </template>
         <template v-else-if="activeView === 'presentations'">
-          <Presentations ref="presentationsRef" />
+          <Presentations 
+            ref="presentationsRef" 
+            :searchQuery="presSearchQuery"
+            :sortBy="presSortBy"
+            :viewMode="presViewMode"
+            :selectedCategories="presSelectedCategories"
+            @update:view-mode="presViewMode = $event"
+          />
         </template>
         <template v-else>
           <div class="placeholder-view">

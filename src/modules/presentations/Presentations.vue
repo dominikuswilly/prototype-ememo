@@ -10,24 +10,16 @@ import {
   Edit2, FolderInput, Copy, Share2, Lock, Link, Info, History, Archive
 } from 'lucide-vue-next';
 import PresentationContent from './components/PresentationContent.vue';
-import PresentationFilter from './components/PresentationFilter.vue';
+import { presentationCategories } from './data/categories';
 
-const categories = [
-  { id: 'all', label: 'All Categories', icon: Layout },
-  { id: 'MARKETING', label: 'Marketing', icon: Globe },
-  { id: 'HRD_GA', label: 'HRD & GA', icon: Users },
-  { id: 'TEKNIK', label: 'Teknik', icon: Wrench },
-  { id: 'EMPLOYEE_BENEFIT', label: 'Employee Benefit', icon: Heart },
-  { id: 'CLAIM', label: 'Claim', icon: ShieldCheck },
-  { id: 'IT', label: 'IT', icon: Cpu },
-  { id: 'ACCOUNTING_FINANCE', label: 'Accounting & Finance', icon: CreditCard },
-  { id: 'MANAJEMEN', label: 'Manajemen', icon: BarChart3 },
-  { id: 'LEGAL', label: 'Legal', icon: Scale },
-  { id: 'RISK_MANAGEMENT', label: 'Risk Management', icon: ShieldAlert }
-];
+const props = defineProps({
+  searchQuery: { type: String, default: '' },
+  sortBy: { type: String, default: 'date_desc' },
+  viewMode: { type: String, default: 'grid' },
+  selectedCategories: { type: Array, default: () => [] }
+});
 
-const selectedCategories = ref([]);
-const searchQuery = ref('');
+const emit = defineEmits(['update:view-mode']);
 const isUploadModalOpen = ref(false);
 const filterRef = ref(null);
 const categoryScrollRef = ref(null);
@@ -46,9 +38,7 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 20;
 };
 
-// Administrative UI State
-const viewMode = ref('grid'); // 'grid' | 'list'
-const sortBy = ref('date_desc'); // 'date_desc', 'title_asc'
+// Cleanup complete
 const selectedFiles = ref([]);
 const activeMenuId = ref(null); // ID of file with open dropdown
 const activeFile = ref(null); // File currently being managed in a modal
@@ -79,8 +69,8 @@ const showToast = (message, type = 'success') => {
 };
 
 const clearSearch = () => {
-  searchQuery.value = '';
-  filterRef.value?.focusSearch();
+  // searchQuery is now a prop, parent should handle clearing it
+  // This function might be deprecated or emit to parent
 };
 
 const handleResize = () => {
@@ -126,22 +116,10 @@ onUnmounted(() => {
   document.removeEventListener('click', handleGlobalClick);
 });
 
-const toggleCategory = (id) => {
-  if (id === 'all') {
-    selectedCategories.value = [];
-    return;
-  }
-  const index = selectedCategories.value.indexOf(id);
-  if (index > -1) {
-    selectedCategories.value.splice(index, 1);
-  } else {
-    selectedCategories.value.push(id);
-  }
-};
-
+// Category helpers moved to props/emits or cleaned up
 const isSelected = (id) => {
-  if (id === 'all') return selectedCategories.value.length === 0;
-  return selectedCategories.value.includes(id);
+  if (id === 'all') return props.selectedCategories.length === 0;
+  return props.selectedCategories.includes(id);
 };
 
 // Selection Helpers
@@ -247,19 +225,19 @@ const categoryCounts = computed(() => {
 
 const sortedFilteredPresentations = computed(() => {
   let filtered = mockPresentations.value.filter(p => {
-    // Hide archived from main view unless explicitly in archive (future)
+    // Hide archived from main view
     if (p.status === 'Archived') return false;
 
-    const matchesCategory = selectedCategories.value.length === 0 || selectedCategories.value.includes(p.category);
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      p.author.toLowerCase().includes(searchQuery.value.toLowerCase());
+    const matchesCategory = props.selectedCategories.length === 0 || props.selectedCategories.includes(p.category);
+    const matchesSearch = p.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+      p.author.toLowerCase().includes(props.searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   return filtered.sort((a, b) => {
-    if (sortBy.value === 'date_desc') return new Date(b.date) - new Date(a.date);
-    if (sortBy.value === 'date_asc') return new Date(a.date) - new Date(b.date);
-    if (sortBy.value === 'title_asc') return a.title.localeCompare(b.title);
+    if (props.sortBy === 'date_desc') return new Date(b.date) - new Date(a.date);
+    if (props.sortBy === 'date_asc') return new Date(a.date) - new Date(b.date);
+    if (props.sortBy === 'title_asc') return a.title.localeCompare(b.title);
     return 0;
   });
 });
@@ -278,8 +256,8 @@ const currentRange = computed(() => {
   return { start, end, total: sortedFilteredPresentations.value.length };
 });
 
-// Watch Categories/Search to reset pagination
-watch([selectedCategories, searchQuery, sortBy], () => {
+// Watch Categories/Search/Sort props to reset pagination
+watch(() => [props.selectedCategories, props.searchQuery, props.sortBy], () => {
   currentPage.value = 1;
 }, { deep: true });
 
@@ -329,28 +307,12 @@ defineExpose({
 
 <template>
   <div class="presentations-page">
-    <!-- EMemo-style Filter & Search Wrapper -->
-    <!-- Presentations Filter Component (Extracted) -->
-    <PresentationFilter
-      ref="filterRef"
-      v-model:search-query="searchQuery"
-      v-model:sort-by="sortBy"
-      v-model:view-mode="viewMode"
-      :categories="categories"
-      :selected-categories="selectedCategories"
-      @toggle-category="toggleCategory"
-    />
-
-
-
     <!-- Main Content Area -->
     <div class="main-content-full">
-      <!-- Presentations Content (Extracted to Sub-component) -->
-      <PresentationContent :items="paginatedPresentations" :view-mode="viewMode" :selected-ids="selectedFiles"
+      <PresentationContent :items="paginatedPresentations" :view-mode="props.viewMode" :selected-ids="selectedFiles"
         :active-menu-id="activeMenuId" :is-mobile="isMobileScreen" :is-select-mode="isSelectMode"
         :is-loading="isPageLoading" @toggle-selection="toggleFileSelection" @open-menu="openMenu"
-        @execute-action="executeAction" @select-all="selectAll" @clear-selection="clearSelection"
-        @clear-filters="selectedCategories = []; searchQuery = ''" />
+        @execute-action="executeAction" @select-all="selectAll" @clear-selection="clearSelection" />
 
       <!-- Pagination Controls -->
       <div v-if="totalPages > 1" class="pagination-wrap">
