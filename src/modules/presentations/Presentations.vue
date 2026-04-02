@@ -302,23 +302,11 @@ const handleUpload = () => {
 
 <template>
   <div class="presentations-page">
-    <!-- Breadcrumbs -->
-    <nav class="breadcrumb-nav">
-      <span class="breadcrumb-item">Dashboard</span>
-      <ChevronRight class="breadcrumb-icon" />
-      <span class="breadcrumb-item active">Presentations</span>
-    </nav>
-
-    <!-- Page Title & Toolbar -->
+    <!-- Sticky Toolbar Header -->
     <header :class="['page-header', { scrolled: isScrolled }]">
-      <div class="title-section">
-        <h1 class="page-title">Presentations</h1>
-        <p class="page-subtitle">{{ sortedFilteredPresentations.length }} items available</p>
-      </div>
-
       <div class="toolbar-section main-toolbar">
-        <!-- Persistent Search for Desktop -->
-        <div v-if="!isMobileScreen" class="search-wrap desktop-search">
+        <!-- Unified Search Component -->
+        <div class="search-wrap">
           <div class="search-box">
             <Search class="search-icon" />
             <input ref="searchInput" v-model="searchQuery" type="text" placeholder="Search presentations..." />
@@ -410,16 +398,7 @@ const handleUpload = () => {
       </div>
     </header>
 
-    <!-- Mobile Search (Persistent in header) -->
-    <div v-if="isMobileScreen" class="mobile-search-bar" :class="{ scrolled: isScrolled }">
-      <div class="search-box">
-        <Search class="search-icon" />
-        <input v-model="searchQuery" type="text" placeholder="Search..." />
-        <button v-if="searchQuery" class="clear-btn" @click="clearSearch">
-          <X class="icon-tiny" />
-        </button>
-      </div>
-    </div>
+
 
     <!-- Main Content Area -->
     <div class="main-content-full">
@@ -687,9 +666,11 @@ const handleUpload = () => {
 .presentations-page {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0;
   animation: fadeIn 0.4s ease-out;
-  padding: 1rem;
+  padding: 0;
+  min-height: 100vh;
+  background: #f8fafc;
 }
 
 @keyframes fadeIn {
@@ -704,38 +685,16 @@ const handleUpload = () => {
   }
 }
 
-/* Breadcrumbs */
-.breadcrumb-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #64748b;
-  margin-bottom: -0.5rem;
-}
-
-.breadcrumb-icon {
-  width: 14px;
-  height: 14px;
-}
-
-.breadcrumb-item.active {
-  color: #1e293b;
-  font-weight: 600;
-}
-
-/* Header & Toolbar */
+/* Header Toolbar Architecture */
 .page-header {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  padding: 1rem 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #f8fafc;
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 1.5rem;
-  margin: 0;
   border-bottom: 1px solid transparent;
 }
 
@@ -743,38 +702,8 @@ const handleUpload = () => {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 0;
   box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-}
-
-.main-toolbar {
-  flex: 1;
-  justify-content: flex-end;
-}
-
-.desktop-search {
-  max-width: 400px;
-  flex: 1;
-  margin-right: auto;
-}
-
-.desktop-search .search-box input {
-  padding: 0.6rem 2.5rem 0.6rem 2.5rem;
-  font-size: 0.875rem;
-  background: #f1f5f9;
-  border-color: transparent;
-}
-
-.desktop-search .search-box input:focus {
-  background: white;
-  border-color: #3b82f6;
-}
-
-.desktop-search .search-icon {
-  width: 16px;
-  height: 16px;
-  left: 0.85rem;
 }
 
 .upload-btn {
@@ -782,84 +711,156 @@ const handleUpload = () => {
   white-space: nowrap;
 }
 
+/* Unified Search Box */
+.search-wrap {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+}
+
+@media (max-width: 1024px) {
+  .search-wrap {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.85rem;
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  z-index: 10;
+}
+
+.search-box input {
+  width: 100%;
+  height: 38px;
+  padding: 0 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f1f5f9;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-box input:focus {
+  outline: none;
+  background: white;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-actions {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 11;
+}
+
+.clear-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+@media (max-width: 1024px) {
+  .search-box input {
+    height: 48px;
+    background: white;
+    border-radius: 12px;
+    padding: 0 3rem;
+    font-size: 1rem;
+  }
+  
+  .search-icon {
+    left: 1.1rem;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .search-actions {
+    right: 0.75rem;
+  }
+  
+  .clear-btn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 @media (max-width: 1024px) {
   .page-header {
-    margin: 0;
-    /* Match page padding */
-    padding: 1.25rem 1rem 0.75rem;
+    padding: 0.75rem 0;
   }
 
   .page-header.scrolled {
-    padding: 0.75rem 1rem;
-  }
-
-  .page-header.scrolled .page-subtitle {
-    display: none;
+    padding: 0.5rem 0;
   }
 }
 
 @media (min-width: 1025px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.25rem;
-  }
-
-  .page-header.scrolled .page-title {
-    font-size: 1.5rem;
-  }
-  
   .main-toolbar {
     width: 100%;
+    display: flex;
     justify-content: flex-start;
+    align-items: center;
+  }
+  
+  .upload-btn {
+    margin-left: auto;
   }
 }
 
-.page-title {
-  font-size: 1.875rem;
-  font-weight: 800;
-  color: #1e293b;
-  letter-spacing: -0.02em;
+
+
+/* Main Content Alignment */
+.main-content-full {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+  padding: 0 0 2rem;
 }
 
-.page-subtitle {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin-top: 0.25rem;
+@media (max-width: 1024px) {
+  .main-content-full {
+    padding: 0 0 1.5rem;
+  }
 }
 
-/* Mobile Search Bar */
-.mobile-search-bar {
-  padding: 0.5rem 1rem 1rem;
-  background: #f8fafc;
-  width: 100%;
-}
 
-.mobile-search-bar.scrolled {
-  position: sticky;
-  top: 56px;
-  z-index: 990;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.mobile-search-bar .search-box input {
-  padding: 0.65rem 2.5rem;
-  font-size: 0.9rem;
-  border-radius: 12px;
-}
 
 .toolbar-section {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: white;
-  padding: 0.5rem;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 1024px) {
@@ -868,9 +869,6 @@ const handleUpload = () => {
     flex-direction: column;
     gap: 0.75rem;
     padding: 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
   }
 }
 
@@ -973,75 +971,7 @@ const handleUpload = () => {
   pointer-events: none;
 }
 
-/* Controls & Search */
-.controls-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
 
-@media (max-width: 1024px) {
-  .controls-container {
-    position: sticky;
-    top: 60px;
-    /* Below sticky header */
-    z-index: 990;
-    background: rgba(248, 250, 252, 0.95);
-    backdrop-filter: blur(8px);
-    margin: 0 -0.75rem;
-    padding: 0.5rem 0.75rem 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
-    gap: 0.75rem;
-  }
-}
-
-@media (min-width: 1025px) {
-  .controls-container {
-    flex-direction: row;
-    align-items: center;
-  }
-}
-
-.search-wrap {
-  flex: 1;
-  max-width: 800px;
-}
-
-.search-box {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 1.1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: #94a3b8;
-  z-index: 10;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 0.75rem 3.5rem 0.75rem 3rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 14px;
-  background: white;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #1e293b;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-}
 
 .divider {
   width: 1px;
