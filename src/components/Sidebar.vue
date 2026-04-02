@@ -45,7 +45,6 @@ const menuData = [
     label: 'Application',
     isGroup: true,
     children: [
-      { id: 'attendance', label: 'Attendance', icon: CalendarCheck, view: 'attendance' },
       {
         id: 'ememo',
         label: 'EMemo',
@@ -58,6 +57,7 @@ const menuData = [
         ]
       },
       { id: 'presentations', label: 'Presentations', icon: Presentation, view: 'presentations' },
+      { id: 'attendance', label: 'Attendance', icon: CalendarCheck, view: 'attendance' },
       { id: 'training', label: 'Training', icon: GraduationCap, view: 'training' },
       { id: 'insurance-policy', label: 'Insurance Policy', icon: Shield, view: 'insurance-policy' },
       { id: 'policy-claims', label: 'Policy Claims', icon: ClipboardList, view: 'policy-claims' },
@@ -177,13 +177,15 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
                           @click.prevent="handleNavClick(grandChild.view, grandChild.tab)">
                           <component :is="grandChild.icon" class="nav-icon-xs" />
                           <span>{{ grandChild.label }}</span>
-                          <span v-if="grandChild.hasBadge && pendingCount > 0" class="sidebar-badge">{{ pendingCount }}</span>
+                          <span v-if="grandChild.hasBadge && pendingCount > 0" class="sidebar-badge">{{ pendingCount
+                            }}</span>
                         </a>
                       </div>
                     </template>
 
                     <!-- Regular SubLink -->
-                    <a v-else href="#" :class="['nav-link sub-link', { active: activeView === subChild.view && (!subChild.tab || activeTab === subChild.tab) }]"
+                    <a v-else href="#"
+                      :class="['nav-link sub-link', { active: activeView === subChild.view && (!subChild.tab || activeTab === subChild.tab) }]"
                       @click.prevent="handleNavClick(subChild.view, subChild.tab)">
                       <component :is="subChild.icon" class="nav-icon-xs" />
                       <span>{{ subChild.label }}</span>
@@ -194,8 +196,9 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
               </template>
 
               <!-- Standard Link -->
-              <a v-else href="#" :class="['nav-link', { active: activeView === child.view && (!child.tab || activeTab === child.tab) }]" :title="child.label"
-                @click.prevent="handleNavClick(child.view, child.tab)">
+              <a v-else href="#"
+                :class="['nav-link', { active: activeView === child.view && (!child.tab || activeTab === child.tab) }]"
+                :title="child.label" @click.prevent="handleNavClick(child.view, child.tab)">
                 <component :is="child.icon" class="nav-icon" />
                 <span v-if="!isCollapsed">{{ child.label }}</span>
               </a>
