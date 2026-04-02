@@ -13,7 +13,8 @@ const presentationsRef = ref(null);
 const memos = ref([...mockMemos]);
 const isMobileMenuOpen = ref(false);
 const activeTab = ref('all');
-const activeView = ref('dashboard'); // New view state
+const activeView = ref('dashboard');
+const memoViewMode = ref('grid');
 
 // Mock user for "Pending Approval" logic
 // Mock user for hierarchy
@@ -207,7 +208,9 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
         <div v-if="activeView === 'ememo-list'" class="header-filter-wrapper">
           <MemoFilter :members="[{ name: currentUser, role: 'you' }, ...subordinates]" :activeTab="activeTab"
-            @filter-change="handleFilterChange" />
+            :viewMode="memoViewMode"
+            @filter-change="handleFilterChange" 
+            @view-mode-change="(mode) => memoViewMode = mode" />
         </div>
       </header>
 
@@ -219,7 +222,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             @view-my-pending="activeView = 'ememo-list'; activeTab = 'all'; filterState.statuses = ['In Review']" />
         </template>
         <template v-else-if="activeView === 'ememo-list'">
-          <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
+          <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" 
+            :currentUser="currentUser" :viewMode="memoViewMode" />
         </template>
         <template v-else-if="activeView === 'presentations'">
           <Presentations ref="presentationsRef" />
@@ -363,24 +367,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 }
 
 .header-filter-wrapper {
-  padding: 1.5rem var(--gutter);
+  padding: 0 var(--gutter) 2rem;
   position: sticky;
   top: 0;
   background-color: var(--bg-app);
   z-index: 120;
-  border-bottom: 1px solid #e2e8f0;
-  overflow: visible;
-}
-
-/* Deep override for MemoFilter when inside sticky header */
-.header-filter-wrapper .filter-wrapper {
-  margin-bottom: 0;
-  border-radius: 0;
-  border-left: none;
-  border-right: none;
   border-bottom: none;
-  background: transparent;
-  box-shadow: none;
+  overflow: visible;
 }
 
 /* Hide scrollbar for tabs container Chrome/Safari */

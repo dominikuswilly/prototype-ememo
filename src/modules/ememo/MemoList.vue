@@ -7,11 +7,13 @@ import {
 import MemoDetailModal from './MemoDetailModal.vue';
 import MemoWizard from './MemoWizard.vue';
 import MemoCard from './MemoCard.vue';
+import MemoRow from './MemoRow.vue';
 
 const props = defineProps({
   memos: { type: Array, required: true },
   activeTab: { type: String, default: 'all' },
-  currentUser: { type: String, default: 'Willy' }
+  currentUser: { type: String, default: 'Willy' },
+  viewMode: { type: String, default: 'grid' }
 });
 
 const emit = defineEmits(['reorder', 'update-memo', 'delete']);
@@ -134,22 +136,40 @@ defineExpose({ openCreateModal });
 <template>
   <div class="memo-list-container">
     <div class="memo-container">
-      <div v-if="processedMemos.length > 0" class="memo-grid">
-        <div v-for="memo in processedMemos" :key="memo.id" class="memo-card-wrapper" draggable="true"
-          @dragstart="handleDragStart(memo.id)" @dragover.prevent="handleDragOver(memo.id)" @dragend="handleDragEnd">
-          <MemoCard 
-            :memo="memo"
-            :isSelected="selectedRow && selectedRow.id === memo.id"
-            :isMobile="isMobile"
-            :currentUser="currentUser"
-            @select="handleRowClick"
-            @deselect="selectedRow = null"
-            @press-start="handlePressStart"
-            @press-end="handlePressEnd"
-            @view="openViewModal"
-            @remind="handleRemind"
-            @delete="handleDelete"
-          />
+      <div v-if="processedMemos.length > 0">
+        <!-- Grid View -->
+        <div v-if="viewMode === 'grid'" class="memo-grid">
+          <div v-for="memo in processedMemos" :key="memo.id" class="memo-card-wrapper" draggable="true"
+            @dragstart="handleDragStart(memo.id)" @dragover.prevent="handleDragOver(memo.id)" @dragend="handleDragEnd">
+            <MemoCard 
+              :memo="memo"
+              :isSelected="selectedRow && selectedRow.id === memo.id"
+              :isMobile="isMobile"
+              :currentUser="currentUser"
+              @select="handleRowClick"
+              @deselect="selectedRow = null"
+              @press-start="handlePressStart"
+              @press-end="handlePressEnd"
+              @view="openViewModal"
+              @remind="handleRemind"
+              @delete="handleDelete"
+            />
+          </div>
+        </div>
+
+        <!-- List View -->
+        <div v-else class="memo-list-view">
+          <div v-for="memo in processedMemos" :key="'row-'+memo.id" class="memo-row-wrapper">
+             <MemoRow 
+               :memo="memo"
+               :isSelected="selectedRow && selectedRow.id === memo.id"
+               :currentUser="currentUser"
+               @select="handleRowClick"
+               @view="openViewModal"
+               @remind="handleRemind"
+               @delete="handleDelete"
+             />
+          </div>
         </div>
       </div>
 
@@ -215,6 +235,24 @@ defineExpose({ openCreateModal });
 @media (max-width: 1280px) { .memo-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 1024px) { .memo-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .memo-grid { grid-template-columns: 1fr; } }
+
+.memo-list-view {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .memo-list-view {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+}
 
 /* Status Colors */
 :root {

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { Search, CalendarDays, ChevronDown, ChevronUp, Filter } from 'lucide-vue-next';
+import { Search, CalendarDays, ChevronDown, ChevronUp, Filter, LayoutGrid, List, User, Check, Clock, SlidersHorizontal, Layers } from 'lucide-vue-next';
 
 const props = defineProps({
   members: {
@@ -10,12 +10,17 @@ const props = defineProps({
   activeTab: {
     type: String,
     default: 'all'
+  },
+  viewMode: {
+    type: String,
+    default: 'grid'
   }
 });
 
-const emit = defineEmits(['filter-change']);
+const emit = defineEmits(['filter-change', 'view-mode-change']);
 
 const isCollapsed = ref(false);
+const isMoreFiltersOpen = ref(false);
 const isStatusDropdownOpen = ref(false);
 
 const filters = ref({
@@ -98,17 +103,20 @@ onUnmounted(() => {
 
     <div :class="['filter-content', { 'is-collapsed': isCollapsed }]">
       <div class="filter-container">
-        <!-- Member Filter (Only for "All Memos") -->
-        <div v-if="activeTab === 'all'" class="filter-group member-group">
-          <select v-model="filters.member" class="filter-input select-input">
-            <option value="">All Members</option>
-            <option v-for="member in members" :key="member.name" :value="member.name">
-              {{ member.name }} ({{ member.role }})
-            </option>
-          </select>
+        <!-- 1. Member Filter (Selective based on Tab) -->
+        <div class="filter-group member-group">
+          <div class="input-icon-wrapper">
+             <Layers class="input-icon" />
+             <select v-model="filters.member" :disabled="activeTab !== 'all'" class="filter-input select-input">
+               <option value="">{{ activeTab === 'all' ? 'All Members' : 'My Memos' }}</option>
+               <option v-for="member in members" :key="member.name" :value="member.name">
+                 {{ member.name }}
+               </option>
+             </select>
+          </div>
         </div>
 
-        <!-- Keyword Search -->
+        <!-- 2. Keyword Search -->
         <div class="filter-group keyword-group">
           <div class="input-icon-wrapper">
             <Search class="input-icon" />
@@ -117,36 +125,14 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Date Range -->
-        <div class="filter-group date-group">
-          <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
-            <CalendarDays class="input-icon" />
-            <div class="date-display-field">
-              {{ filters.startDate || 'YYYY-MM-DD' }}
-            </div>
-            <input type="date" v-model="filters.startDate" class="hidden-date-input" aria-label="Start Date" />
-          </div>
-          <span class="date-separator">to</span>
-          <div class="input-icon-wrapper date-picker-wrapper" @click="openDatePicker">
-            <CalendarDays class="input-icon" />
-            <div class="date-display-field">
-              {{ filters.endDate || 'YYYY-MM-DD' }}
-            </div>
-            <input type="date" v-model="filters.endDate" class="hidden-date-input" aria-label="End Date" />
-          </div>
-        </div>
-
-        <!-- Status Multi-Select Dropdown -->
-        <div v-if="activeTab !== 'pending_approval'" class="filter-group status-group">
-          <div class="custom-multi-select" ref="dropdownRef">
+        <!-- 3. Status/Sort Column -->
+        <div class="filter-group status-group">
+          <div v-if="activeTab !== 'pending_approval'" class="custom-multi-select" ref="dropdownRef">
             <div class="select-trigger" @click="toggleStatusDropdown" :class="{ 'is-open': isStatusDropdownOpen }">
               <div class="trigger-content">
                 <span v-if="filters.statuses.length === 0" class="placeholder">All Statuses</span>
                 <div v-else class="selected-tags">
-                  <span v-for="status in filters.statuses" :key="status" class="status-tag"
-                    :class="'tag-' + status.toLowerCase().replace(/\s+/g, '-')">
-                    {{ status }}
-                  </span>
+                   <span class="status-summary">{{ filters.statuses.length }} selected</span>
                 </div>
               </div>
               <ChevronDown class="dropdown-icon" :class="{ 'rotate': isStatusDropdownOpen }" />
@@ -155,16 +141,63 @@ onUnmounted(() => {
             <div v-if="isStatusDropdownOpen" class="dropdown-menu">
               <div v-for="status in availableStatuses" :key="status" @click="toggleStatus(status)" class="dropdown-item"
                 :class="{ 'active': filters.statuses.includes(status) }">
-                <div class="checkbox-wrapper">
-                  <div class="custom-checkbox" :class="{ 'checked': filters.statuses.includes(status) }">
-                    <div v-if="filters.statuses.includes(status)" class="check-mark"></div>
-                  </div>
+                <div class="custom-checkbox" :class="{ 'checked': filters.statuses.includes(status) }">
+                    <Check v-if="filters.statuses.includes(status)" class="check-icon" />
                 </div>
                 <span class="item-label">{{ status }}</span>
               </div>
             </div>
           </div>
+          <div v-else class="status-placeholder">
+             <div class="trigger-content-fake">
+               <Clock class="input-icon-inline" />
+               <span>Pending Action</span>
+             </div>
+          </div>
         </div>
+
+        <!-- 4. View Mode & More Filters -->
+        <div class="filter-group options-group">
+          <div class="options-container">
+            <div class="view-toggles">
+              <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" 
+                @click="emit('view-mode-change', 'grid')" title="Grid View">
+                <LayoutGrid class="icon-tiny" />
+                <span>Grid</span>
+              </button>
+              <button :class="['view-toggle-btn', { active: viewMode === 'list' }]" 
+                @click="emit('view-mode-change', 'list')" title="List View">
+                <List class="icon-tiny" />
+                <span>List</span>
+              </button>
+            </div>
+            
+            <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
+              @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
+              <SlidersHorizontal class="icon-tiny" />
+              <span>More</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 2: Date Range (Only if More Filters is Open) -->
+        <transition name="expand">
+          <div v-if="isMoreFiltersOpen" class="filter-group date-full-group">
+             <div class="date-range-combined">
+               <div class="date-input-box" @click="openDatePicker">
+                 <CalendarDays class="input-icon-mini" />
+                 <span class="date-val">{{ filters.startDate || 'From' }}</span>
+                 <input type="date" v-model="filters.startDate" class="hidden-date-input" />
+               </div>
+               <div class="date-arrow">→</div>
+               <div class="date-input-box" @click="openDatePicker">
+                 <CalendarDays class="input-icon-mini" />
+                 <span class="date-val">{{ filters.endDate || 'To' }}</span>
+                 <input type="date" v-model="filters.endDate" class="hidden-date-input" />
+               </div>
+             </div>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
@@ -173,23 +206,22 @@ onUnmounted(() => {
 <style scoped>
 .filter-wrapper {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
-  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  border: 1px solid #e2e8f0;
   position: relative;
+  overflow: hidden;
 }
 
 .filter-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 0;
-  /* Remove horizontal padding to align with gutter */
+  padding: 1rem 1.5rem;
   cursor: pointer;
-  background: transparent;
-  /* Seamless integration */
-  transition: opacity 0.2s;
+  background: white;
+  transition: background 0.2s;
 }
 
 .filter-header:hover {
@@ -209,8 +241,8 @@ onUnmounted(() => {
 }
 
 .header-title {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: #1e293b;
 }
 
@@ -230,16 +262,17 @@ onUnmounted(() => {
 }
 
 .filter-content {
-  transition: max-height 0.3s ease-out, opacity 0.2s ease-out, padding 0.3s ease-out;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
   max-height: 500px;
   opacity: 1;
+  border-top: 1px solid #f1f5f9;
 }
 
 .filter-content.is-collapsed {
   max-height: 0;
   opacity: 0;
+  border-top-color: transparent;
   overflow: hidden;
-  padding-bottom: 0;
 }
 
 .filter-content:not(.is-collapsed) {
@@ -248,23 +281,116 @@ onUnmounted(() => {
 }
 
 .filter-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 0;
-  /* Remove horizontal padding */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  padding: 1.5rem;
 }
 
 .filter-group {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
 .keyword-group {
+  grid-column: span 1;
+}
+
+.member-group {
+  grid-column: span 1;
+}
+
+.status-group {
+  grid-column: span 1;
+}
+
+.options-group {
+  grid-column: span 1;
+}
+
+.options-container {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.view-toggles {
   flex: 1;
-  min-width: 250px;
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  height: 42px;
+}
+
+.date-full-group {
+  grid-column: span 4;
+  margin-top: 0.5rem;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+/* Transitions */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 100px;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-10px);
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.date-range-combined {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #f8fafc;
+  padding: 0.5rem 1.25rem;
+  border-radius: 14px;
+  width: fit-content;
+  border: 1.5px solid #e2e8f0;
+}
+
+.date-input-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.date-input-box:hover {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.date-val {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: ui-monospace, monospace;
+}
+
+.date-arrow {
+  color: #94a3b8;
+  font-weight: 800;
+}
+
+.input-icon-mini {
+  width: 14px;
+  height: 14px;
+  color: #64748b;
 }
 
 .date-picker-wrapper {
@@ -321,24 +447,28 @@ onUnmounted(() => {
 
 .filter-input {
   width: 100%;
-  padding: 0.5rem 0.5rem 0.5rem 2.25rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  height: 42px;
+  padding: 0 0.75rem 0 2.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+  background: #f8fafc;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
 }
 
 .filter-input:focus {
+  background: white;
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(225, 29, 46, 0.1);
 }
 
 .select-input {
-  padding-left: 0.75rem;
   cursor: pointer;
-  background-color: white;
-  min-width: 180px;
+  min-width: 160px;
+  appearance: none; /* Premium look */
 }
 
 .member-group {
@@ -359,20 +489,43 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 10px;
-  background: white;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 0 1rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
   cursor: pointer;
-  min-height: 38px;
-  height: auto;
-  /* Allow height to grow */
+  height: 42px;
   transition: all 0.2s;
-  overflow: visible;
 }
 
 .select-trigger:hover {
-  border-color: #94a3b8;
+  background: white;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.status-placeholder {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  background: #f1f5f9;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.trigger-content-fake {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.input-icon-inline {
+  width: 16px;
+  height: 16px;
 }
 
 .select-trigger.is-open {
@@ -392,47 +545,76 @@ onUnmounted(() => {
 
 .placeholder {
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-.selected-tags {
+.status-summary {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+  background: #fef2f2;
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* Options & Buttons */
+.more-filters-btn {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  width: 100%;
-}
-
-.status-tag {
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.tag-in-review {
-  background: #e0e7ff;
-  color: #444ed1;
-}
-
-.tag-approved {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.tag-rejected {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.tag-requested-changes {
-  background: #fef9c3;
-  color: #854d0e;
-}
-
-.tag-draft {
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  height: 42px;
   background: #f1f5f9;
-  color: #475569;
+  border: none;
+  border-radius: 10px;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.more-filters-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.more-filters-btn.active {
+  background: var(--brand-primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(225, 29, 46, 0.2);
+}
+
+/* View Mode Toggles */
+
+.view-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0 1rem;
+}
+
+.view-toggle-btn.active {
+  background: white;
+  color: var(--brand-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.view-toggle-btn .icon-tiny {
+  width: 14px;
+  height: 14px;
 }
 
 .dropdown-icon {
@@ -499,12 +681,10 @@ onUnmounted(() => {
   border-color: var(--brand-primary);
 }
 
-.check-mark {
-  width: 10px;
-  height: 5px;
-  border-left: 2px solid white;
-  border-bottom: 2px solid white;
-  transform: rotate(-45deg) translate(1px, -1px);
+.check-icon {
+  width: 12px;
+  height: 12px;
+  color: white;
 }
 
 .item-label {
@@ -513,38 +693,33 @@ onUnmounted(() => {
   color: #334155;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .filter-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-    /* Tighter gap on mobile */
-    padding: 0.75rem 0;
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  .filter-group {
-    width: 100%;
-  }
-
-  .date-group {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .date-separator {
-    display: none;
-    /* Hide 'to' when stacked */
-  }
-
-  .date-picker-wrapper {
-    width: 100%;
+  .date-full-group {
+    grid-column: span 2;
   }
 }
 
-@media (max-width: 480px) {
-  .header-title {
-    font-size: 0.85rem;
+@media (max-width: 640px) {
+  .filter-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+  .date-full-group {
+    grid-column: span 1;
+  }
+  .date-range-combined {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .date-arrow {
+    text-align: center;
+    transform: rotate(90deg);
+    margin: -0.25rem 0;
   }
 }
 </style>
