@@ -9,6 +9,7 @@ import { mockMemos } from './data/mockData';
 import { Menu, X, Plus } from 'lucide-vue-next';
 
 const memoListRef = ref(null);
+const presentationsRef = ref(null);
 const memos = ref([...mockMemos]);
 const isMobileMenuOpen = ref(false);
 const activeTab = ref('all');
@@ -132,6 +133,12 @@ const triggerCreateModal = async () => {
   }
 };
 
+const triggerUploadModal = () => {
+  if (presentationsRef.value) {
+    presentationsRef.value.openUploadModal();
+  }
+};
+
 const toggleMenu = () => {
 
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -192,6 +199,10 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
             <Plus class="icon-small" />
             <span>New Request</span>
           </button>
+          <button v-else-if="activeView === 'presentations'" class="create-btn" @click="triggerUploadModal">
+            <Plus class="icon-small" />
+            <span>Upload</span>
+          </button>
         </div>
 
         <div v-if="activeView === 'ememo-list'" class="header-filter-wrapper">
@@ -211,7 +222,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
           <MemoList ref="memoListRef" :memos="filteredMemos" :activeTab="activeTab" :currentUser="currentUser" />
         </template>
         <template v-else-if="activeView === 'presentations'">
-          <Presentations />
+          <Presentations ref="presentationsRef" />
         </template>
         <template v-else>
           <div class="placeholder-view">
