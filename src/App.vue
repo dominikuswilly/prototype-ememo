@@ -146,6 +146,13 @@ const handleResize = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
+const handleSidebarNav = ({ view, tab }) => {
+  activeView.value = view;
+  if (tab) {
+    activeTab.value = tab;
+  }
+};
+
 const handleSidebarCollapse = (collapsed) => {
   isSidebarCollapsed.value = collapsed;
 };
@@ -167,8 +174,8 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
     <!-- Sidebar -->
     <div :class="['sidebar-wrapper', { 'mobile-open': isMobileMenuOpen }]">
-      <Sidebar :is-mobile="isMobile" :active-view="activeView" @collapse="handleSidebarCollapse"
-        @close="isMobileMenuOpen = false" @change-view="activeView = $event" />
+      <Sidebar :is-mobile="isMobile" :active-view="activeView" :active-tab="activeTab" :pending-count="pendingCount"
+        @collapse="handleSidebarCollapse" @close="isMobileMenuOpen = false" @change-view="handleSidebarNav" />
     </div>
 
     <!-- Main Content -->
@@ -176,14 +183,6 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       <div v-if="isMobileMenuOpen" class="mobile-overlay" @click="toggleMenu"></div>
 
       <header class="sticky-page-header">
-        <div v-if="activeView === 'ememo-list'" class="tabs-nav">
-          <button v-for="tab in ['all', 'my_memos', 'pending_approval']" :key="tab"
-            :class="['tab-btn', { active: activeTab === tab }]" @click="activeTab = tab">
-            {{ tab === 'pending_approval' ? 'Needs My Approval' : (tab === 'my_memos' ? 'My Memos' : 'All Memos') }}
-            <span v-if="tab === 'pending_approval' && pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
-          </button>
-        </div>
-
         <div class="header-main-row">
           <div class="header-titles">
             <h1>{{ pageTitle }}</h1>
@@ -376,45 +375,6 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 /* Hide scrollbar for tabs container Chrome/Safari */
 .tabs-nav::-webkit-scrollbar {
   display: none;
-}
-
-.tab-btn {
-  background: none;
-  border: none;
-  padding: 0.75rem 1.25rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-  white-space: nowrap;
-  letter-spacing: -0.01em;
-}
-
-.tab-btn:hover {
-  color: var(--text-main);
-}
-
-.tab-btn.active {
-  color: var(--brand-primary);
-  border-bottom-color: var(--brand-primary);
-}
-
-.tab-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #ef4444;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 700;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.25rem;
-  border-radius: 999px;
-  margin-left: 0.5rem;
-  vertical-align: middle;
 }
 
 .list-wrapper {

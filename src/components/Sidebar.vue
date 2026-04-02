@@ -17,6 +17,14 @@ const props = defineProps({
   activeView: {
     type: String,
     default: 'ememo-summary'
+  },
+  activeTab: {
+    type: String,
+    default: 'all'
+  },
+  pendingCount: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -45,7 +53,18 @@ const menuData = [
         isSubGroup: true,
         children: [
           { id: 'ememo-summary', label: 'Summary', icon: BarChart2, view: 'ememo-summary' },
-          { id: 'ememo-list', label: 'Memo List', icon: LayoutGrid, view: 'ememo-list' }
+          {
+            id: 'ememo-list-group',
+            label: 'Memo List',
+            icon: LayoutGrid,
+            isSubSubGroup: true,
+            view: 'ememo-list',
+            children: [
+              { id: 'memo-all', label: 'All Memos', icon: LayoutGrid, view: 'ememo-list', tab: 'all' },
+              { id: 'memo-my', label: 'My Memos', icon: User, view: 'ememo-list', tab: 'my_memos' },
+              { id: 'memo-pending', label: 'Needs My Approval', icon: CalendarCheck, view: 'ememo-list', tab: 'pending_approval', hasBadge: true }
+            ]
+          }
         ]
       },
       { id: 'presentations', label: 'Presentations', icon: Presentation, view: 'presentations' },
@@ -89,9 +108,9 @@ const toggleGroup = (groupId) => {
   }
 };
 
-const handleNavClick = (view) => {
+const handleNavClick = (view, tab = null) => {
   if (!view) return;
-  emit('change-view', view);
+  emit('change-view', { view, tab });
   if (props.isMobile) {
     emit('close');
   }
@@ -149,12 +168,38 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
                 </div>
 
                 <div v-if="isGroupExpanded(child.id) && !isCollapsed" class="sub-group-content">
-                  <a v-for="subChild in child.children" :key="subChild.id" href="#"
-                    :class="['nav-link sub-link', { active: activeView === subChild.view }]"
-                    @click.prevent="handleNavClick(subChild.view)">
-                    <component :is="subChild.icon" class="nav-icon-xs" />
-                    <span>{{ subChild.label }}</span>
-                  </a>
+                  <template v-for="subChild in child.children" :key="subChild.id">
+
+                    <!-- SubSubGroup Toggle (Recursive-lite) -->
+                    <template v-if="subChild.isSubSubGroup">
+                      <div @click="toggleGroup(subChild.id)"
+                        :class="['nav-link sub-link sub-group-toggle', { active: subChild.view === activeView }]">
+                        <div class="sub-group-info">
+                          <component :is="subChild.icon" class="nav-icon-xs" />
+                          <span>{{ subChild.label }}</span>
+                        </div>
+                        <ChevronDown :class="['chevron-icon-sm', { rotated: isGroupExpanded(subChild.id) }]" />
+                      </div>
+
+                      <div v-if="isGroupExpanded(subChild.id)" class="sub-sub-group-content">
+                        <a v-for="grandChild in subChild.children" :key="grandChild.id" href="#"
+                          :class="['nav-link sub-sub-link', { active: activeView === grandChild.view && activeTab === grandChild.tab }]"
+                          @click.prevent="handleNavClick(grandChild.view, grandChild.tab)">
+                          <component :is="grandChild.icon" class="nav-icon-xs" />
+                          <span>{{ grandChild.label }}</span>
+                          <span v-if="grandChild.hasBadge && pendingCount > 0" class="sidebar-badge">{{ pendingCount
+                            }}</span>
+                        </a>
+                      </div>
+                    </template>
+
+                    <!-- Regular SubLink -->
+                    <a v-else href="#" :class="['nav-link sub-link', { active: activeView === subChild.view }]"
+                      @click.prevent="handleNavClick(subChild.view)">
+                      <component :is="subChild.icon" class="nav-icon-xs" />
+                      <span>{{ subChild.label }}</span>
+                    </a>
+                  </template>
                 </div>
               </template>
 
@@ -386,9 +431,30 @@ const isGroupExpanded = (groupId) => expandedGroups.value.includes(groupId);
   margin-bottom: 0.5rem;
 }
 
-.sub-link {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
+.sub-sub-group-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 1rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0.25rem;
+}
+
+.sub-sub-link {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.sidebar-badge {
+  margin-left: auto;
+  background: var(--brand-primary);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 99px;
+  box-shadow: 0 2px 4px rgba(225, 29, 46, 0.3);
 }
 
 .nav-icon {
