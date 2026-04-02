@@ -83,7 +83,7 @@ const handleCardClick = () => emit('select', props.memo);
 const handlePressStart = () => emit('press-start', props.memo);
 const handlePressEnd = () => emit('press-end');
 
-const showSystemOverlay = ref(!!props.memo.externalSystem);
+const showSystemOverlay = ref(false);
 </script>
 
 <template>
@@ -95,7 +95,10 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
         <h3 class="memo-card-title-new">{{ memo.title }}</h3>
         <div class="header-meta-row">
           <span class="memo-card-number-new">#{{ memo.memoNumber }}</span>
-          <div v-if="memo.externalSystem" class="system-integration-badge" :title="`${memo.externalSystem}: ${memo.externalReceiptNumber || 'Pending'}`">
+          <div v-if="memo.externalSystem" class="system-integration-badge" 
+            :title="`${memo.externalSystem}: ${memo.externalReceiptNumber || 'Pending'}`"
+            @click.stop="showSystemOverlay = true"
+            style="cursor: pointer">
             <Zap class="icon-tiny-pulse" />
             <span>{{ memo.externalSystem }}</span>
           </div>
@@ -126,6 +129,26 @@ const showSystemOverlay = ref(!!props.memo.externalSystem);
 
     </div>
 
+
+    <Transition name="fade">
+      <div v-if="showSystemOverlay && memo.externalSystem" class="system-info-overlay" @click.stop>
+        <div class="system-modal-content">
+          <Zap class="system-modal-icon" />
+          <div class="system-modal-text">
+            <span class="system-modal-name">{{ memo.externalSystem }} Integrated</span>
+            <span class="system-modal-ref">Ref: {{ memo.externalReceiptNumber || 'Pending' }}</span>
+            <div class="system-badge mt-1" :class="memo.externalReceiptNumber ? 'badge-sent' : 'badge-waiting'">
+              <CheckCircle v-if="memo.externalReceiptNumber" class="badge-icon" />
+              <Clock v-else class="badge-icon" />
+              <span>{{ memo.externalReceiptNumber ? 'Sync Success' : 'Waiting for Sync' }}</span>
+            </div>
+          </div>
+          <button class="system-modal-close" @click="showSystemOverlay = false">
+            <X class="icon-tiny" />
+          </button>
+        </div>
+      </div>
+    </Transition>
 
     <div class="card-footer-separator-new"></div>
 
