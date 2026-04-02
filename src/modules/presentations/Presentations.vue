@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import {
   Search, Filter, Plus, FileText, Layout,
   MoreVertical, Download, Eye, Clock, User,
@@ -34,6 +34,9 @@ const isPageLoading = ref(true);
 const isCategoryDropdownOpen = ref(false);
 const isMobileScreen = ref(false);
 const isScrolled = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(6);
+
 const checkMobile = () => {
   isMobileScreen.value = window.innerWidth <= 1024;
 };
@@ -260,6 +263,25 @@ const sortedFilteredPresentations = computed(() => {
   });
 });
 
+const totalPages = computed(() => Math.ceil(sortedFilteredPresentations.value.length / itemsPerPage.value));
+
+const paginatedPresentations = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return sortedFilteredPresentations.value.slice(start, end);
+});
+
+const currentRange = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value + 1;
+  const end = Math.min(currentPage.value * itemsPerPage.value, sortedFilteredPresentations.value.length);
+  return { start, end, total: sortedFilteredPresentations.value.length };
+});
+
+// Watch Categories/Search to reset pagination
+watch([selectedCategories, searchQuery, sortBy], () => {
+  currentPage.value = 1;
+}, { deep: true });
+
 const getFileIcon = (type) => {
   if (type === 'MP4') return FileVideo;
   if (type === 'PPTX') return FileImage;
@@ -403,11 +425,33 @@ const handleUpload = () => {
     <!-- Main Content Area -->
     <div class="main-content-full">
       <!-- Presentations Content (Extracted to Sub-component) -->
-      <PresentationContent :items="sortedFilteredPresentations" :view-mode="viewMode" :selected-ids="selectedFiles"
+      <PresentationContent :items="paginatedPresentations" :view-mode="viewMode" :selected-ids="selectedFiles"
         :active-menu-id="activeMenuId" :is-mobile="isMobileScreen" :is-select-mode="isSelectMode"
         :is-loading="isPageLoading" @toggle-selection="toggleFileSelection" @open-menu="openMenu"
         @execute-action="executeAction" @select-all="selectAll" @clear-selection="clearSelection"
         @clear-filters="selectedCategories = []; searchQuery = ''" />
+
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1" class="pagination-wrap">
+        <div class="pagination-info">
+          Showing <span>{{ currentRange.start }}</span> to <span>{{ currentRange.end }}</span> of <span>{{ currentRange.total }}</span> items
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--" title="Previous Page">
+            <ChevronLeft class="icon-small" />
+          </button>
+          <div class="page-numbers">
+            <button v-for="page in totalPages" :key="page" 
+              :class="['page-number', { active: currentPage === page }]"
+              @click="currentPage = page">
+              {{ page }}
+            </button>
+          </div>
+          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++" title="Next Page">
+            <ChevronRight class="icon-small" />
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Administrative Modals -->
@@ -2011,6 +2055,83 @@ const handleUpload = () => {
     font-size: 0.75rem;
     color: #64748b;
     display: block;
+  }
+}
+
+/* Pagination Styling */
+.pagination-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  margin-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.pagination-info span {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.pagination-btn, .page-number {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pagination-btn:hover:not(:disabled), .page-number:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.page-number.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+}
+
+@media (max-width: 768px) {
+  .pagination-wrap {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    text-align: center;
   }
 }
 </style>
