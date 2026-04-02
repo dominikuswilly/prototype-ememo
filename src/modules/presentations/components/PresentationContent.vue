@@ -68,7 +68,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
         <!-- Actual Content (Grid) -->
         <template v-else>
           <div v-for="p in items" :key="p.id"
-            :class="['presentation-card', { selected: isFileSelected(p.id) }]">
+            :class="['presentation-card', { selected: isFileSelected(p.id), 'menu-active': activeMenuId === p.id }]">
             
             <div v-if="!isMobile || isSelectMode" class="card-selection">
               <input type="checkbox" :checked="isFileSelected(p.id)" @change="emit('toggle-selection', p.id)"
@@ -243,12 +243,14 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 @media (max-width: 640px) {
   .presentation-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
+    margin-top: 1rem;
   }
 }
 
@@ -261,7 +263,10 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   flex-direction: column;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
+}
+
+.presentation-card.menu-active {
+  z-index: 100;
 }
 
 @media (max-width: 640px) {
@@ -448,6 +453,7 @@ const isFileSelected = (id) => props.selectedIds.includes(id);
   border-radius: 20px;
   border: 1px solid #f1f5f9;
   overflow: hidden;
+  margin-top: 1.5rem;
 }
 
 .list-header {
