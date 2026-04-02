@@ -396,11 +396,7 @@ const handleUpload = () => {
           </button>
         </div>
 
-        <div class="mobile-only" v-if="isMobileScreen">
-          <button @click="isSelectMode = !isSelectMode" :class="['toolbar-btn text-btn', { active: isSelectMode }]">
-            {{ isSelectMode ? 'Cancel' : 'Select' }}
-          </button>
-        </div>
+
 
         <button v-if="!isMobileScreen" class="btn-primary upload-btn" @click="isUploadModalOpen = true">
           <Plus class="icon-small" />
@@ -851,10 +847,10 @@ const handleUpload = () => {
 
 @media (max-width: 1024px) {
   .toolbar-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 0.75rem;
-    padding: 0.75rem;
+    padding: 0;
     background: transparent;
     border: none;
     box-shadow: none;
