@@ -731,6 +731,21 @@ const handleUpload = () => {
   gap: 1.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: #f8fafc;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 1.5rem;
+  margin: 0;
+  border-bottom: 1px solid transparent;
+}
+
+.page-header.scrolled {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
 }
 
 .main-toolbar {
@@ -769,29 +784,17 @@ const handleUpload = () => {
 
 @media (max-width: 1024px) {
   .page-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: rgba(248, 250, 252, 0.8);
-    backdrop-filter: blur(8px);
-    margin: -0.75rem -0.75rem 0.5rem;
+    margin: 0;
     /* Match page padding */
     padding: 1.25rem 1rem 0.75rem;
-    border-bottom: 1px solid transparent;
   }
 
   .page-header.scrolled {
-    background: rgba(255, 255, 255, 0.9);
-    border-bottom: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
   }
 
   .page-header.scrolled .page-subtitle {
     display: none;
-  }
-
-  .page-header.scrolled .page-title {
-    font-size: 1.25rem;
   }
 }
 
@@ -800,6 +803,10 @@ const handleUpload = () => {
     flex-direction: column;
     align-items: flex-start;
     gap: 1.25rem;
+  }
+
+  .page-header.scrolled .page-title {
+    font-size: 1.5rem;
   }
   
   .main-toolbar {
