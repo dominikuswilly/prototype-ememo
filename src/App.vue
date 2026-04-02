@@ -40,7 +40,7 @@ const handleFilterChange = (newFilters) => {
 };
 
 const pageTitle = computed(() => {
-  if (activeView.value === 'ememo-summary') return 'Memo Summary';
+  if (activeView.value === 'dashboard') return 'Main Dashboard';
   if (activeView.value === 'ememo-list') {
     if (activeTab.value === 'my_memos') return 'My Memos';
     if (activeTab.value === 'pending_approval') return 'Needs My Approval';
@@ -51,7 +51,7 @@ const pageTitle = computed(() => {
 });
 
 const pageDescription = computed(() => {
-  if (activeView.value === 'ememo-summary') return 'High-level overview of memorandum activities and statistics.';
+  if (activeView.value === 'dashboard') return 'High-level overview of memorandum activities, statistics, and current progress.';
   if (activeView.value === 'ememo-list') {
     if (activeTab.value === 'my_memos') return 'Memos created by you, including drafts.';
     if (activeTab.value === 'pending_approval') return 'Memos waiting for your approval.';
@@ -125,7 +125,7 @@ const filteredMemos = computed(() => {
 });
 
 const triggerCreateModal = async () => {
-  if (activeView.value === 'ememo-summary') {
+  if (activeView.value === 'dashboard') {
     activeView.value = 'ememo-list';
     await nextTick();
   }
@@ -173,7 +173,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   <div class="app-layout">
     <!-- Mobile Header -->
     <header class="mobile-header">
-      <div class="mobile-logo" @click="activeView = 'ememo-summary'" style="cursor: pointer;">KBRU</div>
+      <div class="mobile-logo" @click="activeView = 'dashboard'" style="cursor: pointer;">KBRU</div>
       <button @click="toggleMenu" class="menu-btn">
         <Menu v-if="!isMobileMenuOpen" class="icon-small" />
         <X v-else class="icon-small" />
@@ -215,7 +215,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       </header>
 
       <div class="list-wrapper">
-        <template v-if="activeView === 'ememo-summary'">
+        <template v-if="activeView === 'dashboard'">
           <MemoSummary :memos="memos" :members="subordinates" :currentUser="currentUser"
             @view-list="activeView = 'ememo-list'; activeTab = 'all'"
             @view-pending="activeView = 'ememo-list'; activeTab = 'pending_approval'"
