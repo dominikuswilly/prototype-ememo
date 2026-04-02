@@ -928,16 +928,35 @@ const handleUpload = () => {
 
 .toolbar-select {
   appearance: none;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 2.25rem 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #475569;
   cursor: pointer;
+  transition: all 0.2s;
+  height: 38px;
   outline: none;
+}
+
+@media (max-width: 1024px) {
+  .toolbar-select {
+    width: 100%;
+    height: 48px;
+    background: white;
+    border-radius: 12px;
+    padding-left: 1.25rem;
+  }
 }
 
 .select-icon {
   position: absolute;
-  right: 0.5rem;
+  right: 0.85rem;
   width: 14px;
   height: 14px;
-  color: #64748b;
+  color: #94a3b8;
   pointer-events: none;
 }
 
