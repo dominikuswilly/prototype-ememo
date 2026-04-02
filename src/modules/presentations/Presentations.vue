@@ -340,38 +340,40 @@ const handleUpload = () => {
             <ChevronDown class="icon-tiny arrow" :class="{ open: isCategoryDropdownOpen }" />
           </button>
 
-          <Transition name="dropdown">
-            <div v-if="isCategoryDropdownOpen">
-              <!-- Backdrop for Mobile -->
-              <div v-if="isMobileScreen" class="dropdown-backdrop" @click="isCategoryDropdownOpen = false"></div>
-              
-              <div class="category-multi-dropdown">
-                <div class="dropdown-header">
-                  <span>Filter by Category</span>
-                  <button class="btn-reset" v-if="selectedCategories.length > 0" @click="selectedCategories = []">Clear All</button>
-                </div>
-                <div class="dropdown-list custom-scrollbar">
-                  <button v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id"
-                    class="dropdown-item" @click="toggleCategory(cat.id)">
-                    <div class="item-main">
-                      <div :class="['custom-checkbox', { checked: isSelected(cat.id) }]">
-                        <Plus v-if="!isSelected(cat.id)" class="icon-tiny" />
-                        <CheckCircle v-else class="icon-tiny" />
+          <Teleport to="body">
+            <Transition name="dropdown">
+              <div v-if="isCategoryDropdownOpen">
+                <!-- Backdrop for All Screens -->
+                <div class="dropdown-backdrop" @click="isCategoryDropdownOpen = false"></div>
+                
+                <div class="category-multi-dropdown">
+                  <div class="dropdown-header">
+                    <span>Filter by Category</span>
+                    <button class="btn-reset" v-if="selectedCategories.length > 0" @click="selectedCategories = []">Clear All</button>
+                  </div>
+                  <div class="dropdown-list custom-scrollbar">
+                    <button v-for="cat in categories.filter(c => c.id !== 'all')" :key="cat.id"
+                      class="dropdown-item" @click="toggleCategory(cat.id)">
+                      <div class="item-main">
+                        <div :class="['custom-checkbox', { checked: isSelected(cat.id) }]">
+                          <Plus v-if="!isSelected(cat.id)" class="icon-tiny" />
+                          <CheckCircle v-else class="icon-tiny" />
+                        </div>
+                        <component :is="cat.icon" class="item-icon" />
+                        <span class="item-label">{{ cat.label }}</span>
                       </div>
-                      <component :is="cat.icon" class="item-icon" />
-                      <span class="item-label">{{ cat.label }}</span>
-                    </div>
-                    <span class="item-count">{{ categoryCounts[cat.id] || 0 }}</span>
-                  </button>
-                </div>
+                      <span class="item-count">{{ categoryCounts[cat.id] || 0 }}</span>
+                    </button>
+                  </div>
 
-                <!-- Footer for Mobile -->
-                <div v-if="isMobileScreen" class="dropdown-footer">
-                  <button class="btn-primary full-width" @click="isCategoryDropdownOpen = false">Done</button>
+                  <!-- Footer for Mobile -->
+                  <div v-if="isMobileScreen" class="dropdown-footer">
+                    <button class="btn-primary full-width" @click="isCategoryDropdownOpen = false">Done</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Transition>
+            </Transition>
+          </Teleport>
         </div>
 
         <div class="divider" v-if="!isMobileScreen"></div>
@@ -1091,17 +1093,24 @@ const handleUpload = () => {
 }
 
 .category-multi-dropdown {
-  position: absolute;
-  top: calc(100% + 0.75rem);
-  left: 0;
-  width: 280px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  width: calc(100% - 2.5rem);
+  max-width: 440px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   z-index: 2000;
   padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  overflow: hidden;
 }
 
 .dropdown-backdrop {
@@ -1207,39 +1216,9 @@ const handleUpload = () => {
   color: #3b82f6;
 }
 
-.item-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #475569;
-}
-
-.item-count {
-  font-size: 0.75rem;
-  background: #f1f5f9;
-  color: #64748b;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: 800;
-}
-
 @media (max-width: 1024px) {
   .category-multi-dropdown {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    bottom: auto;
-    width: calc(100% - 2.5rem);
-    max-width: 400px;
-    margin: 0;
-    border-radius: 20px;
     padding: 1.5rem;
-    z-index: 2000;
-    max-height: 80vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 
   .dropdown-list {
@@ -1263,29 +1242,26 @@ const handleUpload = () => {
   }
 }
 
-/* Dropdown Transition */
+/* Dropdown Transition - Focused Center 'Light-up' */
 .dropdown-enter-active, .dropdown-leave-active {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Ensure backdrop only fades while modal pop-ins */
 .dropdown-enter-from, .dropdown-leave-to {
   opacity: 0;
 }
 
-@media (max-width: 1024px) {
-  .dropdown-enter-from .category-multi-dropdown,
-  .dropdown-leave-to .category-multi-dropdown {
-    opacity: 0;
-    transform: translate(-50%, -45%) scale(0.9);
-  }
+.dropdown-enter-from .category-multi-dropdown,
+.dropdown-leave-to .category-multi-dropdown {
+  transform: translate(-50%, -50%) scale(0.6) !important;
+  opacity: 0;
 }
 
-@media (min-width: 1025px) {
-  .dropdown-enter-from .category-multi-dropdown,
-  .dropdown-leave-to .category-multi-dropdown {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.95);
-  }
+.dropdown-enter-to .category-multi-dropdown,
+.dropdown-leave-from .category-multi-dropdown {
+  transform: translate(-50%, -50%) scale(1) !important;
+  opacity: 1;
 }
 
 /* Main Content Layout */
