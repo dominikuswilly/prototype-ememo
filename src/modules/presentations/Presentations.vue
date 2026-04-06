@@ -162,6 +162,12 @@ const executeAction = (action, file) => {
     case 'copy-link':
       showToast('Share link copied to clipboard!');
       break;
+    case 'download':
+      showToast(`Downloading ${file.title}...`);
+      break;
+    case 'view':
+      showToast(`Opening ${file.title}...`);
+      break;
     case 'duplicate':
       const copy = { ...file, id: Date.now(), title: file.title + ' (Copy)' };
       mockPresentations.value.unshift(copy);

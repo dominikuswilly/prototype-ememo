@@ -120,10 +120,12 @@ const handleOpenMenu = () => {
         </div>
       </div>
       <div class="card-actions-mini">
-        <button class="mini-action-btn view" title="View" v-if="!isMobile">
+        <button class="mini-action-btn view" title="View" v-if="!isMobile"
+          @click.stop="emit('execute-action', 'view', p)">
           <Eye class="icon-tiny" />
         </button>
-        <button class="mini-action-btn download" title="Download" v-if="!isMobile">
+        <button class="mini-action-btn download" title="Download" v-if="!isMobile" 
+          @click.stop="emit('execute-action', 'download', p)">
           <Download class="icon-tiny" />
         </button>
         <div class="relative-inline action-wrap-trigger">
