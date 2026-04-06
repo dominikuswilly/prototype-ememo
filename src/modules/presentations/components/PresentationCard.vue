@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import { 
   FileText, FileVideo, FileImage, MoreVertical,
   Eye, Download, User, Edit2, FolderInput, Copy, Share2, Link, Info, Archive, Trash2,
@@ -48,6 +49,18 @@ const getStatusIcon = (status) => {
     case 'draft': return Clock;
     default: return Clock;
   }
+};
+const menuTrigger = ref(null);
+const opensUp = ref(false);
+
+const handleOpenMenu = () => {
+  if (menuTrigger.value) {
+    const rect = menuTrigger.value.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const estimatedMenuHeight = 320; 
+    opensUp.value = spaceBelow < estimatedMenuHeight;
+  }
+  emit('open-menu', props.p.id);
 };
 </script>
 
@@ -114,12 +127,12 @@ const getStatusIcon = (status) => {
           <Download class="icon-tiny" />
         </button>
         <div class="relative-inline action-wrap-trigger">
-          <button class="mini-action-btn" @click.stop="emit('open-menu', p.id)">
+          <button ref="menuTrigger" class="mini-action-btn" @click.stop="handleOpenMenu">
             <MoreVertical class="icon-tiny" />
           </button>
           
           <!-- Dropdown Menu (Desktop) -->
-          <div v-if="!isMobile && activeMenuId === p.id" class="dropdown-menu">
+          <div v-if="!isMobile && activeMenuId === p.id" :class="['dropdown-menu', { 'open-up': opensUp }]">
             <div class="menu-group">
               <button @click.stop="emit('execute-action', 'rename', p)"><Edit2 class="icon-tiny" /> Rename</button>
               <button @click.stop="emit('execute-action', 'move', p)"><FolderInput class="icon-tiny" /> Move to...</button>
@@ -444,6 +457,20 @@ const getStatusIcon = (status) => {
 
 @keyframes dropdownIn {
   from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-menu.open-up {
+  top: auto;
+  bottom: calc(100% + 0.5rem);
+  margin-top: 0;
+  margin-bottom: 0;
+  transform-origin: bottom right;
+  animation: dropdownUpIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownUpIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
