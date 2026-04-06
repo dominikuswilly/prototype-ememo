@@ -41,6 +41,7 @@ const filterState = ref({
 const presSearchQuery = ref('');
 const presSortBy = ref('date_desc');
 const presViewMode = ref('grid');
+const presStatus = ref('');
 const presSelectedCategories = ref([]);
 
 const handlePresCategoryToggle = (id) => {
@@ -234,7 +235,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
         </div>
         <div v-else-if="activeView === 'presentations'" class="header-filter-wrapper">
           <PresentationFilter v-model:search-query="presSearchQuery" v-model:sort-by="presSortBy"
-            v-model:view-mode="presViewMode" :categories="presentationCategories"
+            v-model:view-mode="presViewMode" v-model:status="presStatus" :categories="presentationCategories"
             :selected-categories="presSelectedCategories" @toggle-category="handlePresCategoryToggle" />
         </div>
       </header>
@@ -252,7 +253,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
         </template>
         <template v-else-if="activeView === 'presentations'">
           <Presentations ref="presentationsRef" :searchQuery="presSearchQuery" :sortBy="presSortBy"
-            :viewMode="presViewMode" :selectedCategories="presSelectedCategories"
+            :viewMode="presViewMode" :selectedCategories="presSelectedCategories" :status="presStatus"
             @update:view-mode="presViewMode = $event" />
         </template>
         <template v-else>

@@ -16,7 +16,8 @@ const props = defineProps({
   searchQuery: { type: String, default: '' },
   sortBy: { type: String, default: 'date_desc' },
   viewMode: { type: String, default: 'grid' },
-  selectedCategories: { type: Array, default: () => [] }
+  selectedCategories: { type: Array, default: () => [] },
+  status: { type: String, default: '' }
 });
 
 const emit = defineEmits(['update:view-mode']);
@@ -231,7 +232,8 @@ const sortedFilteredPresentations = computed(() => {
     const matchesCategory = props.selectedCategories.length === 0 || props.selectedCategories.includes(p.category);
     const matchesSearch = p.title.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
       p.author.toLowerCase().includes(props.searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesStatus = !props.status || p.status.toLowerCase() === props.status.toLowerCase();
+    return matchesCategory && matchesSearch && matchesStatus;
   });
 
   return filtered.sort((a, b) => {
@@ -256,8 +258,8 @@ const currentRange = computed(() => {
   return { start, end, total: sortedFilteredPresentations.value.length };
 });
 
-// Watch Categories/Search/Sort props to reset pagination
-watch(() => [props.selectedCategories, props.searchQuery, props.sortBy], () => {
+// Watch Categories/Search/Sort/Status props to reset pagination
+watch(() => [props.selectedCategories, props.searchQuery, props.sortBy, props.status], () => {
   currentPage.value = 1;
 }, { deep: true });
 

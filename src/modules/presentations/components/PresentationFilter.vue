@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { 
   Filter, Search, BarChart3, LayoutGrid, List, ChevronDown, ChevronUp,
-  Layers, SlidersHorizontal
+  Layers, SlidersHorizontal, Activity
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -10,13 +10,15 @@ const props = defineProps({
   selectedCategories: { type: Array, default: () => [] },
   searchQuery: { type: String, default: '' },
   sortBy: { type: String, default: 'date_desc' },
-  viewMode: { type: String, default: 'grid' }
+  viewMode: { type: String, default: 'grid' },
+  status: { type: String, default: '' }
 });
 
 const emit = defineEmits([
   'update:searchQuery', 
   'update:sortBy', 
   'update:viewMode', 
+  'update:status',
   'toggle-category'
 ]);
 
@@ -89,8 +91,18 @@ defineExpose({ focusSearch });
           </div>
         </div>
 
-        <!-- 3. Spacer for Ruler Grid Alignment (Matches Status column in Memos) -->
-        <div class="filter-spacer-alignment"></div>
+        <!-- 3. Status Filter (Matches column in Memos) -->
+        <div class="filter-group status-group">
+          <div class="input-icon-wrapper">
+            <Activity class="input-icon" />
+            <select :value="status" @change="emit('update:status', $event.target.value)"
+              class="filter-input select-input">
+              <option value="">All Statuses</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+        </div>
 
         <!-- 4. More Filters (Trigger) -->
         <div v-if="!isMobile" class="filter-group options-group">

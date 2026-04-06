@@ -114,13 +114,13 @@ onUnmounted(() => {
         <!-- 1. Member Filter (Selective based on Tab) -->
         <div class="filter-group member-group">
           <div class="input-icon-wrapper">
-             <Layers class="input-icon" />
-             <select v-model="filters.member" :disabled="activeTab !== 'all'" class="filter-input select-input">
-               <option value="">{{ activeTab === 'all' ? 'All Members' : 'My Memos' }}</option>
-               <option v-for="member in members" :key="member.name" :value="member.name">
-                 {{ member.name }}
-               </option>
-             </select>
+            <Layers class="input-icon" />
+            <select v-model="filters.member" :disabled="activeTab !== 'all'" class="filter-input select-input">
+              <option value="">{{ activeTab === 'all' ? 'All Members' : 'My Memos' }}</option>
+              <option v-for="member in members" :key="member.name" :value="member.name">
+                {{ member.name }}
+              </option>
+            </select>
           </div>
         </div>
 
@@ -140,7 +140,7 @@ onUnmounted(() => {
               <div class="trigger-content">
                 <span v-if="filters.statuses.length === 0" class="placeholder">All Statuses</span>
                 <div v-else class="selected-tags">
-                   <span class="status-summary">{{ filters.statuses.length }} selected</span>
+                  <span class="status-summary">{{ filters.statuses.length }} selected</span>
                 </div>
               </div>
               <ChevronDown class="dropdown-icon" :class="{ 'rotate': isStatusDropdownOpen }" />
@@ -150,23 +150,23 @@ onUnmounted(() => {
               <div v-for="status in availableStatuses" :key="status" @click="toggleStatus(status)" class="dropdown-item"
                 :class="{ 'active': filters.statuses.includes(status) }">
                 <div class="custom-checkbox" :class="{ 'checked': filters.statuses.includes(status) }">
-                    <Check v-if="filters.statuses.includes(status)" class="check-icon" />
+                  <Check v-if="filters.statuses.includes(status)" class="check-icon" />
                 </div>
                 <span class="item-label">{{ status }}</span>
               </div>
             </div>
           </div>
           <div v-else class="status-placeholder">
-             <div class="trigger-content-fake">
-               <Clock class="input-icon-inline" />
-               <span>Pending Action</span>
-             </div>
+            <div class="trigger-content-fake">
+              <Clock class="input-icon-inline" />
+              <span>Pending Action</span>
+            </div>
           </div>
         </div>
 
         <!-- 4. More Filters -->
         <div v-if="!isMobile" class="filter-group more-group">
-          <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]" 
+          <button :class="['more-filters-btn', { active: isMoreFiltersOpen }]"
             @click="isMoreFiltersOpen = !isMoreFiltersOpen" title="More Filters">
             <SlidersHorizontal class="icon-tiny" />
             <span>More</span>
@@ -176,11 +176,11 @@ onUnmounted(() => {
         <!-- 5. View Mode Toggle -->
         <div v-if="!isMobile" class="filter-group view-group">
           <div class="view-toggles">
-            <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]" 
+            <button :class="['view-toggle-btn', { active: viewMode === 'grid' }]"
               @click="emit('view-mode-change', 'grid')" title="Grid View">
               <LayoutGrid class="icon-tiny" />
             </button>
-            <button :class="['view-toggle-btn', { active: viewMode === 'list' }]" 
+            <button :class="['view-toggle-btn', { active: viewMode === 'list' }]"
               @click="emit('view-mode-change', 'list')" title="List View">
               <List class="icon-tiny" />
             </button>
@@ -190,19 +190,19 @@ onUnmounted(() => {
         <!-- Row 2: Date Range (Only if More Filters is Open or on Mobile) -->
         <transition :name="isMobile ? '' : 'expand'">
           <div v-if="isMoreFiltersOpen || isMobile" class="filter-group date-full-group">
-             <div class="date-range-combined">
-               <div class="date-input-box" @click="openDatePicker">
-                 <CalendarDays class="input-icon-mini" />
-                 <span class="date-val">{{ filters.startDate || 'From' }}</span>
-                 <input type="date" v-model="filters.startDate" class="hidden-date-input" />
-               </div>
-               <div class="date-arrow">→</div>
-               <div class="date-input-box" @click="openDatePicker">
-                 <CalendarDays class="input-icon-mini" />
-                 <span class="date-val">{{ filters.endDate || 'To' }}</span>
-                 <input type="date" v-model="filters.endDate" class="hidden-date-input" />
-               </div>
-             </div>
+            <div class="date-range-combined">
+              <div class="date-input-box" @click="openDatePicker">
+                <CalendarDays class="input-icon-mini" />
+                <span class="date-val">{{ filters.startDate || 'From' }}</span>
+                <input type="date" v-model="filters.startDate" class="hidden-date-input" />
+              </div>
+              <div class="date-arrow">→</div>
+              <div class="date-input-box" @click="openDatePicker">
+                <CalendarDays class="input-icon-mini" />
+                <span class="date-val">{{ filters.endDate || 'To' }}</span>
+                <input type="date" v-model="filters.endDate" class="hidden-date-input" />
+              </div>
+            </div>
           </div>
         </transition>
       </div>
@@ -219,7 +219,7 @@ onUnmounted(() => {
   border: 1px solid #e2e8f0;
   position: relative;
   /* overflow: hidden removed to allow dropdowns to break out */
-  overflow: visible; 
+  overflow: visible;
 }
 
 .filter-header {
@@ -317,7 +317,8 @@ onUnmounted(() => {
 }
 
 .status-group.is-open {
-  z-index: 600; /* Forward onto container and higher stacking */
+  z-index: 600;
+  /* Forward onto container and higher stacking */
 }
 
 .more-group {
@@ -335,7 +336,6 @@ onUnmounted(() => {
 }
 
 .view-toggles {
-  flex: 1;
   display: flex;
   background: #f1f5f9;
   padding: 4px;
@@ -391,7 +391,7 @@ onUnmounted(() => {
 
 .date-input-box:hover {
   background: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .date-val {
@@ -487,7 +487,8 @@ onUnmounted(() => {
 .select-input {
   cursor: pointer;
   min-width: 160px;
-  appearance: none; /* Premium look */
+  appearance: none;
+  /* Premium look */
 }
 
 .member-group {
@@ -719,6 +720,7 @@ onUnmounted(() => {
   .filter-container {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .date-full-group {
     grid-column: span 2;
   }
@@ -730,14 +732,17 @@ onUnmounted(() => {
     gap: 1rem;
     padding: 1.25rem;
   }
+
   .date-full-group {
     grid-column: span 1;
   }
+
   .date-range-combined {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
   }
+
   .date-arrow {
     text-align: center;
     transform: rotate(90deg);
