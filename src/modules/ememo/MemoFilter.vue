@@ -290,7 +290,7 @@ onUnmounted(() => {
 
 .filter-container {
   display: grid;
-  grid-template-columns: minmax(150px, 180px) 1fr minmax(150px, 180px) 100px 90px;
+  grid-template-columns: minmax(150px, 180px) 1fr minmax(150px, 180px) 100px 100px;
   gap: 0.75rem;
   padding: 1.25rem 1.5rem;
   align-items: end;
@@ -621,7 +621,6 @@ onUnmounted(() => {
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0 1rem;
 }
 
 .view-toggle-btn.active {
@@ -630,9 +629,14 @@ onUnmounted(() => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.icon-tiny {
+  width: 16px;
+  height: 16px;
+}
+
 .view-toggle-btn .icon-tiny {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 .dropdown-icon {
