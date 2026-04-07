@@ -8,6 +8,7 @@ import Presentations from './modules/presentations/Presentations.vue';
 import PresentationFilter from './modules/presentations/components/PresentationFilter.vue';
 import { presentationCategories } from './modules/presentations/data/categories';
 import { mockMemos } from './data/mockData';
+import Notifications from './modules/notifications/Notifications.vue';
 import { Menu, X, Plus, Bell } from 'lucide-vue-next';
 
 const memoListRef = ref(null);
@@ -167,6 +168,20 @@ const toggleMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
 };
 
+const notifications = ref([
+  { id: 1, title: 'New Memo Approved', read: false },
+  { id: 2, title: 'Reminder: Project Alpha', read: false },
+  { id: 3, title: 'Meeting at 2 PM', read: false },
+  { id: 4, title: 'Policy Update', read: true }
+]);
+
+const unreadNotifCount = computed(() => notifications.value.filter(n => !n.read).length);
+
+const handleMarkAsRead = (id) => {
+  const notif = notifications.value.find(n => n.id === id);
+  if (notif) notif.read = true;
+};
+
 const isSidebarCollapsed = ref(false);
 const showWelcomeModal = ref(true);
 
@@ -198,7 +213,10 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
       <div class="mobile-logo" @click="activeView = 'dashboard'" style="cursor: pointer;">KBRU</div>
       <div class="mobile-actions">
         <button @click="handleSidebarNav({ view: 'notifications' }); isMobileMenuOpen = false" class="notif-btn" :class="{ active: activeView === 'notifications' }">
-          <Bell class="icon-small" />
+          <div class="notif-icon-wrapper">
+            <Bell class="icon-small" />
+            <span v-if="unreadNotifCount > 0" class="notif-badge">{{ unreadNotifCount }}</span>
+          </div>
         </button>
         <button @click="toggleMenu" class="menu-btn">
           <Menu v-if="!isMobileMenuOpen" class="icon-small" />
@@ -260,6 +278,9 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
           <Presentations ref="presentationsRef" :searchQuery="presSearchQuery" :sortBy="presSortBy"
             :viewMode="presViewMode" :selectedCategories="presSelectedCategories" :status="presStatus"
             @update:view-mode="presViewMode = $event" />
+        </template>
+        <template v-else-if="activeView === 'notifications'">
+          <Notifications :notifications="notifications" @mark-as-read="handleMarkAsRead" />
         </template>
         <template v-else>
           <div class="placeholder-view">
@@ -492,6 +513,33 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
   .notif-btn.active {
     color: var(--brand-primary);
     background: var(--brand-primary-light);
+  }
+
+  .notif-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: var(--brand-primary);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(225, 29, 46, 0.3);
   }
 
   .mobile-overlay {
