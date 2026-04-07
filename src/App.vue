@@ -8,7 +8,7 @@ import Presentations from './modules/presentations/Presentations.vue';
 import PresentationFilter from './modules/presentations/components/PresentationFilter.vue';
 import { presentationCategories } from './modules/presentations/data/categories';
 import { mockMemos } from './data/mockData';
-import { Menu, X, Plus } from 'lucide-vue-next';
+import { Menu, X, Plus, Bell } from 'lucide-vue-next';
 
 const memoListRef = ref(null);
 const presentationsRef = ref(null);
@@ -196,10 +196,15 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     <!-- Mobile Header -->
     <header class="mobile-header">
       <div class="mobile-logo" @click="activeView = 'dashboard'" style="cursor: pointer;">KBRU</div>
-      <button @click="toggleMenu" class="menu-btn">
-        <Menu v-if="!isMobileMenuOpen" class="icon-small" />
-        <X v-else class="icon-small" />
-      </button>
+      <div class="mobile-actions">
+        <button @click="handleSidebarNav({ view: 'notifications' }); isMobileMenuOpen = false" class="notif-btn" :class="{ active: activeView === 'notifications' }">
+          <Bell class="icon-small" />
+        </button>
+        <button @click="toggleMenu" class="menu-btn">
+          <Menu v-if="!isMobileMenuOpen" class="icon-small" />
+          <X v-else class="icon-small" />
+        </button>
+      </div>
     </header>
 
     <!-- Sidebar -->
@@ -464,11 +469,29 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
     color: var(--brand-primary);
   }
 
-  .menu-btn {
+  .mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .menu-btn,
+  .notif-btn {
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-main);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+
+  .notif-btn.active {
+    color: var(--brand-primary);
+    background: var(--brand-primary-light);
   }
 
   .mobile-overlay {
